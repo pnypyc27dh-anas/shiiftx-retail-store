@@ -409,3 +409,56 @@ function toggleRetailTheme() {
     const isDark = document.documentElement.classList.toggle('dark');
     localStorage.setItem('retail_theme', isDark ? 'dark' : 'light');
 }
+
+window.openLegalModal = function(section) {
+    const titles = {
+        impressum: "بيانات التاجر والإشعار القانوني (Impressum)",
+        privacy: "سياسة الخصوصية وحماية البيانات (GDPR)",
+        terms: "شروط الاستخدام وحق العدول الأوروبي (AGB)",
+        refund: "سياسة الاسترجاع والاستبدال الرقمي"
+    };
+    document.getElementById("legal-modal-title").textContent = titles[section] || "معلومات قانونية";
+    document.querySelectorAll(".legal-doc-section").forEach(el => {
+        el.classList.toggle("hidden", el.id !== "legal-doc-" + section);
+    });
+    document.getElementById("legal-modal").classList.remove("hidden");
+};
+
+window.acceptEuCookies = function(level) {
+    localStorage.setItem("shiiftx_eu_consent", level);
+    const banner = document.getElementById("eu-cookie-banner");
+    if (banner) banner.classList.add("hidden");
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("shiiftx_eu_consent")) {
+        const banner = document.getElementById("eu-cookie-banner");
+        if (banner) banner.classList.remove("hidden");
+    }
+});
+
+window.deleteMyRetailAccount = async function() {
+    if (!currentUser || !currentSession) return;
+    const confirmed = confirm("تحذير نهائي: سيتم حذف حسابك وبياناتك الشخصية نهائياً ولا يمكن التراجع عن هذه الخطوة. هل تريد المتابعة؟");
+    if (!confirmed) return;
+
+    try {
+        const res = await fetch("/api/delete-account", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + currentSession.access_token
+            }
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            alert(data.error || "تعذر حذف الحساب حالياً");
+            return;
+        }
+        await retailSupabase.auth.signOut();
+        window.closeModal("orders-modal");
+        alert("تم حذف حسابك وبياناتك بنجاح وفق لائحة GDPR.");
+    } catch (err) {
+        alert("خطأ في الاتصال بالخادم: " + err.message);
+    }
+};
