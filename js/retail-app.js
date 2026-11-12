@@ -159,6 +159,7 @@ function openBuyModal(catalogId) {
 
     const item = catalogItems.find(i => i.id === catalogId);
     if (!item) return;
+    document.getElementById("eu-withdrawal-waiver").checked = false;
 
     document.getElementById('buy-catalog-id').value = item.id;
     document.getElementById('buy-product-type').value = item.product_type;
@@ -189,6 +190,11 @@ async function executeRetailPurchase() {
         alert('يرجى إدخال معرّف اللاعب (Player ID) لإتمام الشحن');
         return;
     }
+    const waiverChecked = document.getElementById("eu-withdrawal-waiver")?.checked;
+if (!waiverChecked) {
+    alert("يرجى الموافقة على شرط التنفيذ الفوري والتنازل عن حق العدول الأوروبي قبل إتمام الدفع.");
+    return;
+}
 
     btn.disabled = true;
     btn.innerHTML = `<span>جاري تنفيذ الطلب...</span>`;
