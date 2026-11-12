@@ -225,8 +225,78 @@
                     </tbody>
                 </table>
             </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+  <span class="text-[11px] text-slate-500 dark:text-slate-400">
+    يحق لك حذف حسابك وبياناتك الشخصية نهائياً في أي وقت وفق لائحة حماية البيانات الأوروبية (GDPR).
+  </span>
+  <button type="button" onclick="deleteMyRetailAccount()" class="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-500/20 text-xs font-bold flex items-center gap-1.5 transition shrink-0">
+    <i class="ph-bold ph-trash text-sm"></i>
+    <span>حذف حسابي نهائياً</span>
+  </button>
+</div>
         </div>
     </div>
+    <footer class="mt-16 border-t border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 py-8 px-4 text-xs text-slate-500 dark:text-slate-400">
+  <div class="max-w-6xl mx-auto space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div class="font-bold text-slate-800 dark:text-slate-200">
+        SHIIFT X — متجر البطاقات والاشتراكات الرقمية (مسجل في النمسا — الاتحاد الأوروبي)
+      </div>
+      <div class="flex flex-wrap items-center gap-4 font-bold text-indigo-600 dark:text-indigo-400">
+        <button type="button" onclick="openLegalModal('impressum')" class="hover:underline">بيانات التاجر (Impressum)</button>
+        <button type="button" onclick="openLegalModal('terms')" class="hover:underline">شروط الاستخدام وحق العدول</button>
+        <button type="button" onclick="openLegalModal('privacy')" class="hover:underline">سياسة الخصوصية (GDPR)</button>
+        <button type="button" onclick="openLegalModal('refund')" class="hover:underline">سياسة الاسترجاع</button>
+      </div>
+    </div>
+    <p class="text-[11px] leading-relaxed text-slate-400">
+      جميع الأسعار المعروضة نهائية وشاملة للضرائب المطبقة. جميع أسماء الألعاب والمنصات والعلامات التجارية المذكورة هي ملك لأصحابها الأصليين؛ يعمل متجر SHIIFT X كموزع مستقل للبطاقات الرقمية ولا يتبع رسمياً لأي ناشر ألعاب. للدعم الرسمي: <span dir="ltr" class="font-mono text-slate-500">support@shiiftx.com</span>
+    </p>
+  </div>
+</footer>
+
+<div id="legal-modal" class="hidden fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <h3 id="legal-modal-title" class="text-sm font-black text-slate-900 dark:text-white">معلومات قانونية</h3>
+      <button type="button" onclick="closeModal('legal-modal')" class="text-slate-400 hover:text-rose-500 font-bold text-lg px-2">✕</button>
+    </div>
+    <div class="p-5 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+      <div id="legal-doc-impressum" class="legal-doc-section hidden space-y-2">
+        <p class="font-black text-slate-900 dark:text-white">الإشعار القانوني وفق المادة 5 من قانون التجارة الإلكترونية النمساوي (ECG § 5):</p>
+        <p>• <strong>الكيان التجاري:</strong> SHIIFT X — مؤسسة فردية مسجلة في جمهورية النمسا (إدارة: أنس).</p>
+        <p>• <strong>البريد الإلكتروني الرسمي:</strong> <span dir="ltr" class="font-mono">support@shiiftx.com</span> / <span dir="ltr" class="font-mono">info@shiiftx.com</span></p>
+        <p>• <strong>النشاط التجاري:</strong> التجارة الإلكترونية وتوزيع البطاقات الرقمية ورموز الاشتراكات مسبقة الدفع.</p>
+        <p>• <strong>تسوية النزاعات الأوروبية:</strong> يحق للمستهلكين في الاتحاد الأوروبي اللجوء إلى هيئات تسوية المنازعات البديلة المعتمدة في النمسا (Internet Ombudsstelle).</p>
+      </div>
+      <div id="legal-doc-terms" class="legal-doc-section hidden space-y-2">
+        <p class="font-black text-slate-900 dark:text-white">الشروط العامة للبيع وحق العدول الأوروبي (AGB & Widerrufsrecht):</p>
+        <p>• يتم تسليم الأكواد الرقمية فوراً داخل حساب المستخدم، بينما تُنفذ طلبات الشحن المباشر بالمعرّف (ID) إلكترونياً خلال دقائق.</p>
+        <p>• وفق المادة 16(m) من توجيه حقوق المستهلك الأوروبي (2011/83/EU)، يسقط حق العدول البالغ 14 يوماً بمجرد موافقة المشتري الصريحة على التنفيذ الفوري وكشف الكود الرقمي أو بدء شحن الحساب.</p>
+      </div>
+      <div id="legal-doc-privacy" class="legal-doc-section hidden space-y-2">
+        <p class="font-black text-slate-900 dark:text-white">سياسة حماية البيانات وفق اللائحة الأوروبية العامة (GDPR / DSGVO):</p>
+        <p>• تُعالج البيانات (البريد الإلكتروني، الاسم، سجل الطلبات، ومعرّف اللاعب) حصرياً لتنفيذ العقود وتوثيق المعاملات المالية وفق المادة 6(1)(b) من اللائحة.</p>
+        <p>• تُستضاف قاعدة البيانات داخل خوادم الاتحاد الأوروبي (منطقة فرانكفورت — ألمانيا) مع تشفير كامل للاتصالات.</p>
+        <p>• يحق للمستخدم الوصول لبياناته، تصحيحها، أو حذف حسابه نهائياً في أي وقت من خلال زر حذف الحساب داخل لوحة حسابه.</p>
+      </div>
+      <div id="legal-doc-refund" class="legal-doc-section hidden space-y-2">
+        <p class="font-black text-slate-900 dark:text-white">سياسة الاسترجاع والاستبدال:</p>
+        <p>• <strong>الأكواد الرقمية الفورية:</strong> نظراً لطبيعتها الرقمية غير القابلة للإلغاء بعد الكشف، لا يمكن استرجاع أو استبدال الأكواد المسلمة والصالحة للاستخدام.</p>
+        <p>• <strong>طلبات الشحن المباشر (ID):</strong> في حال تعذر تنفيذ الشحن أو رفضه بسبب خطأ في المعرّف أو الصيانة، يُعاد كامل المبلغ تلقائياً إلى رصيد محفظة العميل.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="eu-cookie-banner" class="hidden fixed bottom-4 inset-x-4 z-50 max-w-3xl mx-auto bg-slate-900 text-white border border-slate-700 rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+  <p class="leading-relaxed text-slate-300">
+    يستخدم هذا المتجر التخزين المحلي الأساسي فقط لحفظ جلسة الدخول وتفضيل المظهر، ولا يستخدم ملفات تتبع إعلانية، وذلك التزاماً بلائحة حماية البيانات الأوروبية (GDPR).
+  </p>
+  <div class="flex items-center gap-2 shrink-0">
+    <button type="button" onclick="acceptEuCookies('essential')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold">موافق</button>
+  </div>
+</div>
 
     <script src="js/retail-app.js"></script>
 </body>
