@@ -359,3 +359,13 @@ window.handleRetailAuthSubmit = async function(e) {
 
 window.handleRetailLogout = async function() {
     await retailSupabase.auth.signOut();
+};
+
+window.closeModal = function(id) {
+    document.getElementById(id).classList.add("hidden");
+};
+
+window.toggleRetailTheme = function() {
+    const isDark = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("retail_theme", isDark ? "dark" : "light");
+};
