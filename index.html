@@ -152,6 +152,18 @@
                     <p class="text-[10px] text-slate-400">تأكد من صحة المعرّف؛ يتم تنفيذ الشحن مباشرة على الحساب المدخل.</p>
                 </div>
 
+                <label class="flex items-start gap-2.5 p-3 rounded-xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 cursor-pointer text-right">
+  <input type="checkbox" id="eu-withdrawal-waiver" class="mt-1 rounded border-slate-400 text-indigo-600 focus:ring-indigo-500">
+  <span class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+    أوافق على التنفيذ الفوري للطلب وتسليم الكود الرقمي أو بدء الشحن المباشر قبل انقضاء مهلة الـ 14 يوماً القانونية، وأُقرّ بفقدان حق العدول الأوروبي بمجرد بدء التنفيذ وفق المادة 16(m) من توجيه حقوق المستهلك الأوروبي.
+  </span>
+</label>
+
+<button type="button" id="btn-confirm-purchase" onclick="executeRetailPurchase()" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black flex items-center justify-center gap-2 transition shadow-sm">
+  <i class="ph-bold ph-check-circle text-base"></i>
+  <span>شراء وتأكيد الدفع الملزم</span>
+</button>
+
                 <button onclick="executeRetailPurchase()" id="btn-confirm-purchase" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black transition flex items-center justify-center gap-2">
                     <i class="ph-bold ph-check-circle text-base"></i>
                     <span>تأكيد الدفع من المحفظة</span>
