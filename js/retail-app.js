@@ -1,5 +1,5 @@
 const RETAIL_SUPABASE_URL = "https://qavdmizccaltsggwrdkk.supabase.co";
-const RETAIL_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdmRtaXpjY2FsdHNnZ3dyZGtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0NDUzMTgsImV4cCI6MjExMDAyMTMxOH0.RUqkSQggtLrpfFGcr8Y2RUyD6RoJLqzKD3CVc5fo4KI";
+const RETAIL_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdmRtaXpjY2FsdHNnZ3dyZGtrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5NDQ0NTMxOCwiZXhwIjoyMTEwMDIxMzE4fQ.rPu37w2SV5_hnURIE_SSBh7RdQSegcY4UF8r9-sP3bI";
 
 const retailSupabase = window.supabase.createClient(RETAIL_SUPABASE_URL, RETAIL_ANON_KEY);
 
@@ -9,14 +9,9 @@ let catalogItems = [];
 
 function escapeHTML(str) {
     if (!str) return "";
-    const sq = new RegExp(String.fromCharCode(39), "g");
-    const dq = new RegExp(String.fromCharCode(34), "g");
-    return String(str)
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(dq, """)
-        .replace(sq, "&#" + "039;");
+    const div = document.createElement("div");
+    div.textContent = String(str);
+    return div.innerHTML;
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -97,10 +92,10 @@ function renderPlatformPills() {
     const activeCls = "filter-pill px-4 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 whitespace-nowrap transition";
     const idleCls = "filter-pill px-4 py-2 rounded-xl bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 whitespace-nowrap transition";
 
-    let html = '<button type="button" onclick="filterRetailCatalog(\'ALL\')" data-platform="ALL" class="' + activeCls + '">جميع الباقات</button>';
+    let html = '<button type="button" onclick="filterRetailCatalog(this.dataset.platform)" data-platform="ALL" class="' + activeCls + '">جميع الباقات</button>';
     platforms.forEach(pl => {
         const safePl = escapeHTML(pl);
-        html += '<button type="button" onclick="filterRetailCatalog(this.getAttribute(\'data-platform\'))" data-platform="' + safePl + '" class="' + idleCls + '">' + safePl + '</button>';
+        html += '<button type="button" onclick="filterRetailCatalog(this.dataset.platform)" data-platform="' + safePl + '" class="' + idleCls + '">' + safePl + '</button>';
     });
     container.innerHTML = html;
 }
@@ -110,7 +105,7 @@ window.filterRetailCatalog = function(platform) {
     const idleCls = "filter-pill px-4 py-2 rounded-xl bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 whitespace-nowrap transition";
 
     document.querySelectorAll(".filter-pill").forEach(btn => {
-        btn.className = btn.getAttribute("data-platform") === platform ? activeCls : idleCls;
+        btn.className = btn.dataset.platform === platform ? activeCls : idleCls;
     });
     renderCatalogGrid(platform);
 };
@@ -143,7 +138,7 @@ function renderCatalogGrid(platform) {
             '<span class="text-[10px] text-slate-400 block">السعر</span>' +
             '<span class="font-mono font-black text-base text-emerald-600 dark:text-emerald-400" dir="ltr">$' + Number(item.retail_price).toFixed(2) + '</span>' +
             '</div>' +
-            '<button type="button" onclick="openBuyModal(\'' + safeId + '\')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-sm">شراء الآن</button>' +
+            '<button type="button" data-id="' + safeId + '" onclick="openBuyModal(this.dataset.id)" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-sm">شراء الآن</button>' +
             '</div>' +
             '</div>';
     }).join("");
@@ -270,7 +265,7 @@ async function loadUserOrdersHistory() {
         const safeRef = escapeHTML(o.local_order_ref);
         let statusHtml = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">مكتمل ✓</span>';
         if (o.status === "pending") {
-            statusHtml = '<div class="flex flex-col items-center gap-1"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400">قيد التنفيذ</span><button type="button" onclick="syncPendingOrder(\'' + safeRef + '\')" class="text-[10px] text-indigo-500 hover:underline font-bold">تحديث الحالة</button></div>';
+            statusHtml = '<div class="flex flex-col items-center gap-1"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400">قيد التنفيذ</span><button type="button" data-ref="' + safeRef + '" onclick="syncPendingOrder(this.dataset.ref)" class="text-[10px] text-indigo-500 hover:underline font-bold">تحديث الحالة</button></div>';
         } else if (o.status === "rejected") {
             const reasonHtml = o.rejection_reason ? '<div class="text-[9px] text-rose-400 mt-0.5">' + escapeHTML(o.rejection_reason) + '</div>' : '';
             statusHtml = '<div class="text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600">مرفوض (مسترجع)</span>' + reasonHtml + '</div>';
@@ -364,13 +359,3 @@ window.handleRetailAuthSubmit = async function(e) {
 
 window.handleRetailLogout = async function() {
     await retailSupabase.auth.signOut();
-};
-
-window.closeModal = function(id) {
-    document.getElementById(id).classList.add("hidden");
-};
-
-window.toggleRetailTheme = function() {
-    const isDark = document.documentElement.classList.toggle("dark");
-    localStorage.setItem("retail_theme", isDark ? "dark" : "light");
-};
