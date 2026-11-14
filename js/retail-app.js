@@ -2,7 +2,7 @@
 // إعدادات مشروع Supabase المستقل لمتجر التجزئة
 // =========================================================================
 const RETAIL_SUPABASE_URL = 'https://qavdmizccaltsggwrdkk.supabase.co';
-const RETAIL_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdmRtaXpjY2FsdHNnZ3dyZGtrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5NDQ0NTMxOCwiZXhwIjoyMTEwMDIxMzE4fQ.rPu37w2SV5_hnURIE_SSBh7RdQSegcY4UF8r9-sP3bI';
+const RETAIL_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdmRtaXpjY2FsdHNnZ3dyZGtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0NDUzMTgsImV4cCI6MjExMDAyMTMxOH0.RUqkSQggtLrpfFGcr8Y2RUyD6RoJLqzKD3CVc5fo4KI';
 
 const retailSupabase = window.supabase.createClient(RETAIL_SUPABASE_URL, RETAIL_ANON_KEY);
 
