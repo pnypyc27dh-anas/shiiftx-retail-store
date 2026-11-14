@@ -174,6 +174,100 @@
             </button>
         </div>
 
+            <!-- نافذة تعليمات الشحن وملاحظات الباقة -->
+<div id="package-details-modal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-[95] flex items-center justify-center p-4" onclick="closePackageDetailsModal()">
+  <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-lg w-full overflow-hidden shadow-2xl text-right" onclick="event.stopPropagation()">
+    
+    <!-- صورة الباقة في أعلى النافذة -->
+    <div class="relative w-full h-52 bg-slate-900 overflow-hidden">
+      <img id="pkg-detail-img" src="" alt="" class="w-full h-full object-cover object-center">
+      <div id="pkg-detail-fallback" class="hidden w-full h-full bg-gradient-to-br from-[#0b1120] via-[#132238] to-[#005ba3] flex items-center justify-center">
+        <i class="ph-duotone ph-credit-card text-6xl text-[#5CE1E6]"></i>
+      </div>
+      <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 to-transparent"></div>
+      <button type="button" onclick="closePackageDetailsModal()" class="btn-spring absolute top-4 left-4 w-9 h-9 rounded-full bg-slate-950/70 hover:bg-rose-600 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
+        <i class="ph-bold ph-x text-base"></i>
+      </button>
+      <span id="pkg-detail-platform" class="absolute bottom-3.5 right-5 px-3 py-1 rounded-full bg-[#005ba3] text-white text-[11px] font-black shadow">---</span>
+    </div>
+
+    <!-- تفاصيل وتعليمات الباقة -->
+    <div class="p-6 space-y-4">
+      <div>
+        <h3 id="pkg-detail-title" class="text-lg font-black text-slate-900 dark:text-white leading-snug">---</h3>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2 max-h-52 overflow-y-auto">
+        <div class="text-xs font-black text-[#005ba3] dark:text-[#5CE1E6] flex items-center gap-1.5">
+          <i class="ph-fill ph-info text-base"></i>
+          <span>تعليمات الشحن وملاحظات الباقة:</span>
+        </div>
+        <p id="pkg-detail-instructions" class="text-xs leading-relaxed text-slate-600 dark:text-slate-300 whitespace-pre-line">
+          ---
+        </p>
+      </div>
+
+      <!-- السعر وزر المتابعة للشراء -->
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
+        <div>
+          <span class="block text-[10px] font-bold text-slate-400">السعر النهائي</span>
+          <span id="pkg-detail-price" class="financial-amount text-2xl font-black text-slate-900 dark:text-white" dir="ltr">$0.00</span>
+        </div>
+        <button type="button" id="pkg-detail-buy-btn" data-id="" onclick="handleCardDirectBuy(this.dataset.id)" class="btn-glow-sheen btn-primary px-6 py-3.5 rounded-2xl text-white text-xs font-black flex items-center gap-2 cursor-pointer">
+          <i class="ph-fill ph-shopping-cart text-base"></i>
+          <span>المتابعة للشراء</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <!-- نافذة تسجيل الدخول وإنشاء الحساب -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3.5">
+                <h3 id="auth-modal-title" class="text-sm font-black text-slate-900 dark:text-white">تسجيل الدخول إلى حسابك</h3>
+                <button onclick="closeModal('auth-modal')" class="btn-spring w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center"><i class="ph-bold ph-x text-base"></i></button>
+            </div>
+
+            <form id="auth-form" onsubmit="handleRetailAuthSubmit(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="auth-mode" value="login">
+                <div id="auth-name-group" class="hidden">
+                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">الاسم الكامل</label>
+                    <input id="auth-fullname" type="text" placeholder="أدخل اسمك" class="input-field w-full px-4 py-3">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">البريد الإلكتروني</label>
+                    <input id="auth-email" type="email" required placeholder="name@example.com" dir="ltr" class="input-field w-full px-4 py-3 text-left">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">كلمة المرور</label>
+                    <input id="auth-password" type="password" required minlength="6" placeholder="••••••••" dir="ltr" class="input-field w-full px-4 py-3 text-left">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="w-full btn-primary text-white font-black py-3.5 rounded-xl text-xs cursor-pointer">
+                    دخول
+                </button>
+            </form>
+
+            <div class="text-center text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <span id="auth-switch-text">ليس لديك حساب؟</span>
+                <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-[#005ba3] dark:text-[#5CE1E6] font-bold hover:underline mr-1 cursor-pointer">إنشاء حساب جديد</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إتمام الشراء وعرض الكود -->
+    <div id="buy-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3.5">
+                <h3 class="text-sm font-black flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i class="ph-fill ph-shopping-cart text-[#005ba3] dark:text-[#5CE1E6] text-lg"></i>
+                    <span>تأكيد عملية الشراء</span>
+                </h3>
+                <button onclick="closeModal('buy-modal')" class="btn-spring w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center"><i class="ph-bold ph-x text-base"></i></button>
+            </div>
+
         <!-- شبكة عرض الباقات -->
         <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <div class="col-span-full py-14 text-center text-slate-400 text-xs font-bold">جاري تحميل الباقات المتوفرة...</div>
@@ -335,99 +429,7 @@
     </footer>
 
     
-    <!-- نافذة تعليمات الشحن وملاحظات الباقة -->
-<div id="package-details-modal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-[95] flex items-center justify-center p-4" onclick="closePackageDetailsModal()">
-  <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-lg w-full overflow-hidden shadow-2xl text-right" onclick="event.stopPropagation()">
-    
-    <!-- صورة الباقة في أعلى النافذة -->
-    <div class="relative w-full h-52 bg-slate-900 overflow-hidden">
-      <img id="pkg-detail-img" src="" alt="" class="w-full h-full object-cover object-center">
-      <div id="pkg-detail-fallback" class="hidden w-full h-full bg-gradient-to-br from-[#0b1120] via-[#132238] to-[#005ba3] flex items-center justify-center">
-        <i class="ph-duotone ph-credit-card text-6xl text-[#5CE1E6]"></i>
-      </div>
-      <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 to-transparent"></div>
-      <button type="button" onclick="closePackageDetailsModal()" class="btn-spring absolute top-4 left-4 w-9 h-9 rounded-full bg-slate-950/70 hover:bg-rose-600 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
-        <i class="ph-bold ph-x text-base"></i>
-      </button>
-      <span id="pkg-detail-platform" class="absolute bottom-3.5 right-5 px-3 py-1 rounded-full bg-[#005ba3] text-white text-[11px] font-black shadow">---</span>
-    </div>
 
-    <!-- تفاصيل وتعليمات الباقة -->
-    <div class="p-6 space-y-4">
-      <div>
-        <h3 id="pkg-detail-title" class="text-lg font-black text-slate-900 dark:text-white leading-snug">---</h3>
-      </div>
-
-      <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2 max-h-52 overflow-y-auto">
-        <div class="text-xs font-black text-[#005ba3] dark:text-[#5CE1E6] flex items-center gap-1.5">
-          <i class="ph-fill ph-info text-base"></i>
-          <span>تعليمات الشحن وملاحظات الباقة:</span>
-        </div>
-        <p id="pkg-detail-instructions" class="text-xs leading-relaxed text-slate-600 dark:text-slate-300 whitespace-pre-line">
-          ---
-        </p>
-      </div>
-
-      <!-- السعر وزر المتابعة للشراء -->
-      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
-        <div>
-          <span class="block text-[10px] font-bold text-slate-400">السعر النهائي</span>
-          <span id="pkg-detail-price" class="financial-amount text-2xl font-black text-slate-900 dark:text-white" dir="ltr">$0.00</span>
-        </div>
-        <button type="button" id="pkg-detail-buy-btn" data-id="" onclick="handleCardDirectBuy(this.dataset.id)" class="btn-glow-sheen btn-primary px-6 py-3.5 rounded-2xl text-white text-xs font-black flex items-center gap-2 cursor-pointer">
-          <i class="ph-fill ph-shopping-cart text-base"></i>
-          <span>المتابعة للشراء</span>
-        </button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-    <!-- نافذة تسجيل الدخول وإنشاء الحساب -->
-    <div id="auth-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-md w-full p-6 space-y-5 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3.5">
-                <h3 id="auth-modal-title" class="text-sm font-black text-slate-900 dark:text-white">تسجيل الدخول إلى حسابك</h3>
-                <button onclick="closeModal('auth-modal')" class="btn-spring w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center"><i class="ph-bold ph-x text-base"></i></button>
-            </div>
-
-            <form id="auth-form" onsubmit="handleRetailAuthSubmit(event)" class="space-y-4 text-xs">
-                <input type="hidden" id="auth-mode" value="login">
-                <div id="auth-name-group" class="hidden">
-                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">الاسم الكامل</label>
-                    <input id="auth-fullname" type="text" placeholder="أدخل اسمك" class="input-field w-full px-4 py-3">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">البريد الإلكتروني</label>
-                    <input id="auth-email" type="email" required placeholder="name@example.com" dir="ltr" class="input-field w-full px-4 py-3 text-left">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">كلمة المرور</label>
-                    <input id="auth-password" type="password" required minlength="6" placeholder="••••••••" dir="ltr" class="input-field w-full px-4 py-3 text-left">
-                </div>
-                <button type="submit" id="auth-submit-btn" class="w-full btn-primary text-white font-black py-3.5 rounded-xl text-xs cursor-pointer">
-                    دخول
-                </button>
-            </form>
-
-            <div class="text-center text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <span id="auth-switch-text">ليس لديك حساب؟</span>
-                <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-[#005ba3] dark:text-[#5CE1E6] font-bold hover:underline mr-1 cursor-pointer">إنشاء حساب جديد</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- نافذة إتمام الشراء وعرض الكود -->
-    <div id="buy-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-md w-full p-6 space-y-5 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3.5">
-                <h3 class="text-sm font-black flex items-center gap-2 text-slate-900 dark:text-white">
-                    <i class="ph-fill ph-shopping-cart text-[#005ba3] dark:text-[#5CE1E6] text-lg"></i>
-                    <span>تأكيد عملية الشراء</span>
-                </h3>
-                <button onclick="closeModal('buy-modal')" class="btn-spring w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center"><i class="ph-bold ph-x text-base"></i></button>
-            </div>
 
     <script src="js/retail-app.js"></script>
 </body>
