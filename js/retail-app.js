@@ -462,3 +462,169 @@ window.deleteMyRetailAccount = async function() {
         alert("خطأ في الاتصال بالخادم: " + err.message);
     }
 };
+
+
+// 1. محوّل ذكي لروابط Imgur (يحوّل رابط الصفحة إلى رابط صورة مباشر تلقائياً)
+function resolveCardImageUrl(rawUrl) {
+    if (!rawUrl || typeof rawUrl !== "string") return "";
+    const clean = rawUrl.trim();
+    const pageMatch = clean.match(/^https?:\/\/(?:www\.)?imgur\.com\/([a-zA-Z0-9]{5,10})(?:\.[a-zA-Z]+)?$/i);
+    if (pageMatch && pageMatch[1]) {
+        return "https://i.imgur.com/" + pageMatch[1] + ".png";
+    }
+    return clean;
+}
+
+function escapeCardHTML(str) {
+    if (!str) return "";
+    const div = document.createElement("div");
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+
+// 2. رسم البطاقات الكبيرة (65% صورة وفراغ بصري علوي + 35% معلومات وزر شراء)
+function renderLargeProductCards(items, containerId) {
+    const grid = document.getElementById(containerId);
+    if (!grid) return;
+
+    if (!items || items.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-16 text-center text-slate-400 text-sm font-bold">لا توجد باقات متوفرة في هذا القسم حالياً.</div>';
+        return;
+    }
+
+    window._renderedCatalogMap = {};
+    items.forEach(item => {
+        window._renderedCatalogMap[String(item.id)] = item;
+    });
+
+    grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6";
+
+    grid.innerHTML = items.map(item => {
+        const safeId = escapeCardHTML(item.id);
+        const platform = escapeCardHTML(item.platform || "بطاقة رقمية");
+        const pkgName = escapeCardHTML(item.package_name || item.name || "باقة شحن");
+        const price = Number(item.retail_price ?? item.price ?? 0).toFixed(2);
+        const isDirectId = (item.product_type === "DIRECT_ID" || item.type === "DIRECT_ID" || item.delivery_type === "ID");
+        const badgeText = isDirectId ? "شحن مباشر (ID)" : "كود فوري";
+        const badgeClass = isDirectId
+            ? "bg-amber-500/95 text-slate-950"
+            : "bg-emerald-500/95 text-slate-950";
+
+        const imgUrl = resolveCardImageUrl(item.image_url);
+        const hasInstructions = Boolean(item.instructions && item.instructions.trim());
+
+        const visualBlock = imgUrl
+            ? '<img src="' + escapeCardHTML(imgUrl) + '" alt="' + pkgName + '" loading="lazy" ' +
+              'onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" ' +
+              'class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">' +
+              '<div style="display:none;" class="w-full h-full bg-gradient-to-br from-[#0b1120] via-[#132238] to-[#005ba3] items-center justify-center p-6">' +
+              '<i class="ph-duotone ph-gift text-5xl text-[#5CE1E6]/80"></i>' +
+              '</div>'
+            : '<div class="w-full h-full bg-gradient-to-br from-[#0b1120] via-[#132238] to-[#005ba3] flex flex-col items-center justify-center p-6 text-center">' +
+              '<i class="ph-duotone ph-credit-card text-5xl text-[#5CE1E6]/80 mb-2"></i>' +
+              '<span class="text-xs font-extrabold text-white/80 tracking-wide">' + platform + '</span>' +
+              '</div>';
+
+        return (
+            '<article data-id="' + safeId + '" onclick="openPackageDetailsModal(this.dataset.id)" ' +
+            'class="group cursor-pointer rounded-[28px] overflow-hidden bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-12px_rgba(0,91,163,0.25)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col">' +
+
+                '<div class="relative w-full aspect-[16/11] min-h-[215px] bg-slate-900 overflow-hidden">' +
+                    visualBlock +
+                    '<div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none"></div>' +
+
+                    '<span class="absolute top-3.5 right-3.5 px-3 py-1 rounded-full text-[11px] font-black shadow-md backdrop-blur-md ' + badgeClass + '">' +
+                        badgeText +
+                    '</span>' +
+
+                    '<button type="button" data-id="' + safeId + '" onclick="event.stopPropagation(); openPackageDetailsModal(this.dataset.id);" ' +
+                    'class="absolute top-3.5 left-3.5 w-9 h-9 rounded-full bg-slate-950/65 hover:bg-[#005ba3] text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition shadow-md" title="تعليمات وملاحظات الباقة">' +
+                        '<i class="ph-bold ' + (hasInstructions ? 'ph-info text-[#5CE1E6]' : 'ph-eye') + ' text-base"></i>' +
+                    '</button>' +
+
+                    '<span class="absolute bottom-3 right-4 text-[11px] font-extrabold text-white/95 tracking-wide">' +
+                        platform +
+                    '</span>' +
+                '</div>' +
+
+                '<div class="p-5 flex-1 flex flex-col justify-between gap-4">' +
+                    '<div class="space-y-1">' +
+                        '<h3 class="text-base font-black text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-[#005ba3] dark:group-hover:text-[#5CE1E6] transition-colors">' +
+                            pkgName +
+                        '</h3>' +
+                        '<p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">' +
+                            '<i class="ph-bold ph-book-open-text text-[#005ba3] dark:text-[#5CE1E6]"></i>' +
+                            '<span>انقر لعرض تعليمات الشحن وملاحظات الباقة</span>' +
+                        '</p>' +
+                    '</div>' +
+
+                    '<div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">' +
+                        '<div>' +
+                            '<span class="block text-[10px] font-bold text-slate-400">السعر النهائي</span>' +
+                            '<span class="financial-amount text-xl font-black text-slate-900 dark:text-white" dir="ltr">$' + price + '</span>' +
+                        '</div>' +
+
+                        '<button type="button" data-id="' + safeId + '" onclick="event.stopPropagation(); handleCardDirectBuy(this.dataset.id);" ' +
+                        'class="btn-primary px-5 py-3 rounded-2xl text-white text-xs font-black flex items-center gap-2 shrink-0 cursor-pointer">' +
+                            '<i class="ph-bold ph-shopping-cart-simple text-base"></i>' +
+                            '<span>شراء الآن</span>' +
+                        '</button>' +
+                    '</div>' +
+                '</div>' +
+
+            '</article>'
+        );
+    }).join("");
+}
+
+// 3. فتح نافذة تعليمات وملاحظات الباقة
+window.openPackageDetailsModal = function(itemId) {
+    const item = window._renderedCatalogMap ? window._renderedCatalogMap[String(itemId)] : null;
+    if (!item) return;
+
+    const modal = document.getElementById("package-details-modal");
+    if (!modal) return;
+
+    const imgEl = document.getElementById("pkg-detail-img");
+    const fallbackEl = document.getElementById("pkg-detail-fallback");
+    const imgUrl = resolveCardImageUrl(item.image_url);
+
+    if (imgUrl && imgEl) {
+        imgEl.src = imgUrl;
+        imgEl.classList.remove("hidden");
+        if (fallbackEl) fallbackEl.classList.add("hidden");
+    } else if (imgEl) {
+        imgEl.classList.add("hidden");
+        if (fallbackEl) fallbackEl.classList.remove("hidden");
+    }
+
+    document.getElementById("pkg-detail-platform").textContent = item.platform || "بطاقة رقمية";
+    document.getElementById("pkg-detail-title").textContent = item.package_name || item.name || "باقة شحن";
+    const priceVal = Number(item.retail_price ?? item.price ?? 0).toFixed(2);
+    document.getElementById("pkg-detail-price").textContent = "$" + priceVal;
+
+    const isDirectId = (item.product_type === "DIRECT_ID" || item.type === "DIRECT_ID" || item.delivery_type === "ID");
+    const defaultNote = isDirectId
+        ? "يتم شحن هذه الباقة مباشرة إلى معرّف اللاعب (Player ID) الخاص بك خلال دقائق. يرجى التأكد من كتابة المعرّف بدقة قبل تأكيد الطلب."
+        : "يتم تسليم الكود الرقمي فوراً داخل حسابك فور إتمام عملية الدفع. يرجى التأكد من توافق منطقة الحساب (Region) مع البطاقة قبل الشراء.";
+
+    document.getElementById("pkg-detail-instructions").textContent =
+        (item.instructions && item.instructions.trim()) ? item.instructions.trim() : defaultNote;
+
+    document.getElementById("pkg-detail-buy-btn").dataset.id = String(item.id);
+    modal.classList.remove("hidden");
+};
+
+window.closePackageDetailsModal = function() {
+    const modal = document.getElementById("package-details-modal");
+    if (modal) modal.classList.add("hidden");
+};
+
+window.handleCardDirectBuy = function(itemId) {
+    window.closePackageDetailsModal();
+    if (typeof window.openBuyModal === "function") {
+        window.openBuyModal(itemId);
+    } else if (typeof window.selectPlanForPurchase === "function") {
+        window.selectPlanForPurchase(itemId);
+    }
+};
