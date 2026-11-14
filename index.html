@@ -2,8 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر البطاقات الرقمية والشحن الفوري</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#005ba3">
+    <title>SHIIFT X — متجر البطاقات الرقمية والشحن الفوري</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' };
@@ -11,53 +13,146 @@
             document.documentElement.classList.add('dark');
         }
     </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
     <style>
-        body { font-family: 'Cairo', sans-serif; }
+        :root {
+            --primary: #005ba3;
+            --primary-glow: rgba(0, 91, 163, 0.3);
+            --bg-glass: rgba(255, 255, 255, 0.85);
+        }
+        body {
+            font-family: 'Tajawal', 'Plus Jakarta Sans', sans-serif;
+            background-color: #f4f7f9;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: #0f172a;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html.dark body {
+            background-color: #0b1120;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+            color: #f8fafc;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        html.dark ::-webkit-scrollbar-thumb { background: #334155; }
+
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+            border-radius: 28px;
+        }
+        html.dark .glass-panel {
+            background: rgba(15, 23, 42, 0.85) !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.45) !important;
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 16px !important;
+            transition: all 0.25s ease !important;
+        }
+        .input-field:focus {
+            border-color: var(--primary) !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(0, 91, 163, 0.1) !important;
+            outline: none;
+        }
+        html.dark .input-field {
+            background: rgba(15, 23, 42, 0.85) !important;
+            border-color: #334155 !important;
+            color: #ffffff !important;
+        }
+        html.dark .input-field:focus {
+            border-color: #5CE1E6 !important;
+            box-shadow: 0 0 0 4px rgba(92, 225, 230, 0.12) !important;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #005ba3 0%, #004a85 100%);
+            box-shadow: 0 8px 20px -6px var(--primary-glow);
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px -8px var(--primary-glow);
+        }
+        .btn-primary:active { transform: scale(0.96); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+        .btn-spring {
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease !important;
+        }
+        .btn-spring:active { transform: scale(0.94) !important; }
+
+        .btn-glow-sheen { position: relative; overflow: hidden; }
+        .btn-glow-sheen::after {
+            content: ""; position: absolute; top: -50%; left: -150%; width: 50%; height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transform: rotate(25deg);
+        }
+        .btn-glow-sheen:hover::after { left: 200%; transition: all 0.75s ease-in-out; }
+
+        .financial-amount {
+            font-family: 'Plus Jakarta Sans', monospace;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+        }
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors">
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-blue-200 selection:text-blue-900">
 
     <!-- الشريط العلوي -->
-    <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
+    <header class="bg-white/85 dark:bg-[#0b1120]/85 backdrop-blur-xl border-b border-slate-200/70 dark:border-white/10 sticky top-0 z-30 shadow-sm">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2.5">
-                <span class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg shadow-sm">
-                    <i class="ph-fill ph-lightning"></i>
+            <!-- شعار SHIIFT X الفيكتور الرسمي -->
+            <a href="/" class="flex items-center gap-3 select-none group">
+                <svg class="h-8 md:h-9 w-auto transition-transform duration-200 group-hover:scale-105" viewBox="70 100 405 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="fill-slate-900 dark:fill-white transition-colors" d="M102.584 151.616C106.853 151.616 110.767 152.034 114.324 152.871C117.871 153.706 121.098 154.808 124.002 156.179L124.289 156.315L124.185 156.615L121.162 165.332L121.035 165.698L120.682 165.538C118.039 164.34 115.144 163.327 111.994 162.501H111.992C108.929 161.679 105.721 161.268 102.368 161.268C99.163 161.268 96.5183 161.754 94.4189 162.708C92.3171 163.663 90.7558 165.014 89.7178 166.756L89.7148 166.762C88.6751 168.434 88.1484 170.405 88.1484 172.689C88.1485 175.36 88.6793 177.557 89.7178 179.3C90.758 181.046 92.4705 182.63 94.8828 184.044C97.3071 185.465 100.597 187.005 104.761 188.661H104.762C109.309 190.402 113.145 192.298 116.265 194.352L116.856 194.73C119.772 196.644 121.995 198.937 123.511 201.611H123.51C125.204 204.471 126.039 208.046 126.039 212.315C126.039 217.201 124.91 221.385 122.635 224.849L122.633 224.852C120.359 228.236 117.1 230.841 112.874 232.676L112.875 232.677C108.718 234.513 103.809 235.425 98.1582 235.425C95.2674 235.425 92.4834 235.273 89.8066 234.97L89.8047 234.969C87.2021 234.666 84.8129 234.248 82.6377 233.716L82.626 233.713C80.4497 233.104 78.5209 232.38 76.8418 231.537L76.6465 231.44V220.93L77.1494 221.164C79.7146 222.36 82.8951 223.447 86.6953 224.425H86.6943C90.5515 225.399 94.5164 225.886 98.5898 225.886C102.374 225.886 105.528 225.362 108.064 224.327C110.602 223.292 112.482 221.823 113.731 219.931C114.984 218.033 115.616 215.801 115.616 213.22C115.616 210.626 115.086 208.465 114.047 206.721C113.01 204.981 111.194 203.358 108.562 201.866L108.553 201.861C105.99 200.293 102.379 198.642 97.7109 196.909L97.707 196.907C94.3838 195.619 91.452 194.253 88.915 192.809L88.9043 192.803C86.4318 191.278 84.3524 189.557 82.6709 187.64C80.9858 185.719 79.7044 183.529 78.8262 181.073L78.8223 181.064V181.063C78.0167 178.605 77.6182 175.774 77.6182 172.575C77.6182 168.214 78.6769 164.48 80.8115 161.392C82.9379 158.24 85.8691 155.823 89.5928 154.138L89.5947 154.137C93.3894 152.453 97.7216 151.616 102.584 151.616ZM156.342 152.748V186.94H195.144V152.748H205.566V234.292H195.144V196.591H156.342V234.292H145.918V152.748H156.342Z"/>
+                    <path class="fill-slate-900 dark:fill-white transition-colors" d="M389.967 151.616V161.519H350.874V190.257H387.563V200.159H350.874V235.425H338.781V151.616H389.967ZM467.7 151.616V161.519H439.615V235.425H427.521V161.519H399.308V151.616H467.7Z"/>
+                    <path class="fill-[#005ba3] dark:fill-[#5CE1E6] drop-shadow-[0_0_8px_rgba(92,225,230,0.5)] transition-colors" d="M234.632 132.734L234.737 132.895L270.402 187.555L270.537 187.763L270.388 187.961L234.723 235.284L234.616 235.425H212.435L212.827 234.867L246.018 187.733L212.815 133.272L212.487 132.734H234.632ZM332.739 132.734L332.41 133.272L299.206 187.733L332.398 234.867L332.79 235.425H310.609L310.502 235.284L274.837 187.961L274.688 187.763L274.823 187.555L310.489 132.895L310.593 132.734H332.739ZM225.717 104.646C229.012 104.647 231.91 105.552 234.396 107.37C237.099 109.098 238.429 111.887 238.429 115.655C238.429 119.302 237.094 122.079 234.406 123.931L234.406 123.932C231.918 125.755 229.017 126.664 225.717 126.664C222.102 126.664 219.037 125.76 216.542 123.932C214.011 122.077 212.763 119.296 212.763 115.655C212.763 111.893 214.007 109.103 216.552 107.371C219.045 105.548 222.107 104.646 225.717 104.646ZM319.508 104.646C323.118 104.646 326.181 105.548 328.673 107.371L328.907 107.537C331.294 109.279 332.462 112.011 332.462 115.655C332.462 119.296 331.214 122.077 328.683 123.932C326.189 125.76 323.123 126.664 319.508 126.664C316.208 126.664 313.307 125.755 310.819 123.932V123.931C308.13 122.079 306.796 119.301 306.796 115.655C306.796 111.888 308.126 109.098 310.828 107.37C313.314 105.552 316.213 104.647 319.508 104.646Z"/>
+                </svg>
+                <span class="hidden sm:inline-block text-[11px] font-bold text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 pr-3">
+                    متجر البطاقات الرقمية
                 </span>
-                <div>
-                    <h1 class="text-sm font-black text-slate-900 dark:text-white">متجر البطاقات الرقمية</h1>
-                    <p class="text-[10px] text-slate-400">تسليم فوري للأكواد وشحن الألعاب</p>
-                </div>
-            </div>
+            </a>
 
             <div class="flex items-center gap-2">
                 <!-- زر المظهر الليلي/النهاري -->
-                <button onclick="toggleRetailTheme()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="تبديل المظهر">
-                    <i class="ph-bold ph-moon text-sm dark:hidden"></i>
-                    <i class="ph-bold ph-sun text-sm hidden dark:inline text-amber-400"></i>
+                <button onclick="toggleRetailTheme()" class="btn-spring p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer" title="تبديل المظهر">
+                    <i class="ph-fill ph-moon text-base dark:hidden"></i>
+                    <i class="ph-fill ph-sun text-base hidden dark:inline"></i>
                 </button>
 
                 <!-- شريط المستخدم المسجل -->
                 <div id="user-nav-panel" class="hidden items-center gap-2">
-                    <div class="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-black flex items-center gap-1.5">
-                        <i class="ph-bold ph-wallet"></i>
-                        <span id="nav-wallet-balance" dir="ltr">$0.00</span>
+                    <div class="px-3.5 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-black flex items-center gap-1.5">
+                        <i class="ph-fill ph-wallet text-sm"></i>
+                        <span id="nav-wallet-balance" class="financial-amount" dir="ltr">$0.00</span>
                     </div>
-                    <button onclick="openOrdersModal()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold flex items-center gap-1.5 transition">
-                        <i class="ph-bold ph-receipt"></i>
+                    <button onclick="openOrdersModal()" class="btn-spring px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
+                        <i class="ph-fill ph-receipt text-[#005ba3] dark:text-[#5CE1E6]"></i>
                         <span class="hidden sm:inline">طلباتي</span>
                     </button>
-                    <button onclick="handleRetailLogout()" class="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 hover:bg-rose-100 transition" title="تسجيل الخروج">
-                        <i class="ph-bold ph-sign-out text-sm"></i>
+                    <button onclick="handleRetailLogout()" class="btn-spring p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition cursor-pointer" title="تسجيل الخروج">
+                        <i class="ph-bold ph-sign-out text-base"></i>
                     </button>
                 </div>
 
                 <!-- زر تسجيل الدخول للزوار -->
-                <button id="guest-login-btn" onclick="openAuthModal('login')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
-                    <i class="ph-bold ph-user"></i>
+                <button id="guest-login-btn" onclick="openAuthModal('login')" class="btn-primary text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 cursor-pointer">
+                    <i class="ph-bold ph-user text-sm"></i>
                     <span>دخول / تسجيل</span>
                 </button>
             </div>
@@ -65,70 +160,70 @@
     </header>
 
     <!-- المحتوى الرئيسي -->
-    <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <main class="max-w-6xl mx-auto px-4 py-7 space-y-6 w-full flex-grow fade-in">
 
         <!-- شريط تصفية المنصات -->
-        <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="glass-panel p-4 flex items-center justify-between gap-3 flex-wrap">
             <div id="platform-filters" class="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
-                <button onclick="filterRetailCatalog('ALL')" data-platform="ALL" class="filter-pill px-4 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 whitespace-nowrap transition">
+                <button onclick="filterRetailCatalog('ALL')" data-platform="ALL" class="filter-pill px-4 py-2 rounded-xl bg-[#005ba3] text-white shadow-sm whitespace-nowrap transition cursor-pointer">
                     جميع الباقات
                 </button>
             </div>
-            <button onclick="loadRetailCatalog()" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center gap-1 font-bold">
+            <button onclick="loadRetailCatalog()" class="btn-spring text-xs text-slate-600 dark:text-slate-300 hover:text-[#005ba3] dark:hover:text-[#5CE1E6] bg-slate-100/80 dark:bg-slate-800/80 px-3.5 py-2 rounded-xl flex items-center gap-1.5 font-bold cursor-pointer">
                 <i class="ph-bold ph-arrows-clockwise"></i> تحديث الأسعار
             </button>
         </div>
 
         <!-- شبكة عرض الباقات -->
-        <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="col-span-full py-12 text-center text-slate-400 text-xs">جاري تحميل الباقات المتوفرة...</div>
+        <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="col-span-full py-14 text-center text-slate-400 text-xs font-bold">جاري تحميل الباقات المتوفرة...</div>
         </div>
 
     </main>
 
     <!-- نافذة تسجيل الدخول وإنشاء الحساب -->
     <div id="auth-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
-                <h3 id="auth-modal-title" class="text-sm font-black">تسجيل الدخول إلى حسابك</h3>
-                <button onclick="closeModal('auth-modal')" class="text-slate-400 hover:text-rose-500"><i class="ph-bold ph-x text-lg"></i></button>
+        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3.5">
+                <h3 id="auth-modal-title" class="text-sm font-black text-slate-900 dark:text-white">تسجيل الدخول إلى حسابك</h3>
+                <button onclick="closeModal('auth-modal')" class="btn-spring w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center"><i class="ph-bold ph-x text-base"></i></button>
             </div>
 
-            <form id="auth-form" onsubmit="handleRetailAuthSubmit(event)" class="space-y-3 text-xs">
+            <form id="auth-form" onsubmit="handleRetailAuthSubmit(event)" class="space-y-4 text-xs">
                 <input type="hidden" id="auth-mode" value="login">
                 <div id="auth-name-group" class="hidden">
-                    <label class="block font-bold text-slate-500 mb-1">الاسم الكامل</label>
-                    <input id="auth-fullname" type="text" placeholder="أدخل اسمك" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 outline-none">
+                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">الاسم الكامل</label>
+                    <input id="auth-fullname" type="text" placeholder="أدخل اسمك" class="input-field w-full px-4 py-3">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-500 mb-1">البريد الإلكتروني</label>
-                    <input id="auth-email" type="email" required placeholder="name@example.com" dir="ltr" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 outline-none">
+                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">البريد الإلكتروني</label>
+                    <input id="auth-email" type="email" required placeholder="name@example.com" dir="ltr" class="input-field w-full px-4 py-3 text-left">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-500 mb-1">كلمة المرور</label>
-                    <input id="auth-password" type="password" required minlength="6" placeholder="••••••••" dir="ltr" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 outline-none">
+                    <label class="block font-bold text-slate-600 dark:text-slate-300 mb-1.5">كلمة المرور</label>
+                    <input id="auth-password" type="password" required minlength="6" placeholder="••••••••" dir="ltr" class="input-field w-full px-4 py-3 text-left">
                 </div>
-                <button type="submit" id="auth-submit-btn" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black transition">
+                <button type="submit" id="auth-submit-btn" class="w-full btn-primary text-white font-black py-3.5 rounded-xl text-xs cursor-pointer">
                     دخول
                 </button>
             </form>
 
-            <div class="text-center text-xs text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div class="text-center text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <span id="auth-switch-text">ليس لديك حساب؟</span>
-                <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-indigo-500 font-bold hover:underline mr-1">إنشاء حساب جديد</button>
+                <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-[#005ba3] dark:text-[#5CE1E6] font-bold hover:underline mr-1 cursor-pointer">إنشاء حساب جديد</button>
             </div>
         </div>
     </div>
 
     <!-- نافذة إتمام الشراء وعرض الكود -->
     <div id="buy-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
-                <h3 class="text-sm font-black flex items-center gap-2">
-                    <i class="ph-fill ph-shopping-cart text-indigo-500 text-lg"></i>
+        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3.5">
+                <h3 class="text-sm font-black flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i class="ph-fill ph-shopping-cart text-[#005ba3] dark:text-[#5CE1E6] text-lg"></i>
                     <span>تأكيد عملية الشراء</span>
                 </h3>
-                <button onclick="closeModal('buy-modal')" class="text-slate-400 hover:text-rose-500"><i class="ph-bold ph-x text-lg"></i></button>
+                <button onclick="closeModal('buy-modal')" class="btn-spring w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center"><i class="ph-bold ph-x text-base"></i></button>
             </div>
 
             <!-- نموذج الشراء -->
@@ -136,62 +231,56 @@
                 <input type="hidden" id="buy-catalog-id">
                 <input type="hidden" id="buy-product-type">
 
-                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                    <div class="text-[11px] text-slate-400" id="buy-modal-platform">---</div>
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2">
+                    <div class="text-[11px] font-bold text-slate-400" id="buy-modal-platform">---</div>
                     <div class="text-sm font-black text-slate-900 dark:text-white" id="buy-modal-package">---</div>
-                    <div class="flex justify-between items-center pt-2 border-t border-slate-200 dark:border-slate-700">
-                        <span class="text-slate-500">المبلغ المطلوب:</span>
-                        <span id="buy-modal-price" class="font-mono font-black text-base text-emerald-600 dark:text-emerald-400" dir="ltr">$0.00</span>
+                    <div class="flex justify-between items-center pt-2.5 border-t border-slate-200/70 dark:border-slate-700/70">
+                        <span class="text-slate-500 dark:text-slate-400 font-bold">المبلغ المطلوب (شامل الضريبة):</span>
+                        <span id="buy-modal-price" class="financial-amount font-black text-lg text-[#005ba3] dark:text-[#5CE1E6]" dir="ltr">$0.00</span>
                     </div>
                 </div>
 
-                <!-- حقل معرّف اللاعب (يظهر فقط لباقات ID مثل ببجي) -->
-                <div id="buy-playerid-group" class="hidden space-y-1">
+                <!-- حقل معرّف اللاعب (لباقات ID) -->
+                <div id="buy-playerid-group" class="hidden space-y-1.5">
                     <label class="block font-bold text-amber-600 dark:text-amber-400">معرّف اللاعب (Player ID) أو رقم الشحن *</label>
-                    <input id="buy-player-id" type="text" placeholder="أدخل الـ ID بدقة هنا..." dir="ltr" class="w-full p-2.5 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50/50 dark:bg-slate-950 font-mono font-bold outline-none">
+                    <input id="buy-player-id" type="text" placeholder="أدخل الـ ID بدقة هنا..." dir="ltr" class="input-field w-full px-4 py-3 font-mono font-bold text-left">
                     <p class="text-[10px] text-slate-400">تأكد من صحة المعرّف؛ يتم تنفيذ الشحن مباشرة على الحساب المدخل.</p>
                 </div>
 
-                <label class="flex items-start gap-2.5 p-3 rounded-xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 cursor-pointer text-right">
-  <input type="checkbox" id="eu-withdrawal-waiver" class="mt-1 rounded border-slate-400 text-indigo-600 focus:ring-indigo-500">
-  <span class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
-    أوافق على التنفيذ الفوري للطلب وتسليم الكود الرقمي أو بدء الشحن المباشر قبل انقضاء مهلة الـ 14 يوماً القانونية، وأُقرّ بفقدان حق العدول الأوروبي بمجرد بدء التنفيذ وفق المادة 16(m) من توجيه حقوق المستهلك الأوروبي.
-  </span>
-</label>
+                <!-- إقرار التنفيذ الفوري والتنازل عن حق العدول الأوروبي -->
+                <label class="flex items-start gap-2.5 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 cursor-pointer text-right">
+                    <input type="checkbox" id="eu-withdrawal-waiver" class="mt-0.5 w-4 h-4 rounded border-slate-300 text-[#005ba3] focus:ring-[#005ba3]">
+                    <span class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                        أوافق على <a href="/terms.html" target="_blank" class="text-[#005ba3] dark:text-[#5CE1E6] underline font-bold">شروط الاستخدام</a> و<a href="/refund.html" target="_blank" class="text-[#005ba3] dark:text-[#5CE1E6] underline font-bold">سياسة الاسترجاع</a>، وأطلب التنفيذ الفوري وتسليم الكود الرقمي أو بدء الشحن المباشر قبل انقضاء مهلة الـ 14 يوماً القانونية، مع إقراري بفقدان حق العدول الأوروبي بمجرد بدء التنفيذ وفق المادة 16(m).
+                    </span>
+                </label>
 
-<button type="button" id="btn-confirm-purchase" onclick="executeRetailPurchase()" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black flex items-center justify-center gap-2 transition shadow-sm">
-  <i class="ph-bold ph-check-circle text-base"></i>
-  <span>شراء وتأكيد الدفع الملزم</span>
-</button>
-
-                <button onclick="executeRetailPurchase()" id="btn-confirm-purchase" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black transition flex items-center justify-center gap-2">
-                    <i class="ph-bold ph-check-circle text-base"></i>
-                    <span>تأكيد الدفع من المحفظة</span>
+                <button type="button" id="btn-confirm-purchase" onclick="executeRetailPurchase()" class="btn-glow-sheen btn-spring w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black flex items-center justify-center gap-2 shadow-md cursor-pointer">
+                    <i class="ph-fill ph-check-circle text-lg"></i>
+                    <span>شراء وتأكيد الدفع الملزم</span>
                 </button>
             </div>
 
             <!-- شاشة النتيجة بعد التنفيذ -->
             <div id="buy-result-step" class="hidden space-y-4 text-xs">
-                <div id="buy-result-banner" class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-1">
+                <div id="buy-result-banner" class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-1">
                     <div class="text-emerald-600 dark:text-emerald-400 font-black text-sm" id="buy-result-title">تمت العملية بنجاح!</div>
                     <div class="text-[11px] text-slate-400">رقم الفاتورة: <span id="buy-result-ref" class="font-mono font-bold">---</span></div>
                 </div>
 
-                <!-- صندوق الكود (لباقات CODE) -->
                 <div id="buy-code-box" class="hidden space-y-1.5">
-                    <label class="block font-bold text-slate-500">الكود الرقمي الخاص بك:</label>
+                    <label class="block font-bold text-slate-500 dark:text-slate-400">الكود الرقمي الخاص بك:</label>
                     <div class="flex items-center gap-2">
-                        <input id="buy-delivered-code" readonly dir="ltr" class="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-950 font-mono font-black text-amber-600 dark:text-amber-400 text-center">
-                        <button onclick="copyDeliveredCode()" class="px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold">نسخ</button>
+                        <input id="buy-delivered-code" readonly dir="ltr" class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-900 font-mono font-black text-emerald-400 text-center tracking-wider">
+                        <button onclick="copyDeliveredCode()" class="btn-primary px-4 py-3 rounded-xl text-white font-bold cursor-pointer">نسخ</button>
                     </div>
                 </div>
 
-                <!-- رسالة الشحن المباشر (لباقات ID) -->
-                <div id="buy-pending-box" class="hidden p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 leading-relaxed">
+                <div id="buy-pending-box" class="hidden p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 leading-relaxed">
                     تم إرسال طلب الشحن لمعرّف اللاعب بنجاح وهو الآن <strong>قيد التنفيذ</strong>. يمكنك متابعة اكتمال الشحن من نافذة «طلباتي».
                 </div>
 
-                <button onclick="closeModal('buy-modal')" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 font-bold transition">
+                <button onclick="closeModal('buy-modal')" class="w-full py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold transition cursor-pointer">
                     إغلاق
                 </button>
             </div>
@@ -200,24 +289,24 @@
 
     <!-- نافذة سجل طلبات الزبون -->
     <div id="orders-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-3xl w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
-                <h3 class="text-sm font-black flex items-center gap-2">
-                    <i class="ph-fill ph-receipt text-indigo-500 text-lg"></i>
+        <div class="bg-white dark:bg-[#111827] border border-slate-200 dark:border-white/10 rounded-[28px] max-w-3xl w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3.5">
+                <h3 class="text-sm font-black flex items-center gap-2 text-slate-900 dark:text-white">
+                    <i class="ph-fill ph-receipt text-[#005ba3] dark:text-[#5CE1E6] text-lg"></i>
                     <span>سجل مشترياتي</span>
                 </h3>
-                <button onclick="closeModal('orders-modal')" class="text-slate-400 hover:text-rose-500"><i class="ph-bold ph-x text-lg"></i></button>
+                <button onclick="closeModal('orders-modal')" class="btn-spring w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center"><i class="ph-bold ph-x text-base"></i></button>
             </div>
 
             <div class="overflow-x-auto max-h-96 overflow-y-auto">
                 <table class="w-full text-right text-xs">
                     <thead>
                         <tr class="text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                            <th class="py-2 px-2">رقم الطلب</th>
-                            <th class="py-2 px-2">الباقة</th>
-                            <th class="py-2 px-2">الكود / المعرّف</th>
-                            <th class="py-2 px-2">السعر</th>
-                            <th class="py-2 px-2 text-center">الحالة</th>
+                            <th class="py-2.5 px-2">رقم الطلب</th>
+                            <th class="py-2.5 px-2">الباقة</th>
+                            <th class="py-2.5 px-2">الكود / المعرّف</th>
+                            <th class="py-2.5 px-2">السعر</th>
+                            <th class="py-2.5 px-2 text-center">الحالة</th>
                         </tr>
                     </thead>
                     <tbody id="retail-orders-tbody" class="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -225,48 +314,71 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40 rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-  <span class="text-[11px] text-slate-500 dark:text-slate-400">
-    يحق لك حذف حسابك وبياناتك الشخصية نهائياً في أي وقت وفق لائحة حماية البيانات الأوروبية (GDPR).
-  </span>
-  <button type="button" onclick="deleteMyRetailAccount()" class="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-500/20 text-xs font-bold flex items-center gap-1.5 transition shrink-0">
-    <i class="ph-bold ph-trash text-sm"></i>
-    <span>حذف حسابي نهائياً</span>
-  </button>
-</div>
+
+            <!-- شريط حذف الحساب النهائي المتوافق مع GDPR و Google Play و App Store -->
+            <div class="p-4 border-t border-slate-200/70 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400">
+                    يحق لك حذف حسابك وبياناتك الشخصية نهائياً في أي وقت وفق لائحة حماية البيانات الأوروبية (GDPR).
+                </span>
+                <button type="button" onclick="deleteMyRetailAccount()" class="btn-spring px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-500/20 text-xs font-bold flex items-center gap-1.5 transition shrink-0 cursor-pointer">
+                    <i class="ph-bold ph-trash text-sm"></i>
+                    <span>حذف حسابي نهائياً</span>
+                </button>
+            </div>
         </div>
     </div>
-    </div>
-  </div>
-</div>
 
-<div id="eu-cookie-banner" class="hidden fixed bottom-4 inset-x-4 z-50 max-w-3xl mx-auto bg-slate-900 text-white border border-slate-700 rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-  <p class="leading-relaxed text-slate-300">
-    يستخدم هذا المتجر التخزين المحلي الأساسي فقط لحفظ جلسة الدخول وتفضيل المظهر، ولا يستخدم ملفات تتبع إعلانية، وذلك التزاماً بلائحة حماية البيانات الأوروبية (GDPR).
-  </p>
-  <div class="flex items-center gap-2 shrink-0">
-    <button type="button" onclick="acceptEuCookies('essential')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold">موافق</button>
-  </div>
-</div>
+    <!-- شريط موافقة ملفات التخزين الأوروبي (GDPR) -->
+    <div id="eu-cookie-banner" class="hidden fixed bottom-4 inset-x-4 z-50 max-w-3xl mx-auto bg-slate-900/95 backdrop-blur-xl text-white border border-white/10 rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <p class="leading-relaxed text-slate-300">
+            يستخدم هذا المتجر التخزين المحلي الأساسي فقط لحفظ جلسة الدخول وتفضيل المظهر، ولا يستخدم ملفات تتبع إعلانية، وذلك التزاماً بلائحة حماية البيانات الأوروبية (GDPR).
+        </p>
+        <button type="button" onclick="acceptEuCookies('essential')" class="btn-primary px-5 py-2 rounded-xl text-white font-bold shrink-0 cursor-pointer">موافق</button>
+    </div>
+
+    <!-- تذييل المتجر الموحد مع هوية SHIIFT X -->
+    <footer class="w-full max-w-6xl mx-auto mt-16 px-4 py-8 border-t border-slate-200/80 dark:border-white/10 text-xs text-slate-500 dark:text-slate-400 space-y-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- هوية المنصة وحقوق النشر -->
+            <div class="flex items-center gap-2">
+                <span class="font-black text-slate-900 dark:text-white">SHIIFT X</span>
+                <span>© 2026 — جميع الحقوق محفوظة (مسجل في النمسا — الاتحاد الأوروبي)</span>
+            </div>
+
+            <!-- أيقونات التواصل الاجتماعي -->
+            <div class="flex items-center gap-2.5">
+                <span class="font-bold text-slate-700 dark:text-slate-300 text-xs">تواصل معنا:</span>
+                <div class="flex items-center gap-1.5">
+                    <a href="https://www.facebook.com/share/19z9gWepTE/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-blue-950/60 text-slate-600 dark:text-slate-300 hover:text-[#005ba3] dark:hover:text-[#5CE1E6] flex items-center justify-center text-base transition-all shadow-sm active:scale-95" title="فيسبوك">
+                        <i class="ph-fill ph-facebook-logo"></i>
+                    </a>
+                    <a href="https://www.instagram.com/shiiftx11?rpxt=czF4N2NubHljandn&utm_source=qr" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800/80 hover:bg-pink-50 dark:hover:bg-pink-950/60 text-slate-600 dark:text-slate-300 hover:text-pink-600 dark:hover:text-pink-400 flex items-center justify-center text-base transition-all shadow-sm active:scale-95" title="إنستغرام">
+                        <i class="ph-fill ph-instagram-logo"></i>
+                    </a>
+                    <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center justify-center text-base transition-all shadow-sm active:scale-95" title="واتساب">
+                        <i class="ph-fill ph-whatsapp-logo"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- روابط الصفحات القانونية المستقلة -->
+            <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 font-bold text-slate-700 dark:text-slate-300">
+                <a href="/privacy.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">سياسة الخصوصية</a>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+                <a href="/terms.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">شروط الاستخدام</a>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+                <a href="/refund.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">سياسة الاسترجاع</a>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+                <a href="/impressum.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">بيانات التاجر (Impressum)</a>
+            </div>
+        </div>
+
+        <p class="text-[11px] leading-relaxed text-slate-400 text-center sm:text-right">
+            جميع الأسعار المعروضة نهائية وشاملة للضرائب المطبقة. جميع أسماء الألعاب والمنصات والعلامات التجارية المذكورة هي ملك لأصحابها الأصليين؛ يعمل متجر SHIIFT X كموزع مستقل للبطاقات الرقمية ولا يتبع رسمياً لأي ناشر ألعاب. للدعم الرسمي:
+            <a href="mailto:support@shiiftx.com" dir="ltr" class="font-mono text-[#005ba3] dark:text-[#5CE1E6] hover:underline">support@shiiftx.com</a>
+        </p>
+    </footer>
 
     <script src="js/retail-app.js"></script>
 </body>
-    <footer class="mt-16 border-t border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 py-8 px-4 text-xs text-slate-500 dark:text-slate-400">
-  <div class="max-w-6xl mx-auto space-y-4">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div class="font-bold text-slate-800 dark:text-slate-200">
-        SHIIFT X — متجر البطاقات والاشتراكات الرقمية (مسجل في النمسا — الاتحاد الأوروبي)
-      </div>
-      <div class="flex flex-wrap items-center gap-4 font-bold text-indigo-600 dark:text-indigo-400">
-        <a href="/impressum.html" class="hover:underline">بيانات التاجر (Impressum)</a>
-        <a href="/terms.html" class="hover:underline">شروط الاستخدام وحق العدول</a>
-        <a href="/privacy.html" class="hover:underline">سياسة الخصوصية (GDPR)</a>
-        <a href="/refund.html" class="hover:underline">سياسة الاسترجاع</a>
-      </div>
-    </div>
-    <p class="text-[11px] leading-relaxed text-slate-400">
-      جميع الأسعار المعروضة نهائية وشاملة للضرائب المطبقة. جميع أسماء الألعاب والمنصات والعلامات التجارية المذكورة هي ملك لأصحابها الأصليين؛ يعمل متجر SHIIFT X كموزع مستقل للبطاقات الرقمية ولا يتبع رسمياً لأي ناشر ألعاب. للدعم الرسمي: <span dir="ltr" class="font-mono text-slate-500">support@shiiftx.com</span>
-    </p>
-  </div>
-</footer>
 </html>
