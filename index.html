@@ -17,7 +17,7 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/retail-pro.css?v=8">
+    <link rel="stylesheet" href="css/retail-pro.css?v=9">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -29,12 +29,11 @@
     <!-- خلفية القائمة الجانبية على الهواتف والأجهزة اللوحية -->
     <div id="sidebar-backdrop" class="hidden rev-sidebar-backdrop lg:hidden" onclick="toggleMobileSidebar(false)"></div>
 
-    <!-- هيكل التطبيق الرئيسي ذو القائمة الجانبية الثابتة (Revolut App Shell) -->
+    <!-- هيكل التطبيق الرئيسي ذو القائمة الجانبية الثابتة -->
     <div class="rev-app-shell">
 
-        <!-- ==================== القائمة الجانبية الثابتة (Persistent Sidebar) ==================== -->
+        <!-- ==================== القائمة الجانبية الثابتة ==================== -->
         <aside id="app-sidebar" class="rev-sidebar">
-            <!-- رأس القائمة الجانبية والشعار -->
             <div class="h-16 px-5 border-b border-black/6 dark:border-white/8 flex items-center justify-between shrink-0">
                 <a href="/" class="flex items-center gap-2.5 select-none group">
                     <svg class="h-7 w-auto transition-transform duration-200 group-hover:scale-105" viewBox="70 100 405 140" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -48,12 +47,9 @@
                 </button>
             </div>
 
-            <!-- محتوى القائمة الجانبية القابل للتمرير -->
             <div class="p-4 flex-grow overflow-y-auto space-y-6">
-
-                <!-- بطاقة المحفظة المصغرة داخل القائمة الجانبية -->
+                <!-- بطاقة المحفظة المدمجة -->
                 <div class="rev-wallet-widget">
-                    <!-- حالة الزائر -->
                     <div id="sidebar-guest-box" class="relative z-10 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold text-slate-300">محفظة SHIIFT X</span>
@@ -67,7 +63,6 @@
                         </button>
                     </div>
 
-                    <!-- حالة المستخدم المسجل -->
                     <div id="sidebar-user-box" class="hidden relative z-10 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold text-slate-300">الرصيد المتاح</span>
@@ -87,14 +82,14 @@
                     </div>
                 </div>
 
-                <!-- قسم التنقل الرئيسي -->
+                <!-- التصفح الرئيسي -->
                 <div class="space-y-1">
-                    <div class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#98a0ad]">التصفح السريع</div>
+                    <div class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#98a0ad]">التصفح</div>
 
-                    <button type="button" id="nav-btn-store" onclick="switchAppView('store')" class="rev-nav-item active">
+                    <button type="button" id="nav-btn-store" onclick="switchAppView('store'); filterRetailCatalog('ALL');" class="rev-nav-item active">
                         <span class="flex items-center gap-2.5">
                             <span class="rev-nav-icon"><i class="ph-fill ph-storefront"></i></span>
-                            <span>جميع المنتجات</span>
+                            <span>الرئيسية والمنصات</span>
                         </span>
                         <span id="sidebar-total-count" class="text-[11px] font-extrabold opacity-75">0</span>
                     </button>
@@ -116,17 +111,15 @@
                     </button>
                 </div>
 
-                <!-- قسم المنصات والألعاب (يُملأ ديناميكياً) -->
+                <!-- قائمة المنصات والألعاب -->
                 <div class="space-y-1">
-                    <div class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#98a0ad]">المنصات والألعاب</div>
+                    <div class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#98a0ad]">العلامات التجارية</div>
                     <div id="sidebar-platform-list" class="space-y-1">
                         <div class="px-3 py-2 text-xs text-[#68707d]">جاري تحميل الأقسام...</div>
                     </div>
                 </div>
-
             </div>
 
-            <!-- تذييل القائمة الجانبية -->
             <div class="p-4 border-t border-black/6 dark:border-white/8 space-y-2 shrink-0">
                 <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="rev-nav-item">
                     <span class="flex items-center gap-2.5">
@@ -145,13 +138,12 @@
             </div>
         </aside>
 
-        <!-- ==================== مساحة العمل الرئيسية (Main Workspace) ==================== -->
+        <!-- ==================== مساحة العمل الرئيسية ==================== -->
         <div class="flex-1 flex flex-col min-w-0">
 
-            <!-- الشريط العلوي مع البحث المركزي -->
+            <!-- الشريط العلوي النظيف -->
             <header class="rev-topbar sticky top-0 z-30">
                 <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-                    <!-- زر فتح القائمة الجانبية على الهواتف -->
                     <div class="flex items-center gap-2.5 lg:hidden">
                         <button type="button" onclick="toggleMobileSidebar(true)" class="rev-btn-secondary w-10 h-10 shrink-0" title="القائمة">
                             <i class="ph-bold ph-list text-lg"></i>
@@ -159,16 +151,14 @@
                         <span class="font-black text-sm tracking-tight">SHIIFT X</span>
                     </div>
 
-                    <!-- حقل البحث المركزي الفوري -->
                     <div class="relative flex-grow max-w-xl">
                         <i class="ph-bold ph-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-[#68707d] text-base pointer-events-none"></i>
-                        <input id="catalog-search-input" type="text" oninput="handleCatalogSearch(this.value)" placeholder="ابحث عن لعبة، منصة، أو قيمة بطاقة..." class="rev-input w-full pr-11 pl-10 py-2.5 text-xs font-bold">
+                        <input id="catalog-search-input" type="text" oninput="handleCatalogSearch(this.value)" placeholder="ابحث عن لعبة، بطاقة هدايا، أو منطقة (US / EU)..." class="rev-input w-full pr-11 pl-10 py-2.5 text-xs font-bold">
                         <button type="button" id="clear-search-btn" onclick="clearCatalogSearch()" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/10 dark:bg-white/10 text-xs items-center justify-center hover:bg-rose-500 hover:text-white transition cursor-pointer">
                             <i class="ph-bold ph-x"></i>
                         </button>
                     </div>
 
-                    <!-- أدوات المستخدم السريعة -->
                     <div class="flex items-center gap-2 shrink-0">
                         <button onclick="toggleRetailTheme()" class="rev-btn-secondary w-9 h-9 text-slate-700 dark:text-amber-400" title="تبديل المظهر">
                             <i class="ph-fill ph-moon text-base dark:hidden"></i>
@@ -190,9 +180,9 @@
             </header>
 
             <!-- المحتوى الرئيسي -->
-            <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 flex-grow fade-in">
+            <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-7 flex-grow fade-in">
 
-                <!-- 1. شريط متابعة الطلبات النشطة (يظهر تلقائياً عند وجود طلب شحن مباشر قيد المعالجة) -->
+                <!-- 1. شريط متابعة الطلبات النشطة -->
                 <div id="pending-order-banner" class="hidden rev-panel px-5 py-3.5 border-amber-500/30 bg-amber-500/8 flex flex-wrap items-center justify-between gap-3">
                     <div class="flex items-center gap-3 text-xs">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping shrink-0"></span>
@@ -211,37 +201,96 @@
                     </div>
                 </div>
 
-                <!-- 2. واجهة العرض الرئيسية (Hero Banner) -->
-                <section id="store-hero-banner" class="rev-hero p-6 sm:p-9 text-white">
-                    <div class="relative z-10 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
-                        <div class="space-y-3 max-w-2xl">
-                            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[#5CE1E6] text-[11px] font-extrabold">
-                                <i class="ph-fill ph-sparkle"></i>
-                                <span>تسليم آلي فوري • تاجر أوروبي مسجل</span>
-                            </div>
-                            <h1 class="text-2xl sm:text-3xl font-black leading-[1.2] tracking-tight">
-                                اشحن ألعابك وبطاقاتك الرقمية <span class="text-[#5CE1E6]">بسرعة البرق وأمان تام.</span>
+                <!-- 2. عارض العروض التفاعلي (Interactive Hero Carousel) -->
+                <section id="hero-carousel" class="rev-carousel">
+                    <!-- الشريحة 1 -->
+                    <div class="rev-slide rev-slide-1 active flex-col justify-between gap-6">
+                        <div class="relative z-10 max-w-2xl space-y-3">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#5CE1E6] text-[11px] font-extrabold">
+                                <i class="ph-fill ph-lightning"></i>
+                                <span>تسليم آلي خلال ثوانٍ • 24/7</span>
+                            </span>
+                            <h1 class="text-2xl sm:text-4xl font-black leading-[1.18] tracking-tight">
+                                بطاقات الألعاب والمتاجر الرقمية، <span class="text-[#5CE1E6]">بتسليم فوري وأسعار نهائية.</span>
                             </h1>
-                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl font-medium">
-                                اختر منصتك من القائمة الجانبية أو ابحث مباشرة؛ أسعار نهائية شاملة للضريبة وتسليم فوري للأكواد.
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+                                استلم كود التفعيل الرقمي فور تأكيد الطلب أو اشحن حسابك مباشرة بالمعرّف بدون انتظار.
                             </p>
                         </div>
+                    </div>
 
-                        <div class="flex flex-wrap items-center gap-3 shrink-0 w-full sm:w-auto">
-                            <button type="button" onclick="openTopupModal()" class="flex-1 sm:flex-initial px-6 py-3 rounded-full bg-white hover:bg-[#5CE1E6] text-[#191c1f] text-xs font-black flex items-center justify-center gap-2 shadow-lg transition cursor-pointer">
-                                <i class="ph-bold ph-plus-circle text-base"></i>
-                                <span>إيداع في المحفظة</span>
+                    <!-- الشريحة 2 -->
+                    <div class="rev-slide rev-slide-2 flex-col justify-between gap-6">
+                        <div class="relative z-10 max-w-2xl space-y-3">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#5CE1E6] text-[11px] font-extrabold">
+                                <i class="ph-fill ph-globe-hemisphere-west"></i>
+                                <span>تغطية شاملة للمتاجر العالمية</span>
+                            </span>
+                            <h2 class="text-2xl sm:text-4xl font-black leading-[1.18] tracking-tight">
+                                بطاقات أمريكية، أوروبية، وعالمية <span class="text-[#5CE1E6]">بشارات توافق واضحة.</span>
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+                                تحقّق من شارة المنطقة الجغرافية على كل بطاقة لضمان التوافق التام مع حسابك قبل الشراء.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- الشريحة 3 -->
+                    <div class="rev-slide rev-slide-3 flex-col justify-between gap-6">
+                        <div class="relative z-10 max-w-2xl space-y-3">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#5CE1E6] text-[11px] font-extrabold">
+                                <i class="ph-fill ph-shield-check"></i>
+                                <span>تاجر مسجل في النمسا — الاتحاد الأوروبي</span>
+                            </span>
+                            <h2 class="text-2xl sm:text-4xl font-black leading-[1.18] tracking-tight">
+                                حماية كاملة للمشتري <span class="text-[#5CE1E6]">وخصوصية بيانات بمعايير GDPR.</span>
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+                                فواتير رقمية موثقة ودعم فني مباشر عبر واتساب والبريد الرسمي لخدمتك في أي وقت.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- أزرار ونقاط التحكم بالعارض -->
+                    <div class="relative z-20 px-6 sm:px-10 pb-5 flex items-center justify-between">
+                        <div class="flex items-center gap-2" id="hero-carousel-dots">
+                            <button type="button" onclick="goToHeroSlide(0)" class="rev-carousel-dot active" aria-label="الشريحة 1"></button>
+                            <button type="button" onclick="goToHeroSlide(1)" class="rev-carousel-dot" aria-label="الشريحة 2"></button>
+                            <button type="button" onclick="goToHeroSlide(2)" class="rev-carousel-dot" aria-label="الشريحة 3"></button>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="stepHeroSlide(-1)" class="w-8 h-8 rounded-full bg-white/12 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer" title="السابق">
+                                <i class="ph-bold ph-caret-right text-sm"></i>
                             </button>
-                            <button type="button" onclick="openOrdersModal()" class="flex-1 sm:flex-initial px-5 py-3 rounded-full bg-white/12 hover:bg-white/20 border border-white/20 text-white text-xs font-bold flex items-center justify-center gap-2 backdrop-blur-md transition cursor-pointer">
-                                <i class="ph-bold ph-receipt text-base text-[#5CE1E6]"></i>
-                                <span>مشترياتي</span>
+                            <button type="button" onclick="stepHeroSlide(1)" class="w-8 h-8 rounded-full bg-white/12 hover:bg-white/25 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer" title="التالي">
+                                <i class="ph-bold ph-caret-left text-sm"></i>
                             </button>
                         </div>
                     </div>
                 </section>
 
-                <!-- 3. شريط مسار التصفح الديناميكي وأدوات الفرز (Breadcrumbs & Sort Bar) -->
-                <section class="flex flex-wrap items-center justify-between gap-3 px-1">
+                <!-- 3. قسم تصفّح العلامات التجارية والمنصات (Brand Hub Tiles) -->
+                <section id="brand-hub-section" class="space-y-3">
+                    <div class="flex items-center justify-between px-1">
+                        <h2 class="text-sm font-black tracking-tight flex items-center gap-2">
+                            <i class="ph-fill ph-squares-four text-[#005ba3] dark:text-[#5CE1E6] text-base"></i>
+                            <span>تصفّح حسب المنصة واللعبة</span>
+                        </h2>
+                        <button type="button" id="brand-reset-btn" onclick="filterRetailCatalog('ALL')" class="hidden text-xs font-extrabold text-[#005ba3] dark:text-[#5CE1E6] hover:underline cursor-pointer">
+                            عرض جميع المنصات
+                        </button>
+                    </div>
+                    <div id="brand-hub-grid" class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
+                        <div class="rev-panel h-[74px] animate-pulse"></div>
+                        <div class="rev-panel h-[74px] animate-pulse"></div>
+                        <div class="rev-panel h-[74px] animate-pulse hidden sm:block"></div>
+                        <div class="rev-panel h-[74px] animate-pulse hidden xl:block"></div>
+                    </div>
+                </section>
+
+                <!-- 4. شريط مسار التصفح الديناميكي والفلترة والفرز -->
+                <section class="flex flex-wrap items-center justify-between gap-3 pt-1 px-1">
                     <div class="flex items-center gap-2 text-xs font-bold text-[#68707d] dark:text-slate-400">
                         <button type="button" onclick="switchAppView('store'); filterRetailCatalog('ALL');" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition cursor-pointer">
                             المتجر
@@ -251,7 +300,13 @@
                         <span class="px-2.5 py-0.5 rounded-full bg-black/5 dark:bg-white/8 text-[11px] font-extrabold" id="breadcrumb-count">0 باقة</span>
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <select id="catalog-type-filter" onchange="handleDeliveryTypeFilter(this.value)" class="rev-input px-3.5 py-2 text-xs font-bold cursor-pointer">
+                            <option value="ALL">كل أنواع التسليم</option>
+                            <option value="CODE">كود فوري ⚡</option>
+                            <option value="ID">شحن مباشر (ID)</option>
+                        </select>
+
                         <select id="catalog-sort-select" onchange="handleCatalogSort(this.value)" class="rev-input px-3.5 py-2 text-xs font-bold cursor-pointer">
                             <option value="default">الترتيب الافتراضي</option>
                             <option value="price_asc">السعر: من الأقل للأعلى</option>
@@ -264,38 +319,38 @@
                     </div>
                 </section>
 
-                <!-- 4. شبكة عرض الباقات الكبيرة -->
+                <!-- 5. شبكة عرض الباقات النظيفة -->
                 <section id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                     <div class="rev-panel overflow-hidden animate-pulse">
-                        <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
+                        <div class="w-full h-[215px] bg-black/5 dark:bg-white/5"></div>
                         <div class="p-5 space-y-4">
                             <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
-                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
+                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/3"></div>
                             <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
                                 <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
-                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
+                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-24"></div>
                             </div>
                         </div>
                     </div>
                     <div class="rev-panel overflow-hidden animate-pulse hidden sm:block">
-                        <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
+                        <div class="w-full h-[215px] bg-black/5 dark:bg-white/5"></div>
                         <div class="p-5 space-y-4">
                             <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
-                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
+                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/3"></div>
                             <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
                                 <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
-                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
+                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-24"></div>
                             </div>
                         </div>
                     </div>
                     <div class="rev-panel overflow-hidden animate-pulse hidden xl:block">
-                        <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
+                        <div class="w-full h-[215px] bg-black/5 dark:bg-white/5"></div>
                         <div class="p-5 space-y-4">
                             <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
-                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
+                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/3"></div>
                             <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
                                 <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
-                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
+                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-24"></div>
                             </div>
                         </div>
                     </div>
@@ -340,7 +395,7 @@
         </div>
     </div>
 
-    <!-- ==================== الأدراج الجانبية المنزلقة وشرائح الجوال (Revolut Drawers) ==================== -->
+    <!-- ==================== الأدراج الجانبية المنزلقة وشرائح الجوال ==================== -->
 
     <!-- 1. درج تفاصيل وتعليمات الباقة -->
     <div id="package-details-modal" class="hidden rev-overlay" onclick="closePackageDetailsModal()">
@@ -363,9 +418,9 @@
             </div>
 
             <div class="p-6 flex-grow overflow-y-auto space-y-5">
-                <div>
-                    <span class="text-[11px] font-bold text-[#68707d] dark:text-slate-400">تفاصيل الباقة</span>
-                    <h3 id="pkg-detail-title" class="text-xl font-black leading-snug mt-0.5">---</h3>
+                <div class="space-y-2">
+                    <div id="pkg-detail-region" class="rev-region-badge">🌍 عالمي</div>
+                    <h3 id="pkg-detail-title" class="text-xl font-black leading-snug">---</h3>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-[#eef0f4] dark:bg-[#181c25] space-y-2">
@@ -602,7 +657,7 @@
 
     <!-- شريط التنقل السفلي للهواتف -->
     <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 rev-topbar border-t border-black/8 dark:border-white/8 px-3 py-2 flex items-center justify-around text-[10px] font-bold text-[#68707d] dark:text-slate-400">
-        <button type="button" onclick="switchAppView('store'); window.scrollTo({top: 0, behavior: 'smooth'});" class="flex flex-col items-center gap-1 text-[#005ba3] dark:text-[#5CE1E6]">
+        <button type="button" onclick="switchAppView('store'); filterRetailCatalog('ALL'); window.scrollTo({top: 0, behavior: 'smooth'});" class="flex flex-col items-center gap-1 text-[#005ba3] dark:text-[#5CE1E6]">
             <i class="ph-fill ph-storefront text-xl"></i>
             <span>المتجر</span>
         </button>
@@ -632,7 +687,7 @@
         <button type="button" onclick="acceptEuCookies('essential')" class="px-5 py-2 rounded-full bg-white text-[#191c1f] font-extrabold shrink-0 cursor-pointer">موافق</button>
     </div>
 
-    <script src="js/retail-app.js?v=8"></script>
+    <script src="js/retail-app.js?v=9"></script>
 </body>
 </html>
 <!-- ==================== نهاية ملف index.html ==================== -->
