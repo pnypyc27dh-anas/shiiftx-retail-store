@@ -1,0 +1,354 @@
+/* ==================== بداية ملف css/retail-pro.css ==================== */
+/* نظام تصميم SHIIFT X المستوحى من Revolut — Ultra-Clean Fintech UI */
+
+:root {
+    --rev-bg: #f6f7f9;
+    --rev-surface: #ffffff;
+    --rev-surface-subtle: #f0f2f5;
+    --rev-elevated: #ffffff;
+    --rev-border: rgba(25, 28, 31, 0.08);
+    --rev-border-strong: rgba(25, 28, 31, 0.14);
+    --rev-text-primary: #191c1f;
+    --rev-text-secondary: #6c727f;
+    --rev-text-muted: #9aa0ac;
+    --rev-brand: #005ba3;
+    --rev-brand-hover: #004985;
+    --rev-brand-soft: rgba(0, 91, 163, 0.08);
+    --rev-cyan: #5CE1E6;
+    --rev-success: #00a86b;
+    --rev-shadow-card: 0 2px 10px rgba(25, 28, 31, 0.03), 0 10px 30px -10px rgba(25, 28, 31, 0.06);
+    --rev-shadow-hover: 0 12px 32px -8px rgba(0, 91, 163, 0.14), 0 4px 12px rgba(25, 28, 31, 0.04);
+    --rev-shadow-drawer: -20px 0 60px rgba(0, 0, 0, 0.15);
+    --rev-spring: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.dark {
+    --rev-bg: #090b0e;
+    --rev-surface: #12151c;
+    --rev-surface-subtle: #191d26;
+    --rev-elevated: #161a23;
+    --rev-border: rgba(255, 255, 255, 0.08);
+    --rev-border-strong: rgba(255, 255, 255, 0.15);
+    --rev-text-primary: #f8fafc;
+    --rev-text-secondary: #94a3b8;
+    --rev-text-muted: #64748b;
+    --rev-brand: #3b82f6;
+    --rev-brand-hover: #2563eb;
+    --rev-brand-soft: rgba(92, 225, 230, 0.1);
+    --rev-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
+    --rev-shadow-hover: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(92, 225, 230, 0.22);
+    --rev-shadow-drawer: -24px 0 70px rgba(0, 0, 0, 0.75);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Tajawal', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--rev-bg);
+    color: var(--rev-text-primary);
+    overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* أشرطة تمرير فائقة النعومة */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.55); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* الأرقام المالية بتباعد ثابت مثل Revolut */
+.financial-amount {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+}
+
+/* الشريط العلوي الزجاجي النظيف */
+.rev-header {
+    background: rgba(246, 247, 249, 0.82);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--rev-border);
+}
+html.dark .rev-header {
+    background: rgba(9, 11, 14, 0.82);
+}
+
+/* بطاقة العرض الرئيسية (Revolut Fintech Hero) */
+.rev-hero {
+    background: linear-gradient(135deg, #0b1324 0%, #102544 55%, #005ba3 100%);
+    border-radius: 28px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px -15px rgba(0, 91, 163, 0.32);
+}
+.rev-hero::after {
+    content: "";
+    position: absolute;
+    top: -35%;
+    left: -10%;
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(92, 225, 230, 0.22) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* الألواح والبطاقات النظيفة */
+.rev-panel {
+    background: var(--rev-surface);
+    border: 1px solid var(--rev-border);
+    border-radius: 24px;
+    box-shadow: var(--rev-shadow-card);
+    transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* بطاقة المنتج الكبيرة بأسلوب Revolut */
+.rev-product-card {
+    background: var(--rev-surface);
+    border: 1px solid var(--rev-border);
+    border-radius: 26px;
+    box-shadow: var(--rev-shadow-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.32s var(--rev-spring), box-shadow 0.32s var(--rev-spring), border-color 0.25s ease;
+}
+.rev-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--rev-shadow-hover);
+    border-color: rgba(0, 91, 163, 0.28);
+}
+html.dark .rev-product-card:hover {
+    border-color: rgba(92, 225, 230, 0.3);
+}
+
+/* الأزرار الكبسولية (Revolut Pill Buttons) */
+.rev-btn-primary {
+    background: #191c1f;
+    color: #ffffff;
+    border-radius: 9999px;
+    font-weight: 800;
+    transition: transform 0.22s var(--rev-spring), background-color 0.2s ease, box-shadow 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+.rev-btn-primary:hover {
+    background: #005ba3;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -6px rgba(0, 91, 163, 0.45);
+}
+.rev-btn-primary:active {
+    transform: scale(0.96);
+}
+.rev-btn-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+}
+html.dark .rev-btn-primary {
+    background: #ffffff;
+    color: #090b0e;
+}
+html.dark .rev-btn-primary:hover {
+    background: #5CE1E6;
+    color: #060913;
+    box-shadow: 0 8px 24px -6px rgba(92, 225, 230, 0.45);
+}
+
+.rev-btn-brand {
+    background: linear-gradient(135deg, #005ba3 0%, #0070c9 100%);
+    color: #ffffff;
+    border-radius: 9999px;
+    font-weight: 800;
+    box-shadow: 0 8px 22px -6px rgba(0, 91, 163, 0.45);
+    transition: transform 0.22s var(--rev-spring), filter 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+.rev-btn-brand:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+.rev-btn-brand:active {
+    transform: scale(0.96);
+}
+.rev-btn-brand:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.rev-btn-secondary {
+    background: var(--rev-surface-subtle);
+    color: var(--rev-text-primary);
+    border: 1px solid var(--rev-border);
+    border-radius: 9999px;
+    font-weight: 700;
+    transition: transform 0.2s var(--rev-spring), background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    cursor: pointer;
+}
+.rev-btn-secondary:hover {
+    background: var(--rev-border-strong);
+}
+.rev-btn-secondary:active {
+    transform: scale(0.96);
+}
+
+/* كبسولات تصفية المنصات */
+.rev-pill {
+    padding: 0.55rem 1.15rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    white-space: nowrap;
+    border: 1px solid var(--rev-border);
+    background: var(--rev-surface);
+    color: var(--rev-text-secondary);
+    transition: all 0.2s var(--rev-spring);
+    cursor: pointer;
+}
+.rev-pill:hover {
+    color: var(--rev-text-primary);
+    border-color: var(--rev-border-strong);
+}
+.rev-pill.active {
+    background: #191c1f;
+    color: #ffffff;
+    border-color: #191c1f;
+    box-shadow: 0 4px 12px rgba(25, 28, 31, 0.16);
+}
+html.dark .rev-pill.active {
+    background: #ffffff;
+    color: #090b0e;
+    border-color: #ffffff;
+}
+
+/* حقول الإدخال العصرية */
+.rev-input {
+    background: var(--rev-surface-subtle);
+    border: 1.5px solid transparent;
+    border-radius: 16px;
+    color: var(--rev-text-primary);
+    transition: all 0.2s ease;
+}
+.rev-input:hover {
+    border-color: var(--rev-border-strong);
+}
+.rev-input:focus {
+    background: var(--rev-surface);
+    border-color: #005ba3;
+    box-shadow: 0 0 0 4px rgba(0, 91, 163, 0.12);
+    outline: none;
+}
+html.dark .rev-input:focus {
+    border-color: #5CE1E6;
+    box-shadow: 0 0 0 4px rgba(92, 225, 230, 0.14);
+}
+
+/* ==================== الدرج الجانبي وشريحة الجوال (Revolut Slide-Over Drawer & Bottom Sheet) ==================== */
+.rev-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 11, 14, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 80;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transition: opacity 0.25s ease;
+}
+
+.rev-drawer-panel {
+    background: var(--rev-elevated);
+    border-top: 1px solid var(--rev-border-strong);
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 -16px 50px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: revSheetUp 0.35s var(--rev-spring) forwards;
+}
+
+@media (min-width: 640px) {
+    .rev-overlay {
+        align-items: stretch;
+        justify-content: flex-end; /* ينزلق من اليسار في الواجهة العربية RTL */
+        padding: 14px;
+    }
+    .rev-drawer-panel {
+        width: 100%;
+        max-width: 460px;
+        max-height: 100%;
+        height: 100%;
+        border-radius: 28px;
+        border: 1px solid var(--rev-border-strong);
+        box-shadow: var(--rev-shadow-drawer);
+        animation: revDrawerLeft 0.35s var(--rev-spring) forwards;
+    }
+    .rev-drawer-panel.rev-drawer-wide {
+        max-width: 680px;
+    }
+}
+
+.rev-sheet-handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--rev-border-strong);
+    margin: 10px auto 2px;
+}
+@media (min-width: 640px) {
+    .rev-sheet-handle { display: none; }
+}
+
+@keyframes revSheetUp {
+    from { opacity: 0; transform: translateY(48px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes revDrawerLeft {
+    from { opacity: 0; transform: translateX(-36px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* إشعارات الكبسولة العائمة (Revolut Pill Toast) */
+.rev-toast {
+    border-radius: 9999px;
+    padding: 0.75rem 1.25rem;
+    box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(16px);
+    animation: revToastDrop 0.35s var(--rev-spring) forwards;
+}
+@keyframes revToastDrop {
+    from { opacity: 0; transform: translateY(-18px) scale(0.94); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.fade-in {
+    animation: revFadeIn 0.4s var(--rev-spring) forwards;
+}
+@keyframes revFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* ==================== نهاية ملف css/retail-pro.css ==================== */
