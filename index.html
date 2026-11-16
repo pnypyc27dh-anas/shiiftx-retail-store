@@ -17,169 +17,328 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/retail-pro.css?v=7">
+    <link rel="stylesheet" href="css/retail-pro.css?v=8">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="min-h-screen flex flex-col justify-between pb-24 sm:pb-0 antialiased selection:bg-[#005ba3]/15 selection:text-[#005ba3]">
+<body class="min-h-screen pb-20 lg:pb-0 antialiased selection:bg-[#005ba3]/15 selection:text-[#005ba3]">
 
     <!-- نظام الإشعارات الكبسولية العائمة (Revolut Pill Toasts) -->
     <div id="retail-toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-[120] w-[92%] max-w-md flex flex-col items-center gap-2 pointer-events-none"></div>
 
-    <!-- الشريط العلوي فائق النظافة -->
-    <header class="rev-header sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-            <!-- شعار SHIIFT X الفيكتور الرسمي -->
-            <a href="/" class="flex items-center gap-3 select-none group">
-                <svg class="h-7 md:h-8 w-auto transition-transform duration-200 group-hover:scale-105" viewBox="70 100 405 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path class="fill-[#191c1f] dark:fill-white transition-colors" d="M102.584 151.616C106.853 151.616 110.767 152.034 114.324 152.871C117.871 153.706 121.098 154.808 124.002 156.179L124.289 156.315L124.185 156.615L121.162 165.332L121.035 165.698L120.682 165.538C118.039 164.34 115.144 163.327 111.994 162.501H111.992C108.929 161.679 105.721 161.268 102.368 161.268C99.163 161.268 96.5183 161.754 94.4189 162.708C92.3171 163.663 90.7558 165.014 89.7178 166.756L89.7148 166.762C88.6751 168.434 88.1484 170.405 88.1484 172.689C88.1485 175.36 88.6793 177.557 89.7178 179.3C90.758 181.046 92.4705 182.63 94.8828 184.044C97.3071 185.465 100.597 187.005 104.761 188.661H104.762C109.309 190.402 113.145 192.298 116.265 194.352L116.856 194.73C119.772 196.644 121.995 198.937 123.511 201.611H123.51C125.204 204.471 126.039 208.046 126.039 212.315C126.039 217.201 124.91 221.385 122.635 224.849L122.633 224.852C120.359 228.236 117.1 230.841 112.874 232.676L112.875 232.677C108.718 234.513 103.809 235.425 98.1582 235.425C95.2674 235.425 92.4834 235.273 89.8066 234.97L89.8047 234.969C87.2021 234.666 84.8129 234.248 82.6377 233.716L82.626 233.713C80.4497 233.104 78.5209 232.38 76.8418 231.537L76.6465 231.44V220.93L77.1494 221.164C79.7146 222.36 82.8951 223.447 86.6953 224.425H86.6943C90.5515 225.399 94.5164 225.886 98.5898 225.886C102.374 225.886 105.528 225.362 108.064 224.327C110.602 223.292 112.482 221.823 113.731 219.931C114.984 218.033 115.616 215.801 115.616 213.22C115.616 210.626 115.086 208.465 114.047 206.721C113.01 204.981 111.194 203.358 108.562 201.866L108.553 201.861C105.99 200.293 102.379 198.642 97.7109 196.909L97.707 196.907C94.3838 195.619 91.452 194.253 88.915 192.809L88.9043 192.803C86.4318 191.278 84.3524 189.557 82.6709 187.64C80.9858 185.719 79.7044 183.529 78.8262 181.073L78.8223 181.064V181.063C78.0167 178.605 77.6182 175.774 77.6182 172.575C77.6182 168.214 78.6769 164.48 80.8115 161.392C82.9379 158.24 85.8691 155.823 89.5928 154.138L89.5947 154.137C93.3894 152.453 97.7216 151.616 102.584 151.616ZM156.342 152.748V186.94H195.144V152.748H205.566V234.292H195.144V196.591H156.342V234.292H145.918V152.748H156.342Z"/>
-                    <path class="fill-[#191c1f] dark:fill-white transition-colors" d="M389.967 151.616V161.519H350.874V190.257H387.563V200.159H350.874V235.425H338.781V151.616H389.967ZM467.7 151.616V161.519H439.615V235.425H427.521V161.519H399.308V151.616H467.7Z"/>
-                    <path class="fill-[#005ba3] dark:fill-[#5CE1E6] transition-colors" d="M234.632 132.734L234.737 132.895L270.402 187.555L270.537 187.763L270.388 187.961L234.723 235.284L234.616 235.425H212.435L212.827 234.867L246.018 187.733L212.815 133.272L212.487 132.734H234.632ZM332.739 132.734L332.41 133.272L299.206 187.733L332.398 234.867L332.79 235.425H310.609L310.502 235.284L274.837 187.961L274.688 187.763L274.823 187.555L310.489 132.895L310.593 132.734H332.739ZM225.717 104.646C229.012 104.647 231.91 105.552 234.396 107.37C237.099 109.098 238.429 111.887 238.429 115.655C238.429 119.302 237.094 122.079 234.406 123.931L234.406 123.932C231.918 125.755 229.017 126.664 225.717 126.664C222.102 126.664 219.037 125.76 216.542 123.932C214.011 122.077 212.763 119.296 212.763 115.655C212.763 111.893 214.007 109.103 216.552 107.371C219.045 105.548 222.107 104.646 225.717 104.646ZM319.508 104.646C323.118 104.646 326.181 105.548 328.673 107.371L328.907 107.537C331.294 109.279 332.462 112.011 332.462 115.655C332.462 119.296 331.214 122.077 328.683 123.932C326.189 125.76 323.123 126.664 319.508 126.664C316.208 126.664 313.307 125.755 310.819 123.932V123.931C308.13 122.079 306.796 119.301 306.796 115.655C306.796 111.888 308.126 109.098 310.828 107.37C313.314 105.552 316.213 104.647 319.508 104.646Z"/>
-                </svg>
-                <span class="hidden md:inline-block text-[11px] font-bold text-[#6c727f] dark:text-slate-400 border-r border-black/10 dark:border-white/10 pr-3">
-                    المتجر الرقمي
-                </span>
-            </a>
+    <!-- خلفية القائمة الجانبية على الهواتف والأجهزة اللوحية -->
+    <div id="sidebar-backdrop" class="hidden rev-sidebar-backdrop lg:hidden" onclick="toggleMobileSidebar(false)"></div>
 
-            <div class="flex items-center gap-2">
-                <!-- زر المظهر الليلي/النهاري -->
-                <button onclick="toggleRetailTheme()" class="rev-btn-secondary w-9 h-9 text-slate-700 dark:text-amber-400" title="تبديل المظهر">
-                    <i class="ph-fill ph-moon text-base dark:hidden"></i>
-                    <i class="ph-fill ph-sun text-base hidden dark:inline"></i>
+    <!-- هيكل التطبيق الرئيسي ذو القائمة الجانبية الثابتة (Revolut App Shell) -->
+    <div class="rev-app-shell">
+
+        <!-- ==================== القائمة الجانبية الثابتة (Persistent Sidebar) ==================== -->
+        <aside id="app-sidebar" class="rev-sidebar">
+            <!-- رأس القائمة الجانبية والشعار -->
+            <div class="h-16 px-5 border-b border-black/6 dark:border-white/8 flex items-center justify-between shrink-0">
+                <a href="/" class="flex items-center gap-2.5 select-none group">
+                    <svg class="h-7 w-auto transition-transform duration-200 group-hover:scale-105" viewBox="70 100 405 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path class="fill-[#191c1f] dark:fill-white transition-colors" d="M102.584 151.616C106.853 151.616 110.767 152.034 114.324 152.871C117.871 153.706 121.098 154.808 124.002 156.179L124.289 156.315L124.185 156.615L121.162 165.332L121.035 165.698L120.682 165.538C118.039 164.34 115.144 163.327 111.994 162.501H111.992C108.929 161.679 105.721 161.268 102.368 161.268C99.163 161.268 96.5183 161.754 94.4189 162.708C92.3171 163.663 90.7558 165.014 89.7178 166.756L89.7148 166.762C88.6751 168.434 88.1484 170.405 88.1484 172.689C88.1485 175.36 88.6793 177.557 89.7178 179.3C90.758 181.046 92.4705 182.63 94.8828 184.044C97.3071 185.465 100.597 187.005 104.761 188.661H104.762C109.309 190.402 113.145 192.298 116.265 194.352L116.856 194.73C119.772 196.644 121.995 198.937 123.511 201.611H123.51C125.204 204.471 126.039 208.046 126.039 212.315C126.039 217.201 124.91 221.385 122.635 224.849L122.633 224.852C120.359 228.236 117.1 230.841 112.874 232.676L112.875 232.677C108.718 234.513 103.809 235.425 98.1582 235.425C95.2674 235.425 92.4834 235.273 89.8066 234.97L89.8047 234.969C87.2021 234.666 84.8129 234.248 82.6377 233.716L82.626 233.713C80.4497 233.104 78.5209 232.38 76.8418 231.537L76.6465 231.44V220.93L77.1494 221.164C79.7146 222.36 82.8951 223.447 86.6953 224.425H86.6943C90.5515 225.399 94.5164 225.886 98.5898 225.886C102.374 225.886 105.528 225.362 108.064 224.327C110.602 223.292 112.482 221.823 113.731 219.931C114.984 218.033 115.616 215.801 115.616 213.22C115.616 210.626 115.086 208.465 114.047 206.721C113.01 204.981 111.194 203.358 108.562 201.866L108.553 201.861C105.99 200.293 102.379 198.642 97.7109 196.909L97.707 196.907C94.3838 195.619 91.452 194.253 88.915 192.809L88.9043 192.803C86.4318 191.278 84.3524 189.557 82.6709 187.64C80.9858 185.719 79.7044 183.529 78.8262 181.073L78.8223 181.064V181.063C78.0167 178.605 77.6182 175.774 77.6182 172.575C77.6182 168.214 78.6769 164.48 80.8115 161.392C82.9379 158.24 85.8691 155.823 89.5928 154.138L89.5947 154.137C93.3894 152.453 97.7216 151.616 102.584 151.616ZM156.342 152.748V186.94H195.144V152.748H205.566V234.292H195.144V196.591H156.342V234.292H145.918V152.748H156.342Z"/>
+                        <path class="fill-[#191c1f] dark:fill-white transition-colors" d="M389.967 151.616V161.519H350.874V190.257H387.563V200.159H350.874V235.425H338.781V151.616H389.967ZM467.7 151.616V161.519H439.615V235.425H427.521V161.519H399.308V151.616H467.7Z"/>
+                        <path class="fill-[#005ba3] dark:fill-[#5CE1E6] transition-colors" d="M234.632 132.734L234.737 132.895L270.402 187.555L270.537 187.763L270.388 187.961L234.723 235.284L234.616 235.425H212.435L212.827 234.867L246.018 187.733L212.815 133.272L212.487 132.734H234.632ZM332.739 132.734L332.41 133.272L299.206 187.733L332.398 234.867L332.79 235.425H310.609L310.502 235.284L274.837 187.961L274.688 187.763L274.823 187.555L310.489 132.895L310.593 132.734H332.739ZM225.717 104.646C229.012 104.647 231.91 105.552 234.396 107.37C237.099 109.098 238.429 111.887 238.429 115.655C238.429 119.302 237.094 122.079 234.406 123.931L234.406 123.932C231.918 125.755 229.017 126.664 225.717 126.664C222.102 126.664 219.037 125.76 216.542 123.932C214.011 122.077 212.763 119.296 212.763 115.655C212.763 111.893 214.007 109.103 216.552 107.371C219.045 105.548 222.107 104.646 225.717 104.646ZM319.508 104.646C323.118 104.646 326.181 105.548 328.673 107.371L328.907 107.537C331.294 109.279 332.462 112.011 332.462 115.655C332.462 119.296 331.214 122.077 328.683 123.932C326.189 125.76 323.123 126.664 319.508 126.664C316.208 126.664 313.307 125.755 310.819 123.932V123.931C308.13 122.079 306.796 119.301 306.796 115.655C306.796 111.888 308.126 109.098 310.828 107.37C313.314 105.552 316.213 104.647 319.508 104.646Z"/>
+                    </svg>
+                </a>
+                <button type="button" onclick="toggleMobileSidebar(false)" class="lg:hidden rev-btn-secondary w-8 h-8">
+                    <i class="ph-bold ph-x text-sm"></i>
                 </button>
+            </div>
 
-                <!-- شريط المستخدم المسجل -->
-                <div id="user-nav-panel" class="hidden items-center gap-2">
-                    <div class="flex items-center rounded-full bg-white dark:bg-[#191d26] border border-black/10 dark:border-white/10 p-1 shadow-xs">
-                        <div class="px-3 py-1 text-xs font-extrabold flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            <span id="nav-wallet-balance" class="financial-amount" dir="ltr">$0.00</span>
+            <!-- محتوى القائمة الجانبية القابل للتمرير -->
+            <div class="p-4 flex-grow overflow-y-auto space-y-6">
+
+                <!-- بطاقة المحفظة المصغرة داخل القائمة الجانبية -->
+                <div class="rev-wallet-widget">
+                    <!-- حالة الزائر -->
+                    <div id="sidebar-guest-box" class="relative z-10 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-300">محفظة SHIIFT X</span>
+                            <i class="ph-fill ph-wallet text-[#5CE1E6] text-lg"></i>
                         </div>
-                        <button type="button" onclick="openTopupModal()" class="rev-btn-primary px-3 py-1.5 text-[11px]" title="شحن الرصيد">
-                            <i class="ph-bold ph-plus text-xs"></i>
-                            <span class="hidden sm:inline">إيداع</span>
+                        <p class="text-xs font-bold leading-relaxed text-white/95">
+                            سجّل الدخول لإدارة رصيدك وشراء البطاقات بضغطة واحدة.
+                        </p>
+                        <button type="button" onclick="toggleMobileSidebar(false); openAuthModal('login');" class="w-full py-2.5 rounded-full bg-white hover:bg-[#5CE1E6] text-[#191c1f] text-xs font-black transition cursor-pointer">
+                            تسجيل الدخول / إنشاء حساب
                         </button>
                     </div>
 
-                    <button onclick="openOrdersModal()" class="rev-btn-secondary px-3.5 py-2 text-xs">
-                        <i class="ph-bold ph-receipt text-base text-[#005ba3] dark:text-[#5CE1E6]"></i>
-                        <span class="hidden sm:inline">طلباتي</span>
+                    <!-- حالة المستخدم المسجل -->
+                    <div id="sidebar-user-box" class="hidden relative z-10 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-300">الرصيد المتاح</span>
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-extrabold">USD</span>
+                        </div>
+                        <div id="sidebar-wallet-balance" class="financial-amount text-2xl font-black tracking-tight" dir="ltr">$0.00</div>
+                        <div class="flex items-center gap-2 pt-1">
+                            <button type="button" onclick="toggleMobileSidebar(false); openTopupModal();" class="flex-1 py-2 rounded-full bg-white hover:bg-[#5CE1E6] text-[#191c1f] text-[11px] font-black flex items-center justify-center gap-1 transition cursor-pointer">
+                                <i class="ph-bold ph-plus text-xs"></i>
+                                <span>إيداع</span>
+                            </button>
+                            <button type="button" onclick="toggleMobileSidebar(false); openOrdersModal();" class="flex-1 py-2 rounded-full bg-white/15 hover:bg-white/25 text-white text-[11px] font-bold flex items-center justify-center gap-1 transition cursor-pointer">
+                                <i class="ph-bold ph-receipt text-xs"></i>
+                                <span>طلباتي</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- قسم التنقل الرئيسي -->
+                <div class="space-y-1">
+                    <div class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#98a0ad]">التصفح السريع</div>
+
+                    <button type="button" id="nav-btn-store" onclick="switchAppView('store')" class="rev-nav-item active">
+                        <span class="flex items-center gap-2.5">
+                            <span class="rev-nav-icon"><i class="ph-fill ph-storefront"></i></span>
+                            <span>جميع المنتجات</span>
+                        </span>
+                        <span id="sidebar-total-count" class="text-[11px] font-extrabold opacity-75">0</span>
                     </button>
 
-                    <button onclick="handleRetailLogout()" class="rev-btn-secondary w-9 h-9 text-rose-600 dark:text-rose-400" title="تسجيل الخروج">
-                        <i class="ph-bold ph-sign-out text-base"></i>
+                    <button type="button" id="nav-btn-favorites" onclick="switchAppView('favorites')" class="rev-nav-item">
+                        <span class="flex items-center gap-2.5">
+                            <span class="rev-nav-icon"><i class="ph-fill ph-heart"></i></span>
+                            <span>المفضلة</span>
+                        </span>
+                        <span id="sidebar-fav-count" class="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-500 text-[10px] font-black">0</span>
+                    </button>
+
+                    <button type="button" onclick="toggleMobileSidebar(false); openOrdersModal();" class="rev-nav-item">
+                        <span class="flex items-center gap-2.5">
+                            <span class="rev-nav-icon"><i class="ph-fill ph-receipt"></i></span>
+                            <span>سجل المشتريات</span>
+                        </span>
+                        <i class="ph-bold ph-caret-left text-xs opacity-50"></i>
                     </button>
                 </div>
 
-                <!-- زر تسجيل الدخول للزوار -->
-                <button id="guest-login-btn" onclick="openAuthModal('login')" class="rev-btn-primary px-5 py-2.5 text-xs">
-                    <span>تسجيل الدخول</span>
+                <!-- قسم المنصات والألعاب (يُملأ ديناميكياً) -->
+                <div class="space-y-1">
+                    <div class="px-3 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-[#98a0ad]">المنصات والألعاب</div>
+                    <div id="sidebar-platform-list" class="space-y-1">
+                        <div class="px-3 py-2 text-xs text-[#68707d]">جاري تحميل الأقسام...</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- تذييل القائمة الجانبية -->
+            <div class="p-4 border-t border-black/6 dark:border-white/8 space-y-2 shrink-0">
+                <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="rev-nav-item">
+                    <span class="flex items-center gap-2.5">
+                        <span class="rev-nav-icon text-emerald-600 dark:text-emerald-400"><i class="ph-fill ph-whatsapp-logo"></i></span>
+                        <span>الدعم المباشر</span>
+                    </span>
+                    <i class="ph-bold ph-arrow-up-left text-xs opacity-50"></i>
+                </a>
+
+                <button type="button" id="sidebar-logout-btn" onclick="handleRetailLogout()" class="hidden rev-nav-item text-rose-600 dark:text-rose-400">
+                    <span class="flex items-center gap-2.5">
+                        <span class="rev-nav-icon text-rose-600 dark:text-rose-400"><i class="ph-bold ph-sign-out"></i></span>
+                        <span>تسجيل الخروج</span>
+                    </span>
                 </button>
             </div>
+        </aside>
+
+        <!-- ==================== مساحة العمل الرئيسية (Main Workspace) ==================== -->
+        <div class="flex-1 flex flex-col min-w-0">
+
+            <!-- الشريط العلوي مع البحث المركزي -->
+            <header class="rev-topbar sticky top-0 z-30">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+                    <!-- زر فتح القائمة الجانبية على الهواتف -->
+                    <div class="flex items-center gap-2.5 lg:hidden">
+                        <button type="button" onclick="toggleMobileSidebar(true)" class="rev-btn-secondary w-10 h-10 shrink-0" title="القائمة">
+                            <i class="ph-bold ph-list text-lg"></i>
+                        </button>
+                        <span class="font-black text-sm tracking-tight">SHIIFT X</span>
+                    </div>
+
+                    <!-- حقل البحث المركزي الفوري -->
+                    <div class="relative flex-grow max-w-xl">
+                        <i class="ph-bold ph-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-[#68707d] text-base pointer-events-none"></i>
+                        <input id="catalog-search-input" type="text" oninput="handleCatalogSearch(this.value)" placeholder="ابحث عن لعبة، منصة، أو قيمة بطاقة..." class="rev-input w-full pr-11 pl-10 py-2.5 text-xs font-bold">
+                        <button type="button" id="clear-search-btn" onclick="clearCatalogSearch()" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/10 dark:bg-white/10 text-xs items-center justify-center hover:bg-rose-500 hover:text-white transition cursor-pointer">
+                            <i class="ph-bold ph-x"></i>
+                        </button>
+                    </div>
+
+                    <!-- أدوات المستخدم السريعة -->
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="toggleRetailTheme()" class="rev-btn-secondary w-9 h-9 text-slate-700 dark:text-amber-400" title="تبديل المظهر">
+                            <i class="ph-fill ph-moon text-base dark:hidden"></i>
+                            <i class="ph-fill ph-sun text-base hidden dark:inline"></i>
+                        </button>
+
+                        <div id="user-nav-panel" class="hidden items-center gap-2">
+                            <button type="button" onclick="openTopupModal()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white dark:bg-[#181c25] border border-black/10 dark:border-white/10 text-xs font-extrabold shadow-xs hover:border-[#005ba3] transition cursor-pointer">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span id="nav-wallet-balance" class="financial-amount" dir="ltr">$0.00</span>
+                            </button>
+                        </div>
+
+                        <button id="guest-login-btn" onclick="openAuthModal('login')" class="rev-btn-primary px-4 sm:px-5 py-2.5 text-xs">
+                            <span>دخول</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- المحتوى الرئيسي -->
+            <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 flex-grow fade-in">
+
+                <!-- 1. شريط متابعة الطلبات النشطة (يظهر تلقائياً عند وجود طلب شحن مباشر قيد المعالجة) -->
+                <div id="pending-order-banner" class="hidden rev-panel px-5 py-3.5 border-amber-500/30 bg-amber-500/8 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 text-xs">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping shrink-0"></span>
+                        <span class="font-extrabold text-amber-700 dark:text-amber-300">
+                            لديك <span id="pending-orders-count">1</span> طلب شحن مباشر قيد التنفيذ حالياً
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="syncAllPendingOrders()" class="rev-btn-primary px-4 py-1.5 text-[11px]">
+                            <i class="ph-bold ph-arrows-clockwise"></i>
+                            <span>تحديث الحالة</span>
+                        </button>
+                        <button type="button" onclick="openOrdersModal()" class="rev-btn-secondary px-3.5 py-1.5 text-[11px]">
+                            التفاصيل
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. واجهة العرض الرئيسية (Hero Banner) -->
+                <section id="store-hero-banner" class="rev-hero p-6 sm:p-9 text-white">
+                    <div class="relative z-10 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
+                        <div class="space-y-3 max-w-2xl">
+                            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[#5CE1E6] text-[11px] font-extrabold">
+                                <i class="ph-fill ph-sparkle"></i>
+                                <span>تسليم آلي فوري • تاجر أوروبي مسجل</span>
+                            </div>
+                            <h1 class="text-2xl sm:text-3xl font-black leading-[1.2] tracking-tight">
+                                اشحن ألعابك وبطاقاتك الرقمية <span class="text-[#5CE1E6]">بسرعة البرق وأمان تام.</span>
+                            </h1>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl font-medium">
+                                اختر منصتك من القائمة الجانبية أو ابحث مباشرة؛ أسعار نهائية شاملة للضريبة وتسليم فوري للأكواد.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3 shrink-0 w-full sm:w-auto">
+                            <button type="button" onclick="openTopupModal()" class="flex-1 sm:flex-initial px-6 py-3 rounded-full bg-white hover:bg-[#5CE1E6] text-[#191c1f] text-xs font-black flex items-center justify-center gap-2 shadow-lg transition cursor-pointer">
+                                <i class="ph-bold ph-plus-circle text-base"></i>
+                                <span>إيداع في المحفظة</span>
+                            </button>
+                            <button type="button" onclick="openOrdersModal()" class="flex-1 sm:flex-initial px-5 py-3 rounded-full bg-white/12 hover:bg-white/20 border border-white/20 text-white text-xs font-bold flex items-center justify-center gap-2 backdrop-blur-md transition cursor-pointer">
+                                <i class="ph-bold ph-receipt text-base text-[#5CE1E6]"></i>
+                                <span>مشترياتي</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. شريط مسار التصفح الديناميكي وأدوات الفرز (Breadcrumbs & Sort Bar) -->
+                <section class="flex flex-wrap items-center justify-between gap-3 px-1">
+                    <div class="flex items-center gap-2 text-xs font-bold text-[#68707d] dark:text-slate-400">
+                        <button type="button" onclick="switchAppView('store'); filterRetailCatalog('ALL');" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition cursor-pointer">
+                            المتجر
+                        </button>
+                        <i class="ph-bold ph-caret-left text-[10px] opacity-60"></i>
+                        <span id="breadcrumb-current" class="font-black text-[#191c1f] dark:text-white">جميع الباقات</span>
+                        <span class="px-2.5 py-0.5 rounded-full bg-black/5 dark:bg-white/8 text-[11px] font-extrabold" id="breadcrumb-count">0 باقة</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <select id="catalog-sort-select" onchange="handleCatalogSort(this.value)" class="rev-input px-3.5 py-2 text-xs font-bold cursor-pointer">
+                            <option value="default">الترتيب الافتراضي</option>
+                            <option value="price_asc">السعر: من الأقل للأعلى</option>
+                            <option value="price_desc">السعر: من الأعلى للأقل</option>
+                        </select>
+
+                        <button type="button" onclick="loadRetailCatalog()" class="rev-btn-secondary w-9 h-9 shrink-0" title="تحديث الأسعار">
+                            <i class="ph-bold ph-arrows-clockwise text-sm"></i>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 4. شبكة عرض الباقات الكبيرة -->
+                <section id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="rev-panel overflow-hidden animate-pulse">
+                        <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
+                        <div class="p-5 space-y-4">
+                            <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
+                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
+                            <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
+                                <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
+                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rev-panel overflow-hidden animate-pulse hidden sm:block">
+                        <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
+                        <div class="p-5 space-y-4">
+                            <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
+                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
+                            <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
+                                <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
+                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rev-panel overflow-hidden animate-pulse hidden xl:block">
+                        <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
+                        <div class="p-5 space-y-4">
+                            <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
+                            <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
+                            <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
+                                <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
+                                <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- التذييل الموحد -->
+            <footer class="w-full max-w-6xl mx-auto mt-14 px-4 sm:px-6 py-8 border-t border-black/8 dark:border-white/8 text-xs text-[#68707d] dark:text-slate-400 space-y-4">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="font-black text-[#191c1f] dark:text-white">SHIIFT X</span>
+                        <span>© 2026 — مسجل في النمسا (الاتحاد الأوروبي)</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <a href="https://www.facebook.com/share/19z9gWepTE/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="rev-btn-secondary w-8 h-8 text-base" title="فيسبوك">
+                            <i class="ph-fill ph-facebook-logo"></i>
+                        </a>
+                        <a href="https://www.instagram.com/shiiftx11?rpxt=czF4N2NubHljandn&utm_source=qr" target="_blank" rel="noopener noreferrer" class="rev-btn-secondary w-8 h-8 text-base" title="إنستغرام">
+                            <i class="ph-fill ph-instagram-logo"></i>
+                        </a>
+                        <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="rev-btn-secondary w-8 h-8 text-base" title="واتساب">
+                            <i class="ph-fill ph-whatsapp-logo"></i>
+                        </a>
+                    </div>
+
+                    <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 font-bold text-[#191c1f] dark:text-slate-300">
+                        <a href="/privacy.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">الخصوصية</a>
+                        <a href="/terms.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">الشروط</a>
+                        <a href="/refund.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">الاسترجاع</a>
+                        <a href="/impressum.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">Impressum</a>
+                    </div>
+                </div>
+
+                <p class="text-[11px] leading-relaxed text-[#98a0ad] dark:text-slate-500 text-center sm:text-right">
+                    جميع الأسعار المعروضة نهائية وشاملة للضرائب المطبقة. جميع العلامات التجارية المذكورة هي ملك لأصحابها الأصليين؛ يعمل متجر SHIIFT X كموزع مستقل للبطاقات الرقمية. للدعم الرسمي:
+                    <a href="mailto:support@shiiftx.com" dir="ltr" class="font-mono text-[#005ba3] dark:text-[#5CE1E6] hover:underline">support@shiiftx.com</a>
+                </p>
+            </footer>
+
         </div>
-    </header>
-
-    <!-- المحتوى الرئيسي -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-7 space-y-6 w-full flex-grow fade-in">
-
-        <!-- 1. واجهة العرض الرئيسية بأسلوب Revolut -->
-        <section class="rev-hero p-7 sm:p-10 text-white">
-            <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-7">
-                <div class="space-y-3.5 max-w-2xl">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-[#5CE1E6] text-[11px] font-extrabold">
-                        <i class="ph-fill ph-sparkle"></i>
-                        <span>تسليم فوري • تاجر أوروبي مسجل</span>
-                    </div>
-                    <h1 class="text-2xl sm:text-4xl font-black leading-[1.18] tracking-tight">
-                        بطاقاتك الرقمية وشحن ألعابك، <span class="text-[#5CE1E6]">ببساطة وسرعة فائقة.</span>
-                    </h1>
-                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl font-medium">
-                        اشترِ أكواد الشحن الفورية أو اشحن حسابك مباشرة بالمعرّف (ID) بأسعار نهائية واضحة وبدون أي رسوم مخفية.
-                    </p>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-3 shrink-0 w-full sm:w-auto">
-                    <button type="button" onclick="document.getElementById('catalog-search-input').focus()" class="flex-1 sm:flex-initial px-6 py-3.5 rounded-full bg-white hover:bg-[#5CE1E6] text-[#191c1f] text-xs font-black flex items-center justify-center gap-2 shadow-lg transition cursor-pointer">
-                        <i class="ph-bold ph-magnifying-glass text-base"></i>
-                        <span>تصفّح الباقات</span>
-                    </button>
-                    <button type="button" onclick="openTopupModal()" class="flex-1 sm:flex-initial px-5 py-3.5 rounded-full bg-white/12 hover:bg-white/20 border border-white/20 text-white text-xs font-bold flex items-center justify-center gap-2 backdrop-blur-md transition cursor-pointer">
-                        <i class="ph-bold ph-plus-circle text-base text-[#5CE1E6]"></i>
-                        <span>شحن المحفظة</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. شريط البحث والفرز وتصفية المنصات المدمج -->
-        <section class="rev-panel p-4 sm:p-5 space-y-4">
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <div class="relative flex-grow">
-                    <i class="ph-bold ph-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-[#6c727f] text-base pointer-events-none"></i>
-                    <input id="catalog-search-input" type="text" oninput="handleCatalogSearch(this.value)" placeholder="ابحث عن لعبة، منصة، أو قيمة بطاقة..." class="rev-input w-full pr-11 pl-10 py-3 text-xs font-bold">
-                    <button type="button" id="clear-search-btn" onclick="clearCatalogSearch()" class="hidden absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/10 dark:bg-white/10 text-xs items-center justify-center hover:bg-rose-500 hover:text-white transition cursor-pointer">
-                        <i class="ph-bold ph-x"></i>
-                    </button>
-                </div>
-
-                <div class="flex items-center gap-2 shrink-0">
-                    <select id="catalog-sort-select" onchange="handleCatalogSort(this.value)" class="rev-input px-4 py-3 text-xs font-bold cursor-pointer">
-                        <option value="default">الترتيب الافتراضي</option>
-                        <option value="price_asc">السعر: من الأقل للأعلى</option>
-                        <option value="price_desc">السعر: من الأعلى للأقل</option>
-                    </select>
-
-                    <button type="button" onclick="loadRetailCatalog()" class="rev-btn-secondary w-10 h-10 shrink-0" title="تحديث الأسعار">
-                        <i class="ph-bold ph-arrows-clockwise text-base"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div id="platform-filters" class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-                <button onclick="filterRetailCatalog('ALL')" data-platform="ALL" class="rev-pill active">
-                    جميع الباقات
-                </button>
-            </div>
-        </section>
-
-        <!-- 3. شبكة عرض الباقات الكبيرة -->
-        <section id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="rev-panel overflow-hidden animate-pulse">
-                <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
-                <div class="p-5 space-y-4">
-                    <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
-                    <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
-                    <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
-                        <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
-                        <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="rev-panel overflow-hidden animate-pulse hidden sm:block">
-                <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
-                <div class="p-5 space-y-4">
-                    <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
-                    <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
-                    <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
-                        <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
-                        <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="rev-panel overflow-hidden animate-pulse hidden lg:block">
-                <div class="w-full h-[220px] bg-black/5 dark:bg-white/5"></div>
-                <div class="p-5 space-y-4">
-                    <div class="h-4 bg-black/5 dark:bg-white/5 rounded-full w-3/4"></div>
-                    <div class="h-3 bg-black/5 dark:bg-white/5 rounded-full w-1/2"></div>
-                    <div class="pt-3 border-t border-black/5 dark:border-white/5 flex justify-between items-center">
-                        <div class="h-6 bg-black/5 dark:bg-white/5 rounded-full w-16"></div>
-                        <div class="h-10 bg-black/5 dark:bg-white/5 rounded-full w-28"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
+    </div>
 
     <!-- ==================== الأدراج الجانبية المنزلقة وشرائح الجوال (Revolut Drawers) ==================== -->
 
@@ -188,7 +347,6 @@
         <div class="rev-drawer-panel text-right" onclick="event.stopPropagation()">
             <div class="rev-sheet-handle"></div>
 
-            <!-- صورة الباقة -->
             <div class="relative w-full h-56 bg-[#0b1324] overflow-hidden shrink-0">
                 <img id="pkg-detail-img" src="" alt="" referrerpolicy="no-referrer" class="w-full h-full object-cover object-center">
                 <div id="pkg-detail-fallback" class="hidden w-full h-full bg-gradient-to-br from-[#0b1324] via-[#102544] to-[#005ba3] flex items-center justify-center">
@@ -198,31 +356,32 @@
                 <button type="button" onclick="closePackageDetailsModal()" class="absolute top-4 left-4 w-9 h-9 rounded-full bg-black/55 hover:bg-rose-600 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
                     <i class="ph-bold ph-x text-base"></i>
                 </button>
+                <button type="button" id="pkg-detail-fav-btn" data-id="" onclick="toggleFavoritePackage(this.dataset.id)" class="rev-fav-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/55 hover:bg-rose-500 text-white border border-white/15 flex items-center justify-center backdrop-blur-md transition cursor-pointer" title="إضافة للمفضلة">
+                    <i class="ph-fill ph-heart text-base"></i>
+                </button>
                 <span id="pkg-detail-platform" class="absolute bottom-4 right-5 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-[11px] font-extrabold">---</span>
             </div>
 
-            <!-- محتوى الدرج -->
             <div class="p-6 flex-grow overflow-y-auto space-y-5">
                 <div>
-                    <span class="text-[11px] font-bold text-[#6c727f] dark:text-slate-400">تفاصيل الباقة</span>
+                    <span class="text-[11px] font-bold text-[#68707d] dark:text-slate-400">تفاصيل الباقة</span>
                     <h3 id="pkg-detail-title" class="text-xl font-black leading-snug mt-0.5">---</h3>
                 </div>
 
-                <div class="p-4 rounded-2xl bg-[#f0f2f5] dark:bg-[#191d26] space-y-2">
+                <div class="p-4 rounded-2xl bg-[#eef0f4] dark:bg-[#181c25] space-y-2">
                     <div class="text-xs font-extrabold text-[#005ba3] dark:text-[#5CE1E6] flex items-center gap-1.5">
                         <i class="ph-fill ph-info text-base"></i>
                         <span>تعليمات الشحن وملاحظات هامة</span>
                     </div>
-                    <p id="pkg-detail-instructions" class="text-xs leading-relaxed text-[#6c727f] dark:text-slate-300 whitespace-pre-line">
+                    <p id="pkg-detail-instructions" class="text-xs leading-relaxed text-[#68707d] dark:text-slate-300 whitespace-pre-line">
                         ---
                     </p>
                 </div>
             </div>
 
-            <!-- تذييل الدرج الثابت -->
             <div class="p-5 border-t border-black/8 dark:border-white/8 flex items-center justify-between gap-4 shrink-0">
                 <div>
-                    <span class="block text-[10px] font-bold text-[#6c727f] dark:text-slate-400">السعر النهائي شامل الضريبة</span>
+                    <span class="block text-[10px] font-bold text-[#68707d] dark:text-slate-400">السعر النهائي شامل الضريبة</span>
                     <span id="pkg-detail-price" class="financial-amount text-2xl font-black" dir="ltr">$0.00</span>
                 </div>
                 <button type="button" id="pkg-detail-buy-btn" data-id="" onclick="handleCardDirectBuy(this.dataset.id)" class="rev-btn-primary px-7 py-3.5 text-xs">
@@ -249,15 +408,15 @@
             </div>
 
             <div class="p-6 flex-grow overflow-y-auto space-y-5 text-xs">
-                <div class="p-4 rounded-2xl bg-[#f0f2f5] dark:bg-[#191d26] space-y-2">
-                    <span class="block text-[11px] font-bold text-[#6c727f] dark:text-slate-400">معرّف حسابك (البريد الإلكتروني):</span>
-                    <div class="flex items-center justify-between gap-2 bg-white dark:bg-[#12151c] p-3 rounded-xl border border-black/8 dark:border-white/8">
+                <div class="p-4 rounded-2xl bg-[#eef0f4] dark:bg-[#181c25] space-y-2">
+                    <span class="block text-[11px] font-bold text-[#68707d] dark:text-slate-400">معرّف حسابك (البريد الإلكتروني):</span>
+                    <div class="flex items-center justify-between gap-2 bg-white dark:bg-[#11141b] p-3 rounded-xl border border-black/8 dark:border-white/8">
                         <span id="topup-user-email" dir="ltr" class="font-mono font-bold truncate">---</span>
                         <button type="button" onclick="copyTopupEmail()" class="rev-btn-primary px-3.5 py-1.5 text-[11px] shrink-0">نسخ</button>
                     </div>
                 </div>
 
-                <p class="leading-relaxed text-[#6c727f] dark:text-slate-300">
+                <p class="leading-relaxed text-[#68707d] dark:text-slate-300">
                     لإضافة رصيد فوري إلى محفظتك، انسخ بريد حسابك أعلاه وتواصل مع فريق الدعم أو الوكيل المعتمد مع تحديد المبلغ المطلوب:
                 </p>
 
@@ -291,15 +450,15 @@
                 <form id="auth-form" onsubmit="handleRetailAuthSubmit(event)" class="space-y-4 text-xs">
                     <input type="hidden" id="auth-mode" value="login">
                     <div id="auth-name-group" class="hidden space-y-1.5">
-                        <label class="block font-bold text-[#6c727f] dark:text-slate-400">الاسم الكامل</label>
+                        <label class="block font-bold text-[#68707d] dark:text-slate-400">الاسم الكامل</label>
                         <input id="auth-fullname" type="text" placeholder="أدخل اسمك الكامل" class="rev-input w-full px-4 py-3.5 font-bold">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block font-bold text-[#6c727f] dark:text-slate-400">البريد الإلكتروني</label>
+                        <label class="block font-bold text-[#68707d] dark:text-slate-400">البريد الإلكتروني</label>
                         <input id="auth-email" type="email" required placeholder="name@example.com" dir="ltr" class="rev-input w-full px-4 py-3.5 font-bold text-left">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block font-bold text-[#6c727f] dark:text-slate-400">كلمة المرور</label>
+                        <label class="block font-bold text-[#68707d] dark:text-slate-400">كلمة المرور</label>
                         <input id="auth-password" type="password" required minlength="6" placeholder="••••••••" dir="ltr" class="rev-input w-full px-4 py-3.5 font-bold text-left">
                     </div>
                     <div class="pt-2">
@@ -309,7 +468,7 @@
                     </div>
                 </form>
 
-                <div class="text-center text-xs text-[#6c727f] dark:text-slate-400 pt-4 border-t border-black/8 dark:border-white/8">
+                <div class="text-center text-xs text-[#68707d] dark:text-slate-400 pt-4 border-t border-black/8 dark:border-white/8">
                     <span id="auth-switch-text">ليس لديك حساب؟</span>
                     <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-[#005ba3] dark:text-[#5CE1E6] font-extrabold hover:underline mr-1 cursor-pointer">إنشاء حساب جديد</button>
                 </div>
@@ -317,7 +476,7 @@
         </div>
     </div>
 
-    <!-- 4. درج إتمام الشراء وعرض الكود (Slide-Over Checkout Drawer) -->
+    <!-- 4. درج إتمام الشراء وعرض الكود -->
     <div id="buy-modal" class="hidden rev-overlay" onclick="closeModal('buy-modal')">
         <div class="rev-drawer-panel text-right" onclick="event.stopPropagation()">
             <div class="rev-sheet-handle"></div>
@@ -333,31 +492,28 @@
             </div>
 
             <div class="p-6 flex-grow overflow-y-auto">
-                <!-- الخطوة 1: مراجعة الدفع -->
                 <div id="buy-confirm-step" class="space-y-5 text-xs">
                     <input type="hidden" id="buy-catalog-id">
                     <input type="hidden" id="buy-product-type">
 
-                    <div class="p-5 rounded-3xl bg-[#f0f2f5] dark:bg-[#191d26] space-y-3">
-                        <span class="inline-block px-3 py-1 rounded-full bg-white dark:bg-[#12151c] text-[11px] font-extrabold text-[#005ba3] dark:text-[#5CE1E6]" id="buy-modal-platform">---</span>
+                    <div class="p-5 rounded-3xl bg-[#eef0f4] dark:bg-[#181c25] space-y-3">
+                        <span class="inline-block px-3 py-1 rounded-full bg-white dark:bg-[#11141b] text-[11px] font-extrabold text-[#005ba3] dark:text-[#5CE1E6]" id="buy-modal-platform">---</span>
                         <div class="text-base font-black leading-snug" id="buy-modal-package">---</div>
                         <div class="flex justify-between items-center pt-3 border-t border-black/8 dark:border-white/8">
-                            <span class="text-[#6c727f] dark:text-slate-400 font-bold">الإجمالي (شامل الضريبة)</span>
+                            <span class="text-[#68707d] dark:text-slate-400 font-bold">الإجمالي (شامل الضريبة)</span>
                             <span id="buy-modal-price" class="financial-amount font-black text-2xl" dir="ltr">$0.00</span>
                         </div>
                     </div>
 
-                    <!-- حقل معرّف اللاعب (لباقات ID) -->
                     <div id="buy-playerid-group" class="hidden space-y-2">
                         <label class="block font-extrabold text-amber-600 dark:text-amber-400">معرّف اللاعب (Player ID) *</label>
                         <input id="buy-player-id" type="text" placeholder="أدخل الـ ID بدقة هنا..." dir="ltr" class="rev-input w-full px-4 py-3.5 font-mono font-bold text-left text-sm">
-                        <p class="text-[11px] text-[#6c727f] dark:text-slate-400">يتم إرسال الشحن مباشرة إلى الحساب المرتبط بهذا المعرّف.</p>
+                        <p class="text-[11px] text-[#68707d] dark:text-slate-400">يتم إرسال الشحن مباشرة إلى الحساب المرتبط بهذا المعرّف.</p>
                     </div>
 
-                    <!-- إقرار التنفيذ الفوري الأوروبي (Art. 16(m)) -->
-                    <label class="flex items-start gap-3 p-4 rounded-2xl bg-[#f0f2f5] dark:bg-[#191d26] cursor-pointer text-right">
+                    <label class="flex items-start gap-3 p-4 rounded-2xl bg-[#eef0f4] dark:bg-[#181c25] cursor-pointer text-right">
                         <input type="checkbox" id="eu-withdrawal-waiver" class="mt-0.5 w-4 h-4 rounded border-slate-300 text-[#005ba3] focus:ring-[#005ba3]">
-                        <span class="text-[11px] leading-relaxed text-[#6c727f] dark:text-slate-300">
+                        <span class="text-[11px] leading-relaxed text-[#68707d] dark:text-slate-300">
                             أوافق على <a href="/terms.html" target="_blank" class="text-[#005ba3] dark:text-[#5CE1E6] underline font-bold">شروط الاستخدام</a> و<a href="/refund.html" target="_blank" class="text-[#005ba3] dark:text-[#5CE1E6] underline font-bold">سياسة الاسترجاع</a>، وأطلب التنفيذ الفوري وتسليم الكود الرقمي أو بدء الشحن قبل انقضاء مهلة الـ 14 يوماً، مع إقراري بفقدان حق العدول الأوروبي بمجرد بدء التنفيذ وفق المادة 16(m).
                         </span>
                     </label>
@@ -368,18 +524,17 @@
                     </button>
                 </div>
 
-                <!-- الخطوة 2: نتيجة التنفيذ واستلام الكود -->
                 <div id="buy-result-step" class="hidden space-y-5 text-xs">
                     <div id="buy-result-banner" class="p-6 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-2">
                         <div class="w-12 h-12 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto text-2xl shadow-md">
                             <i class="ph-bold ph-check"></i>
                         </div>
                         <div class="text-emerald-600 dark:text-emerald-400 font-black text-base" id="buy-result-title">تمت العملية بنجاح!</div>
-                        <div class="text-[11px] text-[#6c727f] dark:text-slate-400">رقم المرجع: <span id="buy-result-ref" class="font-mono font-bold">---</span></div>
+                        <div class="text-[11px] text-[#68707d] dark:text-slate-400">رقم المرجع: <span id="buy-result-ref" class="font-mono font-bold">---</span></div>
                     </div>
 
                     <div id="buy-code-box" class="hidden space-y-2">
-                        <label class="block font-bold text-[#6c727f] dark:text-slate-400">الكود الرقمي الخاص بك:</label>
+                        <label class="block font-bold text-[#68707d] dark:text-slate-400">الكود الرقمي الخاص بك:</label>
                         <div class="flex items-center gap-2">
                             <input id="buy-delivered-code" readonly dir="ltr" class="w-full p-3.5 rounded-2xl bg-[#0b1324] font-mono font-black text-[#5CE1E6] text-center tracking-wider text-sm">
                             <button onclick="copyDeliveredCode()" class="rev-btn-primary px-5 py-3.5 shrink-0">نسخ</button>
@@ -417,23 +572,23 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
                         <thead>
-                            <tr class="text-[#6c727f] dark:text-slate-400 border-b border-black/8 dark:border-white/8">
+                            <tr class="text-[#68707d] dark:text-slate-400 border-b border-black/8 dark:border-white/8">
                                 <th class="py-3 px-2">رقم الطلب</th>
                                 <th class="py-3 px-2">الباقة</th>
                                 <th class="py-3 px-2">الكود / المعرّف</th>
                                 <th class="py-3 px-2">السعر</th>
-                                <th class="py-3 px-2 text-center">الحالة</th>
+                                <th class="py-3 px-2 text-center">الحالة والإجراء</th>
                             </tr>
                         </thead>
                         <tbody id="retail-orders-tbody" class="divide-y divide-black/6 dark:divide-white/6">
-                            <tr><td colspan="5" class="py-8 text-center text-[#6c727f]">جاري تحميل الطلبات...</td></tr>
+                            <tr><td colspan="5" class="py-8 text-center text-[#68707d]">جاري تحميل الطلبات...</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- خيار حذف الحساب النهائي GDPR -->
-                <div class="p-4 rounded-2xl bg-[#f0f2f5] dark:bg-[#191d26] flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <span class="text-[11px] text-[#6c727f] dark:text-slate-400">
+                <div class="p-4 rounded-2xl bg-[#eef0f4] dark:bg-[#181c25] flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <span class="text-[11px] text-[#68707d] dark:text-slate-400">
                         يحق لك حذف حسابك وبياناتك الشخصية نهائياً وفق لائحة حماية البيانات الأوروبية (GDPR).
                     </span>
                     <button type="button" onclick="deleteMyRetailAccount()" class="px-4 py-2 rounded-full bg-rose-500/10 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold flex items-center gap-1.5 transition shrink-0 cursor-pointer">
@@ -446,14 +601,18 @@
     </div>
 
     <!-- شريط التنقل السفلي للهواتف -->
-    <nav class="sm:hidden fixed bottom-0 inset-x-0 z-40 rev-header border-t border-black/8 dark:border-white/8 px-4 py-2 flex items-center justify-around text-[10px] font-bold text-[#6c727f] dark:text-slate-400">
-        <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center gap-1 text-[#005ba3] dark:text-[#5CE1E6]">
+    <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 rev-topbar border-t border-black/8 dark:border-white/8 px-3 py-2 flex items-center justify-around text-[10px] font-bold text-[#68707d] dark:text-slate-400">
+        <button type="button" onclick="switchAppView('store'); window.scrollTo({top: 0, behavior: 'smooth'});" class="flex flex-col items-center gap-1 text-[#005ba3] dark:text-[#5CE1E6]">
             <i class="ph-fill ph-storefront text-xl"></i>
             <span>المتجر</span>
         </button>
-        <button type="button" onclick="document.getElementById('catalog-search-input').focus()" class="flex flex-col items-center gap-1">
-            <i class="ph-bold ph-magnifying-glass text-xl"></i>
-            <span>البحث</span>
+        <button type="button" onclick="switchAppView('favorites'); window.scrollTo({top: 0, behavior: 'smooth'});" class="flex flex-col items-center gap-1">
+            <i class="ph-bold ph-heart text-xl"></i>
+            <span>المفضلة</span>
+        </button>
+        <button type="button" onclick="toggleMobileSidebar(true)" class="flex flex-col items-center gap-1">
+            <i class="ph-bold ph-squares-four text-xl"></i>
+            <span>الأقسام</span>
         </button>
         <button type="button" onclick="openTopupModal()" class="flex flex-col items-center gap-1">
             <i class="ph-bold ph-plus-circle text-xl"></i>
@@ -466,48 +625,14 @@
     </nav>
 
     <!-- شريط موافقة التخزين الأوروبي (GDPR) -->
-    <div id="eu-cookie-banner" class="hidden fixed bottom-16 sm:bottom-4 inset-x-4 z-50 max-w-3xl mx-auto bg-[#191c1f]/95 backdrop-blur-xl text-white border border-white/10 rounded-full px-5 py-3 shadow-2xl flex items-center justify-between gap-4 text-xs">
+    <div id="eu-cookie-banner" class="hidden fixed bottom-16 lg:bottom-4 inset-x-4 z-50 max-w-3xl mx-auto bg-[#191c1f]/95 backdrop-blur-xl text-white border border-white/10 rounded-full px-5 py-3 shadow-2xl flex items-center justify-between gap-4 text-xs">
         <p class="leading-snug text-slate-300 truncate sm:whitespace-normal">
             نستخدم التخزين المحلي الأساسي فقط لحفظ جلستك وتفضيل المظهر دون أي ملفات تتبع إعلانية (GDPR).
         </p>
         <button type="button" onclick="acceptEuCookies('essential')" class="px-5 py-2 rounded-full bg-white text-[#191c1f] font-extrabold shrink-0 cursor-pointer">موافق</button>
     </div>
 
-    <!-- التذييل الموحد -->
-    <footer class="w-full max-w-6xl mx-auto mt-16 px-4 sm:px-6 py-8 border-t border-black/8 dark:border-white/8 text-xs text-[#6c727f] dark:text-slate-400 space-y-4">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <span class="font-black text-[#191c1f] dark:text-white">SHIIFT X</span>
-                <span>© 2026 — مسجل في النمسا (الاتحاد الأوروبي)</span>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <a href="https://www.facebook.com/share/19z9gWepTE/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="rev-btn-secondary w-8 h-8 text-base" title="فيسبوك">
-                    <i class="ph-fill ph-facebook-logo"></i>
-                </a>
-                <a href="https://www.instagram.com/shiiftx11?rpxt=czF4N2NubHljandn&utm_source=qr" target="_blank" rel="noopener noreferrer" class="rev-btn-secondary w-8 h-8 text-base" title="إنستغرام">
-                    <i class="ph-fill ph-instagram-logo"></i>
-                </a>
-                <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="rev-btn-secondary w-8 h-8 text-base" title="واتساب">
-                    <i class="ph-fill ph-whatsapp-logo"></i>
-                </a>
-            </div>
-
-            <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 font-bold text-[#191c1f] dark:text-slate-300">
-                <a href="/privacy.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">الخصوصية</a>
-                <a href="/terms.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">الشروط</a>
-                <a href="/refund.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">الاسترجاع</a>
-                <a href="/impressum.html" class="hover:text-[#005ba3] dark:hover:text-[#5CE1E6] transition">Impressum</a>
-            </div>
-        </div>
-
-        <p class="text-[11px] leading-relaxed text-[#9aa0ac] dark:text-slate-500 text-center sm:text-right">
-            جميع الأسعار المعروضة نهائية وشاملة للضرائب المطبقة. جميع العلامات التجارية المذكورة هي ملك لأصحابها الأصليين؛ يعمل متجر SHIIFT X كموزع مستقل للبطاقات الرقمية. للدعم الرسمي:
-            <a href="mailto:support@shiiftx.com" dir="ltr" class="font-mono text-[#005ba3] dark:text-[#5CE1E6] hover:underline">support@shiiftx.com</a>
-        </p>
-    </footer>
-
-    <script src="js/retail-app.js?v=7"></script>
+    <script src="js/retail-app.js?v=8"></script>
 </body>
 </html>
 <!-- ==================== نهاية ملف index.html ==================== -->
