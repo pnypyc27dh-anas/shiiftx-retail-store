@@ -1,5 +1,5 @@
 /* ==================== بداية ملف css/retail-pro.css ==================== */
-/* نظام تصميم SHIIFT X المستوحى من Revolut Web App — القائمة الجانبية والأدراج المنزلقة */
+/* نظام تصميم SHIIFT X — المرحلة الأولى: عارض العروض، بطاقات المنصات، وشارات المناطق */
 
 :root {
     --rev-bg: #f5f6f8;
@@ -16,8 +16,7 @@
     --rev-brand-soft: rgba(0, 91, 163, 0.08);
     --rev-cyan: #5CE1E6;
     --rev-shadow-card: 0 1px 3px rgba(25, 28, 31, 0.03), 0 8px 24px -8px rgba(25, 28, 31, 0.06);
-    --rev-shadow-hover: 0 14px 34px -8px rgba(0, 91, 163, 0.15), 0 4px 12px rgba(25, 28, 31, 0.04);
-    --rev-shadow-drawer: 20px 0 60px rgba(0, 0, 0, 0.16);
+    --rev-shadow-hover: 0 14px 34px -8px rgba(0, 91, 163, 0.16), 0 4px 12px rgba(25, 28, 31, 0.04);
     --rev-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -35,8 +34,7 @@ html.dark {
     --rev-brand-hover: #2563eb;
     --rev-brand-soft: rgba(92, 225, 230, 0.1);
     --rev-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
-    --rev-shadow-hover: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(92, 225, 230, 0.24);
-    --rev-shadow-drawer: 24px 0 70px rgba(0, 0, 0, 0.78);
+    --rev-shadow-hover: 0 16px 36px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(92, 225, 230, 0.26);
 }
 
 * {
@@ -65,7 +63,7 @@ body {
     letter-spacing: -0.03em;
 }
 
-/* ==================== هيكل التطبيق ذو القائمة الجانبية (Revolut App Shell) ==================== */
+/* ==================== هيكل التطبيق ذو القائمة الجانبية ==================== */
 .rev-app-shell {
     display: flex;
     min-height: 100vh;
@@ -197,24 +195,111 @@ html.dark .rev-topbar {
     background: rgba(8, 10, 13, 0.84);
 }
 
-/* بطاقة العرض الرئيسية */
-.rev-hero {
-    background: linear-gradient(135deg, #0b1324 0%, #102544 55%, #005ba3 100%);
-    border-radius: 26px;
+/* ==================== عارض العروض التفاعلي (Interactive Hero Carousel) ==================== */
+.rev-carousel {
+    border-radius: 28px;
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 18px 44px -15px rgba(0, 91, 163, 0.3);
+    box-shadow: 0 20px 46px -16px rgba(0, 91, 163, 0.34);
+    min-height: 220px;
 }
-.rev-hero::after {
+
+.rev-slide {
+    display: none;
+    padding: 28px 26px;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    animation: revSlideFade 0.45s var(--rev-spring) forwards;
+}
+@media (min-width: 640px) {
+    .rev-slide {
+        padding: 36px 40px;
+    }
+}
+.rev-slide.active {
+    display: flex;
+}
+
+.rev-slide-1 {
+    background: linear-gradient(135deg, #091122 0%, #0f2447 55%, #005ba3 100%);
+}
+.rev-slide-2 {
+    background: linear-gradient(135deg, #0b1426 0%, #16223d 52%, #0d6e8a 100%);
+}
+.rev-slide-3 {
+    background: linear-gradient(135deg, #0c101d 0%, #1a1f36 52%, #004a85 100%);
+}
+
+.rev-slide::after {
     content: "";
     position: absolute;
     top: -35%;
-    left: -10%;
-    width: 360px;
-    height: 360px;
+    left: -8%;
+    width: 340px;
+    height: 340px;
     background: radial-gradient(circle, rgba(92, 225, 230, 0.22) 0%, transparent 70%);
     pointer-events: none;
+}
+
+.rev-carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.32);
+    transition: all 0.28s var(--rev-spring);
+    cursor: pointer;
+}
+.rev-carousel-dot.active {
+    width: 26px;
+    background: #5CE1E6;
+}
+
+@keyframes revSlideFade {
+    from { opacity: 0; transform: scale(0.985); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* ==================== بطاقات المنصات المجمّعة (Brand Hub Tiles) ==================== */
+.rev-brand-tile {
+    background: var(--rev-surface);
+    border: 1px solid var(--rev-border);
+    border-radius: 22px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    text-align: right;
+    box-shadow: var(--rev-shadow-card);
+    transition: transform 0.26s var(--rev-spring), box-shadow 0.26s var(--rev-spring), border-color 0.2s ease;
+}
+.rev-brand-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--rev-shadow-hover);
+    border-color: rgba(0, 91, 163, 0.3);
+}
+.rev-brand-tile.active {
+    border-color: #005ba3;
+    background: var(--rev-brand-soft);
+}
+html.dark .rev-brand-tile.active {
+    border-color: #5CE1E6;
+    background: rgba(92, 225, 230, 0.1);
+}
+
+.rev-brand-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #ffffff;
+    flex-shrink: 0;
+    box-shadow: 0 6px 14px -4px rgba(0, 0, 0, 0.22);
 }
 
 /* الألواح والبطاقات */
@@ -226,7 +311,7 @@ html.dark .rev-topbar {
     transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-/* بطاقة المنتج الكبيرة */
+/* بطاقة المنتج النظيفة (Refined Product Card) */
 .rev-product-card {
     background: var(--rev-surface);
     border: 1px solid var(--rev-border);
@@ -245,6 +330,20 @@ html.dark .rev-topbar {
 }
 html.dark .rev-product-card:hover {
     border-color: rgba(92, 225, 230, 0.32);
+}
+
+/* شارة المنطقة الجغرافية (Region Pill) */
+.rev-region-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 800;
+    background: var(--rev-surface-subtle);
+    color: var(--rev-text-secondary);
+    border: 1px solid var(--rev-border);
 }
 
 /* زر المفضلة داخل البطاقة */
