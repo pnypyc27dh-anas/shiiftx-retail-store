@@ -1,5 +1,5 @@
 /* ==================== بداية ملف css/retail-pro.css ==================== */
-/* نظام تصميم SHIIFT X — المرحلة الأولى: عارض العروض، بطاقات المنصات، وشارات المناطق */
+/* نظام تصميم SHIIFT X — المرحلة الثالثة: مبدّل العملات (USD/EUR) وقسم الأسئلة الشائعة التفاعلي (FAQ) */
 
 :root {
     --rev-bg: #f5f6f8;
@@ -195,6 +195,37 @@ html.dark .rev-topbar {
     background: rgba(8, 10, 13, 0.84);
 }
 
+/* ==================== مبدّل العملات الفوري (USD / EUR Switcher) ==================== */
+.rev-currency-switch {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px;
+    border-radius: 9999px;
+    background: var(--rev-surface-subtle);
+    border: 1px solid var(--rev-border);
+}
+
+.rev-currency-btn {
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--rev-text-secondary);
+    transition: all 0.2s var(--rev-spring);
+    cursor: pointer;
+}
+
+.rev-currency-btn.active {
+    background: #191c1f;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+}
+html.dark .rev-currency-btn.active {
+    background: #ffffff;
+    color: #080a0d;
+}
+
 /* ==================== عارض العروض التفاعلي (Interactive Hero Carousel) ==================== */
 .rev-carousel {
     border-radius: 28px;
@@ -351,6 +382,72 @@ html.dark .rev-product-card:hover {
     background: rgba(244, 63, 94, 0.92) !important;
     border-color: rgba(255, 255, 255, 0.3) !important;
     color: #ffffff !important;
+}
+
+/* ==================== قسم الأسئلة الشائعة القابل للطي (Interactive Accordion FAQ) ==================== */
+.rev-faq-item {
+    background: var(--rev-surface);
+    border: 1px solid var(--rev-border);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.rev-faq-item.open {
+    border-color: rgba(0, 91, 163, 0.35);
+    box-shadow: var(--rev-shadow-card);
+}
+html.dark .rev-faq-item.open {
+    border-color: rgba(92, 225, 230, 0.35);
+}
+
+.rev-faq-trigger {
+    width: 100%;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--rev-text-primary);
+    cursor: pointer;
+    background: transparent;
+}
+
+.rev-faq-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 9999px;
+    background: var(--rev-surface-subtle);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.28s var(--rev-spring), background-color 0.2s ease, color 0.2s ease;
+}
+.rev-faq-item.open .rev-faq-icon {
+    transform: rotate(180deg);
+    background: #005ba3;
+    color: #ffffff;
+}
+html.dark .rev-faq-item.open .rev-faq-icon {
+    background: #5CE1E6;
+    color: #080a0d;
+}
+
+.rev-faq-content {
+    display: none;
+    padding: 0 20px 18px;
+    font-size: 12px;
+    line-height: 1.75;
+    color: var(--rev-text-secondary);
+    border-top: 1px solid var(--rev-border);
+    padding-top: 12px;
+}
+.rev-faq-item.open .rev-faq-content {
+    display: block;
+    animation: revFadeIn 0.25s ease forwards;
 }
 
 /* الأزرار الكبسولية (Revolut Pill Buttons) */
