@@ -1,11 +1,12 @@
 // ==================== بداية ملف js/retail-app.js ====================
 const RETAIL_SUPABASE_URL = 'https://qavdmizccaltsggwrdkk.supabase.co';
-const RETAIL_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdmRtaXpjY2FsdHNnZ3dyZGtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0NDUzMTgsImV4cCI6MjExMDAyMTMxOH0.RUqkSQggtLrpfFGcr8Y2RUyD6RoJLqzKD3CVc5fo4KI';
+const RETAIL_ANON_KEY = 'PASTE_YOUR_ANON_KEY_HERE';
 
 const retailSupabase = window.supabase.createClient(RETAIL_SUPABASE_URL, RETAIL_ANON_KEY);
 
 let currentUser = null;
 let currentSession = null;
+let currentWalletBalance = 0;
 let catalogItems = [];
 let pendingOrderRefs = [];
 let activeAppView = 'store'; // 'store' | 'favorites'
@@ -20,6 +21,76 @@ let heroAutoTimer = null;
 
 function saveFavoritesStorage() {
     localStorage.setItem('shiiftx_retail_favs', JSON.stringify([...favoriteIds]));
+}
+
+// إدارة معرّفات اللاعبين المحفوظة لكل منصة (Saved Player IDs)
+function getSavedPlayerIdsMap() {
+    try {
+        return JSON.parse(localStorage.getItem('shiiftx_saved_player_ids') || '{}');
+    } catch (_e) {
+        return {};
+    }
+}
+
+function getSavedPlayerIdsForPlatform(platform) {
+    const key = (platform || 'GENERAL').trim().toUpperCase();
+    const map = getSavedPlayerIdsMap();
+    return Array.isArray(map[key]) ? map[key] : [];
+}
+
+function savePlayerIdForPlatform(platform, playerId) {
+    const cleanId = (playerId || '').trim();
+    if (!cleanId) return;
+    const key = (platform || 'GENERAL').trim().toUpperCase();
+    const map = getSavedPlayerIdsMap();
+    const existing = Array.isArray(map[key]) ? map[key].filter(id => id !== cleanId) : [];
+    existing.unshift(cleanId);
+    map[key] = existing.slice(0, 4); // حفظ آخر 4 معرّفات لكل لعبة
+    localStorage.setItem('shiiftx_saved_player_ids', JSON.stringify(map));
+}
+
+window.removeSavedPlayerId = function(platform, playerId) {
+    const key = (platform || 'GENERAL').trim().toUpperCase();
+    const map = getSavedPlayerIdsMap();
+    if (!Array.isArray(map[key])) return;
+    map[key] = map[key].filter(id => id !== playerId);
+    localStorage.setItem('shiiftx_saved_player_ids', JSON.stringify(map));
+    renderSavedPlayerIdsBar(platform);
+};
+
+window.selectSavedPlayerId = function(playerId) {
+    const input = document.getElementById('buy-player-id');
+    if (input) {
+        input.value = playerId;
+        input.focus();
+    }
+};
+
+function renderSavedPlayerIdsBar(platform) {
+    const bar = document.getElementById('saved-player-ids-bar');
+    if (!bar) return;
+
+    const savedList = getSavedPlayerIdsForPlatform(platform);
+    if (savedList.length === 0) {
+        bar.innerHTML = '';
+        bar.classList.add('hidden');
+        bar.classList.remove('flex');
+        return;
+    }
+
+    bar.classList.remove('hidden');
+    bar.classList.add('flex');
+    bar.innerHTML = `<span class="text-[10px] font-extrabold text-[#68707d] dark:text-slate-400 ml-1">معرّفات محفوظة:</span>` +
+        savedList.map(pid => `
+            <div class="inline-flex items-center rounded-full bg-[#eef0f4] dark:bg-[#181c25] border border-black/8 dark:border-white/10 overflow-hidden">
+                <button type="button" onclick="selectSavedPlayerId('${escapeHTML(pid)}')" class="px-2.5 py-1 text-[11px] font-mono font-bold text-[#005ba3] dark:text-[#5CE1E6] hover:bg-black/5 dark:hover:bg-white/5 transition cursor-pointer" dir="ltr">
+                    ${escapeHTML(pid)}
+                </button>
+                <button type="button" onclick="removeSavedPlayerId('${escapeHTML(platform)}', '${escapeHTML(pid)}')" class="px-1.5 py-1 text-[10px] text-[#68707d] hover:text-rose-500 transition cursor-pointer" title="حذف المعرّف">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+        `).join('');
 }
 
 function escapeHTML(str) {
@@ -221,7 +292,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function syncAuthUIState(isLoggedIn, balance = 0) {
-    const formatted = `$${Number(balance || 0).toFixed(2)}`;
+    currentWalletBalance = Number(balance || 0);
+    const formatted = `$${currentWalletBalance.toFixed(2)}`;
     const navPanel = document.getElementById('user-nav-panel');
     const guestBtn = document.getElementById('guest-login-btn');
     const navBal = document.getElementById('nav-wallet-balance');
@@ -690,9 +762,41 @@ window.copyTopupEmail = function() {
 };
 
 // =========================================================================
-// 3. تنفيذ الشراء عبر دالة Vercel الآمنة (/api/buy)
+// 3. تنفيذ الشراء الذكي عبر دالة Vercel الآمنة (/api/buy) — المرحلة الثانية
 // =========================================================================
-function openBuyModal(catalogId, prefillPlayerId = '') {
+function updateCheckoutWalletPreview(price) {
+    const itemPrice = Number(price || 0);
+    const currentEl = document.getElementById('checkout-current-balance');
+    const afterLabel = document.getElementById('checkout-after-label');
+    const afterEl = document.getElementById('checkout-after-balance');
+    const shortfallBox = document.getElementById('checkout-shortfall-box');
+    const confirmBtn = document.getElementById('btn-confirm-purchase');
+
+    if (currentEl) currentEl.textContent = `$${currentWalletBalance.toFixed(2)}`;
+
+    const diff = currentWalletBalance - itemPrice;
+    if (diff >= -0.0001) {
+        const remaining = Math.max(0, diff);
+        if (afterLabel) afterLabel.textContent = 'المتبقي بعد الدفع:';
+        if (afterEl) {
+            afterEl.textContent = `$${remaining.toFixed(2)}`;
+            afterEl.className = 'financial-amount font-black text-emerald-600 dark:text-emerald-400';
+        }
+        if (shortfallBox) shortfallBox.classList.add('hidden');
+        if (confirmBtn) confirmBtn.disabled = false;
+    } else {
+        const needed = Math.abs(diff);
+        if (afterLabel) afterLabel.textContent = 'المبلغ الناقص لإتمام الطلب:';
+        if (afterEl) {
+            afterEl.textContent = `-$${needed.toFixed(2)}`;
+            afterEl.className = 'financial-amount font-black text-rose-600 dark:text-rose-400';
+        }
+        if (shortfallBox) shortfallBox.classList.remove('hidden');
+        if (confirmBtn) confirmBtn.disabled = true;
+    }
+}
+
+async function openBuyModal(catalogId, prefillPlayerId = '') {
     if (!currentUser || !currentSession) {
         showRetailToast('يرجى تسجيل الدخول لإتمام الطلب', 'info');
         openAuthModal('login');
@@ -705,21 +809,35 @@ function openBuyModal(catalogId, prefillPlayerId = '') {
         return;
     }
 
+    await refreshUserWallet();
+
     const waiver = document.getElementById('eu-withdrawal-waiver');
     if (waiver) waiver.checked = false;
 
+    const region = detectPackageRegion(item.platform, item.package_name);
     document.getElementById('buy-catalog-id').value = item.id;
     document.getElementById('buy-product-type').value = item.product_type;
     document.getElementById('buy-modal-platform').textContent = item.platform;
     document.getElementById('buy-modal-package').textContent = item.package_name;
     document.getElementById('buy-modal-price').textContent = `$${Number(item.retail_price).toFixed(2)}`;
-    document.getElementById('buy-player-id').value = prefillPlayerId || '';
+
+    const regEl = document.getElementById('buy-modal-region');
+    if (regEl) regEl.textContent = `${region.flag} ${region.label}`;
+
+    updateCheckoutWalletPreview(item.retail_price);
 
     const pidGroup = document.getElementById('buy-playerid-group');
-    if (item.product_type === 'ID') {
+    const pidInput = document.getElementById('buy-player-id');
+    const isID = (item.product_type && item.product_type.toUpperCase() === 'ID');
+
+    if (isID) {
         pidGroup.classList.remove('hidden');
+        const savedIds = getSavedPlayerIdsForPlatform(item.platform);
+        pidInput.value = prefillPlayerId || (savedIds[0] || '');
+        renderSavedPlayerIdsBar(item.platform);
     } else {
         pidGroup.classList.add('hidden');
+        pidInput.value = '';
     }
 
     document.getElementById('buy-confirm-step').classList.remove('hidden');
@@ -730,10 +848,12 @@ function openBuyModal(catalogId, prefillPlayerId = '') {
 async function executeRetailPurchase() {
     const catalogId = document.getElementById('buy-catalog-id').value;
     const productType = document.getElementById('buy-product-type').value;
+    const platformName = document.getElementById('buy-modal-platform').textContent;
     const playerId = document.getElementById('buy-player-id').value.trim();
     const btn = document.getElementById('btn-confirm-purchase');
+    const isID = (productType && productType.toUpperCase() === 'ID');
 
-    if (productType === 'ID' && !playerId) {
+    if (isID && !playerId) {
         showRetailToast('يرجى إدخال معرّف اللاعب (Player ID)', 'warning');
         return;
     }
@@ -756,7 +876,7 @@ async function executeRetailPurchase() {
             },
             body: JSON.stringify({
                 catalog_id: catalogId,
-                player_id: productType === 'ID' ? playerId : null
+                player_id: isID ? playerId : null
             })
         });
 
@@ -768,6 +888,10 @@ async function executeRetailPurchase() {
             }
             showRetailToast(result.error || 'تعذر إتمام عملية الشراء', 'error');
             return;
+        }
+
+        if (isID && playerId) {
+            savePlayerIdForPlatform(platformName, playerId);
         }
 
         syncAuthUIState(true, result.remaining_balance);
