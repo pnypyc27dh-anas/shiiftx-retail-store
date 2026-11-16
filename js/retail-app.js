@@ -28,39 +28,55 @@ function resolveCardImageUrl(rawUrl) {
     return clean;
 }
 
+// إشعارات الكبسولة العائمة بأسلوب Revolut (Pill Toasts)
 function showRetailToast(message, type = 'info') {
     const container = document.getElementById('retail-toast-container');
     if (!container) return;
 
     const styles = {
-        success: { bg: 'bg-emerald-600/95 border-emerald-400/30 text-white', icon: 'ph-fill ph-check-circle' },
-        error: { bg: 'bg-rose-600/95 border-rose-400/30 text-white', icon: 'ph-fill ph-warning-circle' },
-        warning: { bg: 'bg-amber-500/95 border-amber-300/40 text-slate-950', icon: 'ph-fill ph-warning' },
-        info: { bg: 'bg-slate-900/95 border-[#5CE1E6]/30 text-white', icon: 'ph-fill ph-info text-[#5CE1E6]' }
+        success: {
+            bg: 'bg-[#191c1f]/95 dark:bg-emerald-600/95 border border-emerald-400/30 text-white',
+            icon: 'ph-fill ph-check-circle text-emerald-400 dark:text-white'
+        },
+        error: {
+            bg: 'bg-rose-600/95 border border-rose-400/30 text-white',
+            icon: 'ph-fill ph-warning-circle text-white'
+        },
+        warning: {
+            bg: 'bg-amber-500/95 border-amber-300/40 text-[#191c1f]',
+            icon: 'ph-fill ph-warning text-[#191c1f]'
+        },
+        info: {
+            bg: 'bg-[#191c1f]/95 dark:bg-[#191d26]/95 border border-white/15 text-white',
+            icon: 'ph-fill ph-info text-[#5CE1E6]'
+        }
     };
 
     const currentStyle = styles[type] || styles.info;
     const toast = document.createElement('div');
-    toast.className = `toast-slide-in pointer-events-auto flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl border shadow-2xl backdrop-blur-xl text-xs font-bold ${currentStyle.bg}`;
+    toast.className = `rev-toast pointer-events-auto inline-flex items-center justify-between gap-3 text-xs font-extrabold max-w-full ${currentStyle.bg}`;
     toast.innerHTML = `
-        <div class="flex items-center gap-2.5">
-            <i class="${currentStyle.icon} text-lg shrink-0"></i>
+        <div class="flex items-center gap-2">
+            <i class="${currentStyle.icon} text-base shrink-0"></i>
             <span class="leading-snug">${escapeHTML(message)}</span>
         </div>
-        <button type="button" onclick="this.parentElement.remove()" class="opacity-75 hover:opacity-100 p-1 cursor-pointer">
-            <i class="ph-bold ph-x text-sm"></i>
+        <button type="button" onclick="this.parentElement.remove()" class="opacity-70 hover:opacity-100 p-0.5 cursor-pointer">
+            <i class="ph-bold ph-x text-xs"></i>
         </button>
     `;
 
     container.appendChild(toast);
     setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateY(-10px)';
-        toast.style.transition = 'all 0.25s ease';
-        setTimeout(() => toast.remove(), 260);
-    }, 4200);
+        toast.style.transform = 'translateY(-10px) scale(0.96)';
+        toast.style.transition = 'all 0.22s ease';
+        setTimeout(() => toast.remove(), 240);
+    }, 4000);
 }
 
+// =========================================================================
+// 1. التهيئة ومراقبة جلسة المستخدم
+// =========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
     await loadRetailCatalog();
 
@@ -115,6 +131,9 @@ async function refreshUserWallet() {
     }
 }
 
+// =========================================================================
+// 2. جلب وعرض كتالوج الباقات بأسلوب Revolut
+// =========================================================================
 async function loadRetailCatalog() {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
@@ -127,7 +146,7 @@ async function loadRetailCatalog() {
         .order('retail_price', { ascending: true });
 
     if (error) {
-        grid.innerHTML = `<div class="col-span-full py-12 text-center text-rose-500 text-xs font-bold">تعذر تحميل المنتجات: ${escapeHTML(error.message)}</div>`;
+        grid.innerHTML = `<div class="col-span-full rev-panel py-12 text-center text-rose-500 text-xs font-bold">تعذر تحميل المنتجات: ${escapeHTML(error.message)}</div>`;
         return;
     }
 
@@ -143,15 +162,15 @@ function renderPlatformPills() {
 
     const allActive = activePlatformFilter === 'ALL';
     container.innerHTML = `
-        <button type="button" onclick="filterRetailCatalog('ALL')" data-platform="ALL" class="filter-pill px-4 py-2 rounded-xl ${allActive ? 'bg-[#005ba3] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'} whitespace-nowrap transition cursor-pointer">
-            جميع الباقات (${catalogItems.length})
+        <button type="button" onclick="filterRetailCatalog('ALL')" data-platform="ALL" class="rev-pill ${allActive ? 'active' : ''}">
+            الكل (${catalogItems.length})
         </button>
     ` + platforms.map(pl => {
         const count = catalogItems.filter(i => i.platform === pl).length;
         const isSel = activePlatformFilter === pl;
         return `
-            <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" class="filter-pill px-4 py-2 rounded-xl ${isSel ? 'bg-[#005ba3] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'} whitespace-nowrap transition cursor-pointer">
-                ${escapeHTML(pl)} <span class="opacity-70 text-[10px]">(${count})</span>
+            <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" class="rev-pill ${isSel ? 'active' : ''}">
+                ${escapeHTML(pl)} <span class="opacity-65 text-[10px]">(${count})</span>
             </button>
         `;
     }).join('');
@@ -211,10 +230,10 @@ function renderCatalogGrid() {
 
     if (items.length === 0) {
         grid.innerHTML = `
-            <div class="col-span-full glass-panel py-16 px-4 text-center space-y-3">
-                <i class="ph-duotone ph-magnifying-glass text-4xl text-slate-400"></i>
-                <p class="text-slate-600 dark:text-slate-300 text-sm font-black">لم يتم العثور على باقات مطابقة لبحثك</p>
-                <button type="button" onclick="clearCatalogSearch(); filterRetailCatalog('ALL');" class="btn-primary px-5 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer">
+            <div class="col-span-full rev-panel py-16 px-4 text-center space-y-3">
+                <i class="ph-duotone ph-magnifying-glass text-4xl text-[#6c727f]"></i>
+                <p class="text-sm font-black">لم يتم العثور على باقات مطابقة لبحثك</p>
+                <button type="button" onclick="clearCatalogSearch(); filterRetailCatalog('ALL');" class="rev-btn-primary px-6 py-2.5 text-xs">
                     عرض جميع الباقات
                 </button>
             </div>`;
@@ -230,8 +249,8 @@ function renderCatalogGrid() {
         const price = Number(item.retail_price || 0).toFixed(2);
         const isID = (item.product_type && item.product_type.toUpperCase() === 'ID');
 
-        const badgeText = isID ? 'شحن مباشر (ID)' : 'كود فوري ⚡';
-        const badgeClass = isID ? 'bg-amber-500/95 text-slate-950' : 'bg-emerald-500/95 text-slate-950';
+        const badgeText = isID ? 'شحن مباشر ID' : 'كود فوري';
+        const badgeDot = isID ? 'bg-amber-400' : 'bg-emerald-400';
 
         const imgUrl = resolveCardImageUrl(item.image_url);
         const hasInstructions = Boolean(item.instructions && item.instructions.trim());
@@ -240,29 +259,28 @@ function renderCatalogGrid() {
             ? `<img src="${escapeHTML(imgUrl)}" alt="${pkgName}" loading="lazy" referrerpolicy="no-referrer"
                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                     class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
-               <div style="display:none;" class="w-full h-full bg-gradient-to-br from-[#0b1120] via-[#132238] to-[#005ba3] flex-col items-center justify-center p-6 text-center">
+               <div style="display:none;" class="w-full h-full bg-gradient-to-br from-[#0b1324] via-[#102544] to-[#005ba3] flex-col items-center justify-center p-6 text-center">
                    <i class="ph-duotone ph-gift text-5xl text-[#5CE1E6]/85 mb-2"></i>
-                   <span class="text-xs font-extrabold text-white/80 tracking-wide">${platformName}</span>
+                   <span class="text-xs font-extrabold text-white/85 tracking-wide">${platformName}</span>
                </div>`
-            : `<div class="w-full h-full bg-gradient-to-br from-[#0b1120] via-[#132238] to-[#005ba3] flex flex-col items-center justify-center p-6 text-center">
+            : `<div class="w-full h-full bg-gradient-to-br from-[#0b1324] via-[#102544] to-[#005ba3] flex flex-col items-center justify-center p-6 text-center">
                    <i class="ph-duotone ph-credit-card text-5xl text-[#5CE1E6]/85 mb-2"></i>
-                   <span class="text-xs font-extrabold text-white/80 tracking-wide">${platformName}</span>
+                   <span class="text-xs font-extrabold text-white/85 tracking-wide">${platformName}</span>
                </div>`;
 
         return `
-            <article data-id="${safeId}" onclick="openPackageDetailsModal(this.dataset.id)"
-                     class="group cursor-pointer rounded-[28px] overflow-hidden bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-12px_rgba(0,91,163,0.28)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
-
-                <div class="relative w-full aspect-[16/11] min-h-[220px] bg-slate-900 overflow-hidden">
+            <article data-id="${safeId}" onclick="openPackageDetailsModal(this.dataset.id)" class="rev-product-card group">
+                <div class="relative w-full aspect-[16/11] min-h-[220px] bg-[#0b1324] overflow-hidden">
                     ${visualBlock}
-                    <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none"></div>
+                    <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none"></div>
 
-                    <span class="absolute top-3.5 right-3.5 px-3 py-1 rounded-full text-[11px] font-black shadow-md backdrop-blur-md ${badgeClass}">
-                        ${badgeText}
+                    <span class="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white text-[11px] font-extrabold inline-flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full ${badgeDot}"></span>
+                        <span>${badgeText}</span>
                     </span>
 
                     <button type="button" data-id="${safeId}" onclick="event.stopPropagation(); openPackageDetailsModal(this.dataset.id);"
-                            class="absolute top-3.5 left-3.5 w-9 h-9 rounded-full bg-slate-950/65 hover:bg-[#005ba3] text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition shadow-md cursor-pointer"
+                            class="absolute top-3.5 left-3.5 w-9 h-9 rounded-full bg-black/55 hover:bg-[#005ba3] text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition cursor-pointer"
                             title="تعليمات وملاحظات الباقة">
                         <i class="ph-bold ${hasInstructions ? 'ph-info text-[#5CE1E6]' : 'ph-eye'} text-base"></i>
                     </button>
@@ -274,25 +292,25 @@ function renderCatalogGrid() {
 
                 <div class="p-5 flex-1 flex flex-col justify-between gap-4">
                     <div class="space-y-1">
-                        <h3 class="text-base font-black text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-[#005ba3] dark:group-hover:text-[#5CE1E6] transition-colors">
+                        <h3 class="text-base font-black leading-snug line-clamp-2 group-hover:text-[#005ba3] dark:group-hover:text-[#5CE1E6] transition-colors">
                             ${pkgName}
                         </h3>
-                        <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                            <i class="ph-bold ph-book-open-text text-[#005ba3] dark:text-[#5CE1E6]"></i>
-                            <span>انقر لعرض تعليمات الشحن وملاحظات الباقة</span>
+                        <p class="text-[11px] font-semibold text-[#6c727f] dark:text-slate-400 flex items-center gap-1">
+                            <i class="ph-bold ph-info text-[#005ba3] dark:text-[#5CE1E6]"></i>
+                            <span>انقر للتفاصيل والتعليمات</span>
                         </p>
                     </div>
 
-                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-3">
+                    <div class="pt-3 border-t border-black/6 dark:border-white/8 flex items-center justify-between gap-3">
                         <div>
-                            <span class="block text-[10px] font-bold text-slate-400">السعر النهائي</span>
-                            <span class="financial-amount text-xl font-black text-slate-900 dark:text-white" dir="ltr">$${price}</span>
+                            <span class="block text-[10px] font-bold text-[#6c727f] dark:text-slate-400">السعر النهائي</span>
+                            <span class="financial-amount text-xl font-black" dir="ltr">$${price}</span>
                         </div>
 
                         <button type="button" data-id="${safeId}" onclick="event.stopPropagation(); handleCardDirectBuy(this.dataset.id);"
-                                class="btn-primary px-5 py-3 rounded-2xl text-white text-xs font-black flex items-center gap-2 shrink-0 cursor-pointer">
-                            <i class="ph-bold ph-shopping-cart-simple text-base"></i>
-                            <span>شراء الآن</span>
+                                class="rev-btn-primary px-5 py-2.5 text-xs shrink-0">
+                            <span>شراء</span>
+                            <i class="ph-bold ph-arrow-left text-xs"></i>
                         </button>
                     </div>
                 </div>
@@ -301,6 +319,9 @@ function renderCatalogGrid() {
     }).join('');
 }
 
+// =========================================================================
+// 2.1 الأدراج الجانبية: تفاصيل الباقة + شحن الرصيد
+// =========================================================================
 window.openPackageDetailsModal = function(itemId) {
     const item = catalogItems.find(i => String(i.id) === String(itemId));
     if (!item) return;
@@ -359,7 +380,7 @@ window.handleCardDirectBuy = function(itemId) {
 
 window.openTopupModal = function() {
     if (!currentUser) {
-        showRetailToast('يرجى تسجيل الدخول أولاً لشحن رصيد محفظتك', 'info');
+        showRetailToast('يرجى تسجيل الدخول أولاً لشحن محفظتك', 'info');
         openAuthModal('login');
         return;
     }
@@ -372,12 +393,15 @@ window.openTopupModal = function() {
 window.copyTopupEmail = function() {
     if (!currentUser || !currentUser.email) return;
     navigator.clipboard.writeText(currentUser.email);
-    showRetailToast('تم نسخ بريد حسابك بنجاح!', 'success');
+    showRetailToast('تم نسخ بريد حسابك بنجاح', 'success');
 };
 
+// =========================================================================
+// 3. تنفيذ الشراء عبر دالة Vercel الآمنة (/api/buy)
+// =========================================================================
 function openBuyModal(catalogId) {
     if (!currentUser || !currentSession) {
-        showRetailToast('يرجى تسجيل الدخول لإتمام عملية الشراء', 'info');
+        showRetailToast('يرجى تسجيل الدخول لإتمام الطلب', 'info');
         openAuthModal('login');
         return;
     }
@@ -414,13 +438,13 @@ async function executeRetailPurchase() {
     const btn = document.getElementById('btn-confirm-purchase');
 
     if (productType === 'ID' && !playerId) {
-        showRetailToast('يرجى إدخال معرّف اللاعب (Player ID) لإتمام الشحن', 'warning');
+        showRetailToast('يرجى إدخال معرّف اللاعب (Player ID)', 'warning');
         return;
     }
 
     const waiverChecked = document.getElementById('eu-withdrawal-waiver')?.checked;
     if (!waiverChecked) {
-        showRetailToast('يرجى الموافقة على شرط التنفيذ الفوري والتنازل عن حق العدول الأوروبي', 'warning');
+        showRetailToast('يرجى الموافقة على شرط التنفيذ الفوري الأوروبي', 'warning');
         return;
     }
 
@@ -460,32 +484,35 @@ async function executeRetailPurchase() {
             document.getElementById('buy-result-title').textContent = 'تم استلام طلب الشحن المباشر';
             document.getElementById('buy-code-box').classList.add('hidden');
             document.getElementById('buy-pending-box').classList.remove('hidden');
-            showRetailToast('تم إرسال طلب الشحن المباشر وهو قيد التنفيذ', 'success');
+            showRetailToast('تم إرسال طلب الشحن المباشر بنجاح', 'success');
         } else {
-            document.getElementById('buy-result-title').textContent = 'تم الشراء بنجاح! إليك الكود الرقمي';
+            document.getElementById('buy-result-title').textContent = 'تم الشراء بنجاح! إليك الكود';
             document.getElementById('buy-delivered-code').value = result.card_code;
             document.getElementById('buy-code-box').classList.remove('hidden');
             document.getElementById('buy-pending-box').classList.add('hidden');
-            showRetailToast('تم الشراء بنجاح وتسليم الكود الرقمي!', 'success');
+            showRetailToast('تم الشراء وتسليم الكود الرقمي بنجاح', 'success');
         }
 
     } catch (err) {
         showRetailToast('خطأ في الاتصال بالخادم: ' + err.message, 'error');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="ph-fill ph-check-circle text-lg"></i><span>شراء وتأكيد الدفع الملزم</span>`;
+        btn.innerHTML = `<i class="ph-fill ph-lock-key text-base"></i><span>تأكيد الدفع من المحفظة</span>`;
     }
 }
 
 function copyDeliveredCode() {
     const input = document.getElementById('buy-delivered-code');
     navigator.clipboard.writeText(input.value);
-    showRetailToast('تم نسخ الكود الرقمي إلى الحافظة!', 'success');
+    showRetailToast('تم نسخ الكود الرقمي إلى الحافظة', 'success');
 }
 
+// =========================================================================
+// 4. سجل طلبات الزبون ومزامنة حالة طلبات الـ ID (/api/sync-order)
+// =========================================================================
 async function openOrdersModal() {
     if (!currentUser) {
-        showRetailToast('يرجى تسجيل الدخول لعرض سجل مشترياتك', 'info');
+        showRetailToast('يرجى تسجيل الدخول لعرض طلباتك', 'info');
         openAuthModal('login');
         return;
     }
@@ -495,7 +522,7 @@ async function openOrdersModal() {
 
 async function loadUserOrdersHistory() {
     const tbody = document.getElementById('retail-orders-tbody');
-    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">جاري جلب طلباتك...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-[#6c727f]">جاري جلب طلباتك...</td></tr>`;
 
     const { data, error } = await retailSupabase
         .from('retail_orders')
@@ -503,45 +530,45 @@ async function loadUserOrdersHistory() {
         .order('created_at', { ascending: false });
 
     if (error) {
-        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-rose-500">${escapeHTML(error.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-rose-500">${escapeHTML(error.message)}</td></tr>`;
         return;
     }
 
     if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">لا توجد مشتريات سابقة في حسابك.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-[#6c727f]">لا توجد مشتريات سابقة في حسابك.</td></tr>`;
         return;
     }
 
     tbody.innerHTML = data.map(o => {
         const pkgTitle = o.retail_catalog ? `${o.retail_catalog.platform} - ${o.retail_catalog.package_name}` : 'باقة رقمية';
         const deliveryInfo = o.delivered_code
-            ? `<span class="font-mono font-bold text-amber-600 dark:text-amber-400 select-all" dir="ltr">${escapeHTML(o.delivered_code)}</span>`
-            : `<span class="font-mono text-slate-500" dir="ltr">ID: ${escapeHTML(o.player_id || '---')}</span>`;
+            ? `<span class="font-mono font-bold text-[#005ba3] dark:text-[#5CE1E6] select-all" dir="ltr">${escapeHTML(o.delivered_code)}</span>`
+            : `<span class="font-mono text-[#6c727f]" dir="ltr">ID: ${escapeHTML(o.player_id || '---')}</span>`;
 
         let statusHtml = '';
         if (o.status === 'completed') {
-            statusHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">مكتمل ✓</span>`;
+            statusHtml = `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">مكتمل ✓</span>`;
         } else if (o.status === 'pending') {
             statusHtml = `
                 <div class="flex flex-col items-center gap-1">
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400">قيد التنفيذ</span>
-                    <button onclick="syncPendingOrder('${escapeHTML(o.local_order_ref)}')" class="text-[10px] text-[#005ba3] dark:text-[#5CE1E6] hover:underline font-bold cursor-pointer">تحديث الحالة</button>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-500/10 text-amber-600 dark:text-amber-400">قيد التنفيذ</span>
+                    <button onclick="syncPendingOrder('${escapeHTML(o.local_order_ref)}')" class="text-[10px] text-[#005ba3] dark:text-[#5CE1E6] hover:underline font-extrabold cursor-pointer">تحديث</button>
                 </div>`;
         } else {
             statusHtml = `
                 <div class="text-center">
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600">مرفوض (مسترجع)</span>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-500/10 text-rose-600">مرفوض (مسترجع)</span>
                     ${o.rejection_reason ? `<div class="text-[9px] text-rose-400 mt-0.5">${escapeHTML(o.rejection_reason)}</div>` : ''}
                 </div>`;
         }
 
         return `
-            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
-                <td class="py-3 px-2 font-mono font-bold">${escapeHTML(o.local_order_ref)}</td>
-                <td class="py-3 px-2 font-bold">${escapeHTML(pkgTitle)}</td>
-                <td class="py-3 px-2">${deliveryInfo}</td>
-                <td class="py-3 px-2 font-mono font-bold text-emerald-600 dark:text-emerald-400" dir="ltr">$${Number(o.retail_price).toFixed(2)}</td>
-                <td class="py-3 px-2 text-center">${statusHtml}</td>
+            <tr class="hover:bg-black/3 dark:hover:bg-white/3 transition-colors">
+                <td class="py-3.5 px-2 font-mono font-bold">${escapeHTML(o.local_order_ref)}</td>
+                <td class="py-3.5 px-2 font-bold">${escapeHTML(pkgTitle)}</td>
+                <td class="py-3.5 px-2">${deliveryInfo}</td>
+                <td class="py-3.5 px-2 financial-amount font-extrabold text-emerald-600 dark:text-emerald-400" dir="ltr">$${Number(o.retail_price).toFixed(2)}</td>
+                <td class="py-3.5 px-2 text-center">${statusHtml}</td>
             </tr>
         `;
     }).join('');
@@ -556,12 +583,12 @@ async function syncPendingOrder(localOrderRef) {
         });
         const data = await res.json();
         if (data.status === 'rejected') {
-            showRetailToast(`تم رفض الطلب (${data.rejection_reason || 'سبب غير محدد'}) وأُعيد المبلغ إلى محفظتك.`, 'warning');
+            showRetailToast(`تم رفض الطلب (${data.rejection_reason || 'سبب غير محدد'}) وأُعيد المبلغ لمحفظتك`, 'warning');
             await refreshUserWallet();
         } else if (data.status === 'completed') {
-            showRetailToast('اكتمل شحن الطلب بنجاح!', 'success');
+            showRetailToast('اكتمل شحن الطلب بنجاح', 'success');
         } else {
-            showRetailToast('الطلب لا يزال قيد المعالجة لدى المزود.', 'info');
+            showRetailToast('الطلب لا يزال قيد المعالجة لدى المزود', 'info');
         }
         await loadUserOrdersHistory();
     } catch (err) {
@@ -569,6 +596,9 @@ async function syncPendingOrder(localOrderRef) {
     }
 }
 
+// =========================================================================
+// 5. إدارة المصادقة والمظهر وحذف الحساب GDPR
+// =========================================================================
 function openAuthModal(mode = 'login') {
     document.getElementById('auth-mode').value = mode;
     updateAuthModalUI();
@@ -583,9 +613,9 @@ function toggleAuthMode() {
 
 function updateAuthModalUI() {
     const isRegister = document.getElementById('auth-mode').value === 'register';
-    document.getElementById('auth-modal-title').textContent = isRegister ? 'إنشاء حساب زبون جديد' : 'تسجيل الدخول إلى حسابك';
+    document.getElementById('auth-modal-title').textContent = isRegister ? 'إنشاء حساب جديد' : 'تسجيل الدخول إلى حسابك';
     document.getElementById('auth-name-group').classList.toggle('hidden', !isRegister);
-    document.getElementById('auth-submit-btn').textContent = isRegister ? 'إنشاء الحساب' : 'دخول';
+    document.getElementById('auth-submit-btn').textContent = isRegister ? 'إنشاء الحساب' : 'متابعة';
     document.getElementById('auth-switch-text').textContent = isRegister ? 'لديك حساب بالفعل؟' : 'ليس لديك حساب؟';
     document.getElementById('auth-switch-btn').textContent = isRegister ? 'تسجيل الدخول' : 'إنشاء حساب جديد';
 }
@@ -609,11 +639,11 @@ async function handleRetailAuthSubmit(e) {
                 options: { data: { full_name: fullName } }
             });
             if (error) throw error;
-            showRetailToast('تم إنشاء حسابك بنجاح!', 'success');
+            showRetailToast('تم إنشاء حسابك بنجاح', 'success');
         } else {
             const { error } = await retailSupabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
-            showRetailToast('تم تسجيل الدخول بنجاح', 'success');
+            showRetailToast('مرحباً بعودتك', 'success');
         }
         closeModal('auth-modal');
     } catch (err) {
@@ -626,7 +656,7 @@ async function handleRetailAuthSubmit(e) {
 
 async function handleRetailLogout() {
     await retailSupabase.auth.signOut();
-    showRetailToast('تم تسجيل الخروج بنجاح', 'info');
+    showRetailToast('تم تسجيل الخروج', 'info');
 }
 
 function closeModal(id) {
@@ -665,7 +695,7 @@ window.deleteMyRetailAccount = async function() {
         }
         await retailSupabase.auth.signOut();
         closeModal('orders-modal');
-        showRetailToast('تم حذف حسابك وبياناتك بنجاح وفق لائحة GDPR.', 'success');
+        showRetailToast('تم حذف حسابك وبياناتك بنجاح وفق لائحة GDPR', 'success');
     } catch (err) {
         showRetailToast('خطأ في الاتصال بالخادم: ' + err.message, 'error');
     }
