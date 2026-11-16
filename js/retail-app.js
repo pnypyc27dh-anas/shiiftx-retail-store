@@ -10,9 +10,13 @@ let catalogItems = [];
 let pendingOrderRefs = [];
 let activeAppView = 'store'; // 'store' | 'favorites'
 let activePlatformFilter = 'ALL';
+let activeDeliveryTypeFilter = 'ALL';
 let activeSearchQuery = '';
 let activeSortOrder = 'default';
 let favoriteIds = new Set(JSON.parse(localStorage.getItem('shiiftx_retail_favs') || '[]'));
+
+let currentHeroSlide = 0;
+let heroAutoTimer = null;
 
 function saveFavoritesStorage() {
     localStorage.setItem('shiiftx_retail_favs', JSON.stringify([...favoriteIds]));
@@ -35,22 +39,64 @@ function resolveCardImageUrl(rawUrl) {
     return clean;
 }
 
-// أيقونة مخصصة لكل منصة في القائمة الجانبية
-function getPlatformIconClass(platformName) {
+// استخراج شارة المنطقة الجغرافية تلقائياً من اسم الباقة أو المنصة
+function detectPackageRegion(platform, packageName) {
+    const text = `${platform || ''} ${packageName || ''}`.toLowerCase();
+    if (text.includes('امريكي') || text.includes('أمريكي') || text.includes('usa') || /\bus\b/.test(text) || text.includes('united states')) {
+        return { flag: '🇺🇸', label: 'المتجر الأمريكي (US)' };
+    }
+    if (text.includes('اوروبي') || text.includes('أوروبي') || /\beu\b/.test(text) || text.includes('europe') || text.includes('euro')) {
+        return { flag: '🇪🇺', label: 'المتجر الأوروبي (EU)' };
+    }
+    if (text.includes('سعودي') || /\bsa\b/.test(text) || text.includes('saudi') || text.includes('ksa')) {
+        return { flag: '🇸🇦', label: 'المتجر السعودي (KSA)' };
+    }
+    if (text.includes('اماراتي') || text.includes('إماراتي') || /\buae\b/.test(text) || text.includes('emirates')) {
+        return { flag: '🇦🇪', label: 'المتجر الإماراتي (UAE)' };
+    }
+    if (text.includes('تركي') || /\btr\b/.test(text) || text.includes('turkey') || text.includes('turkish')) {
+        return { flag: '🇹🇷', label: 'المتجر التركي (TR)' };
+    }
+    if (text.includes('بريطاني') || /\buk\b/.test(text) || text.includes('united kingdom')) {
+        return { flag: '🇬🇧', label: 'المتجر البريطاني (UK)' };
+    }
+    return { flag: '🌍', label: 'حساب عالمي (Global)' };
+}
+
+// أيقونة ولون هوية مخصص لكل علامة تجارية
+function getPlatformBrandMeta(platformName) {
     const p = (platformName || '').toLowerCase();
     if (p.includes('pubg') || p.includes('free fire') || p.includes('call of duty') || p.includes('valorant') || p.includes('mobile legends')) {
-        return 'ph-fill ph-game-controller';
+        return { icon: 'ph-fill ph-game-controller', bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' };
     }
-    if (p.includes('google')) return 'ph-fill ph-google-play-logo';
-    if (p.includes('apple') || p.includes('itunes')) return 'ph-fill ph-apple-logo';
-    if (p.includes('playstation') || p.includes('psn')) return 'ph-fill ph-playstation-logo';
-    if (p.includes('xbox')) return 'ph-fill ph-xbox-logo';
-    if (p.includes('steam')) return 'ph-fill ph-steam-logo';
-    if (p.includes('razer')) return 'ph-fill ph-coin-vertical';
-    if (p.includes('netflix') || p.includes('spotify') || p.includes('shahid') || p.includes('watch')) return 'ph-fill ph-television-simple';
-    if (p.includes('likee') || p.includes('tiktok') || p.includes('bigo') || p.includes('discord')) return 'ph-fill ph-chats-circle';
-    if (p.includes('windows') || p.includes('office') || p.includes('outlook') || p.includes('microsoft')) return 'ph-fill ph-windows-logo';
-    return 'ph-fill ph-credit-card';
+    if (p.includes('google')) {
+        return { icon: 'ph-fill ph-google-play-logo', bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' };
+    }
+    if (p.includes('apple') || p.includes('itunes')) {
+        return { icon: 'ph-fill ph-apple-logo', bg: 'linear-gradient(135deg, #334155 0%, #0f172a 100%)' };
+    }
+    if (p.includes('playstation') || p.includes('psn')) {
+        return { icon: 'ph-fill ph-playstation-logo', bg: 'linear-gradient(135deg, #00439c 0%, #0070d1 100%)' };
+    }
+    if (p.includes('xbox')) {
+        return { icon: 'ph-fill ph-xbox-logo', bg: 'linear-gradient(135deg, #107c10 0%, #0b5a0b 100%)' };
+    }
+    if (p.includes('steam')) {
+        return { icon: 'ph-fill ph-steam-logo', bg: 'linear-gradient(135deg, #1b2838 0%, #2a475e 100%)' };
+    }
+    if (p.includes('razer')) {
+        return { icon: 'ph-fill ph-coin-vertical', bg: 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)' };
+    }
+    if (p.includes('netflix') || p.includes('spotify') || p.includes('shahid') || p.includes('watch')) {
+        return { icon: 'ph-fill ph-television-simple', bg: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)' };
+    }
+    if (p.includes('likee') || p.includes('tiktok') || p.includes('bigo') || p.includes('discord')) {
+        return { icon: 'ph-fill ph-chats-circle', bg: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)' };
+    }
+    if (p.includes('windows') || p.includes('office') || p.includes('outlook') || p.includes('microsoft')) {
+        return { icon: 'ph-fill ph-windows-logo', bg: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' };
+    }
+    return { icon: 'ph-fill ph-credit-card', bg: 'linear-gradient(135deg, #005ba3 0%, #004278 100%)' };
 }
 
 // إشعارات الكبسولة العائمة بأسلوب Revolut (Pill Toasts)
@@ -100,9 +146,50 @@ function showRetailToast(message, type = 'info') {
 }
 
 // =========================================================================
+// 0. عارض العروض التفاعلي (Interactive Hero Carousel)
+// =========================================================================
+function initHeroCarousel() {
+    const carousel = document.getElementById('hero-carousel');
+    if (!carousel) return;
+
+    startHeroAutoPlay();
+    carousel.addEventListener('mouseenter', stopHeroAutoPlay);
+    carousel.addEventListener('mouseleave', startHeroAutoPlay);
+}
+
+function startHeroAutoPlay() {
+    stopHeroAutoPlay();
+    heroAutoTimer = setInterval(() => {
+        window.stepHeroSlide(1);
+    }, 6000);
+}
+
+function stopHeroAutoPlay() {
+    if (heroAutoTimer) {
+        clearInterval(heroAutoTimer);
+        heroAutoTimer = null;
+    }
+}
+
+window.goToHeroSlide = function(index) {
+    const slides = document.querySelectorAll('#hero-carousel .rev-slide');
+    const dots = document.querySelectorAll('#hero-carousel-dots .rev-carousel-dot');
+    if (!slides.length) return;
+
+    currentHeroSlide = ((index % slides.length) + slides.length) % slides.length;
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === currentHeroSlide));
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === currentHeroSlide));
+};
+
+window.stepHeroSlide = function(delta) {
+    window.goToHeroSlide(currentHeroSlide + delta);
+};
+
+// =========================================================================
 // 1. التهيئة ومراقبة جلسة المستخدم
 // =========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
+    initHeroCarousel();
     updateFavoritesCounter();
     await loadRetailCatalog();
 
@@ -181,7 +268,7 @@ async function refreshUserWallet() {
 }
 
 // =========================================================================
-// 2. القائمة الجانبية، التبديل بين المتجر والمفضلة، والبحث والفرز
+// 2. القائمة الجانبية، بطاقات العلامات التجارية، المفضلة، والفلترة
 // =========================================================================
 window.toggleMobileSidebar = function(forceOpen) {
     const sidebar = document.getElementById('app-sidebar');
@@ -198,11 +285,13 @@ window.switchAppView = function(view) {
 
     const btnStore = document.getElementById('nav-btn-store');
     const btnFav = document.getElementById('nav-btn-favorites');
-    const hero = document.getElementById('store-hero-banner');
+    const carousel = document.getElementById('hero-carousel');
+    const brandHub = document.getElementById('brand-hub-section');
 
     if (btnStore) btnStore.classList.toggle('active', activeAppView === 'store' && activePlatformFilter === 'ALL');
     if (btnFav) btnFav.classList.toggle('active', activeAppView === 'favorites');
-    if (hero) hero.classList.toggle('hidden', activeAppView === 'favorites');
+    if (carousel) carousel.classList.toggle('hidden', activeAppView === 'favorites');
+    if (brandHub) brandHub.classList.toggle('hidden', activeAppView === 'favorites');
 
     if (activeAppView === 'favorites') {
         document.querySelectorAll('.sidebar-platform-btn').forEach(b => b.classList.remove('active'));
@@ -264,6 +353,7 @@ async function loadRetailCatalog() {
 
     updateFavoritesCounter();
     renderSidebarPlatforms();
+    renderBrandHubTiles();
     renderCatalogGrid();
 }
 
@@ -285,14 +375,52 @@ function renderSidebarPlatforms() {
     container.innerHTML = platforms.map(pl => {
         const count = catalogItems.filter(i => i.platform === pl).length;
         const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
-        const iconClass = getPlatformIconClass(pl);
+        const meta = getPlatformBrandMeta(pl);
         return `
             <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" class="sidebar-platform-btn rev-nav-item ${isSel ? 'active' : ''}">
                 <span class="flex items-center gap-2.5 truncate">
-                    <span class="rev-nav-icon"><i class="${iconClass}"></i></span>
+                    <span class="rev-nav-icon"><i class="${meta.icon}"></i></span>
                     <span class="truncate">${escapeHTML(pl)}</span>
                 </span>
                 <span class="text-[11px] font-extrabold opacity-70 shrink-0">${count}</span>
+            </button>
+        `;
+    }).join('');
+}
+
+// رسم بطاقات العلامات التجارية المجمّعة (Brand Hub Tiles)
+function renderBrandHubTiles() {
+    const grid = document.getElementById('brand-hub-grid');
+    const resetBtn = document.getElementById('brand-reset-btn');
+    if (!grid) return;
+
+    if (resetBtn) {
+        resetBtn.classList.toggle('hidden', activePlatformFilter === 'ALL');
+    }
+
+    const platforms = [...new Set(catalogItems.map(i => i.platform).filter(Boolean))];
+    if (platforms.length === 0) {
+        grid.innerHTML = '';
+        return;
+    }
+
+    grid.innerHTML = platforms.map(pl => {
+        const plItems = catalogItems.filter(i => i.platform === pl);
+        const minPrice = Math.min(...plItems.map(i => Number(i.retail_price || 0)));
+        const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
+        const meta = getPlatformBrandMeta(pl);
+
+        return `
+            <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" class="rev-brand-tile ${isSel ? 'active' : ''}">
+                <div class="rev-brand-avatar" style="background: ${meta.bg};">
+                    <i class="${meta.icon}"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="text-xs font-black truncate">${escapeHTML(pl)}</div>
+                    <div class="text-[11px] font-bold text-[#68707d] dark:text-slate-400 mt-0.5">
+                        ${plItems.length} باقات • من <span class="financial-amount font-extrabold text-[#191c1f] dark:text-white" dir="ltr">$${minPrice.toFixed(2)}</span>
+                    </div>
+                </div>
             </button>
         `;
     }).join('');
@@ -303,11 +431,14 @@ function filterRetailCatalog(platform) {
     activePlatformFilter = platform || 'ALL';
 
     const btnFav = document.getElementById('nav-btn-favorites');
-    const hero = document.getElementById('store-hero-banner');
+    const carousel = document.getElementById('hero-carousel');
+    const brandHub = document.getElementById('brand-hub-section');
     if (btnFav) btnFav.classList.remove('active');
-    if (hero) hero.classList.remove('hidden');
+    if (carousel) carousel.classList.remove('hidden');
+    if (brandHub) brandHub.classList.remove('hidden');
 
     renderSidebarPlatforms();
+    renderBrandHubTiles();
     window.toggleMobileSidebar(false);
     renderCatalogGrid();
 }
@@ -326,6 +457,11 @@ function clearCatalogSearch() {
     const input = document.getElementById('catalog-search-input');
     if (input) input.value = '';
     handleCatalogSearch('');
+}
+
+function handleDeliveryTypeFilter(typeVal) {
+    activeDeliveryTypeFilter = typeVal || 'ALL';
+    renderCatalogGrid();
 }
 
 function handleCatalogSort(sortOrder) {
@@ -348,12 +484,19 @@ function renderCatalogGrid() {
         viewTitle = activePlatformFilter;
     }
 
+    if (activeDeliveryTypeFilter === 'ID') {
+        items = items.filter(i => i.product_type && i.product_type.toUpperCase() === 'ID');
+    } else if (activeDeliveryTypeFilter === 'CODE') {
+        items = items.filter(i => !i.product_type || i.product_type.toUpperCase() !== 'ID');
+    }
+
     if (activeSearchQuery) {
         items = items.filter(i => {
             const p = (i.platform || '').toLowerCase();
             const n = (i.package_name || '').toLowerCase();
             const pr = String(i.retail_price || '');
-            return p.includes(activeSearchQuery) || n.includes(activeSearchQuery) || pr.includes(activeSearchQuery);
+            const reg = detectPackageRegion(i.platform, i.package_name).label.toLowerCase();
+            return p.includes(activeSearchQuery) || n.includes(activeSearchQuery) || pr.includes(activeSearchQuery) || reg.includes(activeSearchQuery);
         });
     }
 
@@ -373,11 +516,11 @@ function renderCatalogGrid() {
         grid.innerHTML = `
             <div class="col-span-full rev-panel py-16 px-4 text-center space-y-3">
                 <i class="ph-duotone ${isFavEmpty ? 'ph-heart-break' : 'ph-magnifying-glass'} text-4xl text-[#68707d]"></i>
-                <p class="text-sm font-black">${isFavEmpty ? 'قائمة المفضلة فارغة حالياً' : 'لم يتم العثور على باقات مطابقة لبحثك'}</p>
-                <p class="text-xs text-[#68707d] dark:text-slate-400">${isFavEmpty ? 'اضغط على أيقونة القلب أعلى أي بطاقة لحفظها هنا للوصول السريع.' : 'جرّب البحث بكلمة أخرى أو تصفّح جميع الأقسام.'}</p>
+                <p class="text-sm font-black">${isFavEmpty ? 'قائمة المفضلة فارغة حالياً' : 'لم يتم العثور على باقات مطابقة لخيارات التصفية'}</p>
+                <p class="text-xs text-[#68707d] dark:text-slate-400">${isFavEmpty ? 'اضغط على أيقونة القلب أعلى أي بطاقة لحفظها هنا للوصول السريع.' : 'جرّب تغيير نوع التسليم أو إعادة ضبط الفلاتر.'}</p>
                 <div class="pt-1">
-                    <button type="button" onclick="clearCatalogSearch(); switchAppView('store'); filterRetailCatalog('ALL');" class="rev-btn-primary px-6 py-2.5 text-xs">
-                        تصفّح جميع الباقات
+                    <button type="button" onclick="clearCatalogSearch(); activeDeliveryTypeFilter='ALL'; document.getElementById('catalog-type-filter').value='ALL'; switchAppView('store'); filterRetailCatalog('ALL');" class="rev-btn-primary px-6 py-2.5 text-xs">
+                        عرض جميع الباقات
                     </button>
                 </div>
             </div>`;
@@ -393,6 +536,7 @@ function renderCatalogGrid() {
         const price = Number(item.retail_price || 0).toFixed(2);
         const isID = (item.product_type && item.product_type.toUpperCase() === 'ID');
         const isFav = favoriteIds.has(String(item.id));
+        const region = detectPackageRegion(item.platform, item.package_name);
 
         const badgeText = isID ? 'شحن مباشر ID' : 'كود فوري';
         const badgeDot = isID ? 'bg-amber-400' : 'bg-emerald-400';
@@ -435,19 +579,19 @@ function renderCatalogGrid() {
                 </div>
 
                 <div class="p-5 flex-1 flex flex-col justify-between gap-4">
-                    <div class="space-y-1">
+                    <div class="space-y-2">
+                        <div class="rev-region-badge">
+                            <span>${region.flag}</span>
+                            <span>${escapeHTML(region.label)}</span>
+                        </div>
                         <h3 class="text-base font-black leading-snug line-clamp-2 group-hover:text-[#005ba3] dark:group-hover:text-[#5CE1E6] transition-colors">
                             ${pkgName}
                         </h3>
-                        <p class="text-[11px] font-semibold text-[#68707d] dark:text-slate-400 flex items-center gap-1">
-                            <i class="ph-bold ph-info text-[#005ba3] dark:text-[#5CE1E6]"></i>
-                            <span>انقر للتفاصيل والتعليمات</span>
-                        </p>
                     </div>
 
                     <div class="pt-3 border-t border-black/6 dark:border-white/8 flex items-center justify-between gap-3">
                         <div>
-                            <span class="block text-[10px] font-bold text-[#68707d] dark:text-slate-400">السعر النهائي</span>
+                            <span class="block text-[10px] font-bold text-[#68707d] dark:text-slate-400">شامل الضريبة</span>
                             <span class="financial-amount text-xl font-black" dir="ltr">$${price}</span>
                         </div>
 
@@ -491,13 +635,16 @@ window.openPackageDetailsModal = function(itemId) {
         if (fallbackEl) fallbackEl.classList.remove('hidden');
     }
 
+    const region = detectPackageRegion(item.platform, item.package_name);
     const platEl = document.getElementById('pkg-detail-platform');
+    const regEl = document.getElementById('pkg-detail-region');
     const titleEl = document.getElementById('pkg-detail-title');
     const priceEl = document.getElementById('pkg-detail-price');
     const instEl = document.getElementById('pkg-detail-instructions');
     const buyBtn = document.getElementById('pkg-detail-buy-btn');
 
     if (platEl) platEl.textContent = item.platform || 'بطاقة رقمية';
+    if (regEl) regEl.textContent = `${region.flag} ${region.label}`;
     if (titleEl) titleEl.textContent = item.package_name || 'باقة شحن';
     if (priceEl) priceEl.textContent = `$${Number(item.retail_price || 0).toFixed(2)}`;
 
