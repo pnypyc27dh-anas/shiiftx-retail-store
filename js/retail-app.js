@@ -1,6 +1,4 @@
-// =========================================================================
-// إعدادات مشروع Supabase المستقل لمتجر التجزئة
-// =========================================================================
+// ==================== بداية ملف js/retail-app.js ====================
 const RETAIL_SUPABASE_URL = 'https://qavdmizccaltsggwrdkk.supabase.co';
 const RETAIL_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdmRtaXpjY2FsdHNnZ3dyZGtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0NDUzMTgsImV4cCI6MjExMDAyMTMxOH0.RUqkSQggtLrpfFGcr8Y2RUyD6RoJLqzKD3CVc5fo4KI';
 
@@ -9,6 +7,9 @@ const retailSupabase = window.supabase.createClient(RETAIL_SUPABASE_URL, RETAIL_
 let currentUser = null;
 let currentSession = null;
 let catalogItems = [];
+let activePlatformFilter = 'ALL';
+let activeSearchQuery = '';
+let activeSortOrder = 'default';
 
 function escapeHTML(str) {
     if (str === null || str === undefined) return '';
@@ -17,7 +18,6 @@ function escapeHTML(str) {
     return div.innerHTML;
 }
 
-// محوّل ذكي لروابط Imgur (يحوّل رابط الصفحة العادي إلى رابط صورة مباشر تلقائياً)
 function resolveCardImageUrl(rawUrl) {
     if (!rawUrl || typeof rawUrl !== 'string') return '';
     const clean = rawUrl.trim();
@@ -28,9 +28,39 @@ function resolveCardImageUrl(rawUrl) {
     return clean;
 }
 
-// =========================================================================
-// 1. التهيئة ومراقبة جلسة المستخدم
-// =========================================================================
+function showRetailToast(message, type = 'info') {
+    const container = document.getElementById('retail-toast-container');
+    if (!container) return;
+
+    const styles = {
+        success: { bg: 'bg-emerald-600/95 border-emerald-400/30 text-white', icon: 'ph-fill ph-check-circle' },
+        error: { bg: 'bg-rose-600/95 border-rose-400/30 text-white', icon: 'ph-fill ph-warning-circle' },
+        warning: { bg: 'bg-amber-500/95 border-amber-300/40 text-slate-950', icon: 'ph-fill ph-warning' },
+        info: { bg: 'bg-slate-900/95 border-[#5CE1E6]/30 text-white', icon: 'ph-fill ph-info text-[#5CE1E6]' }
+    };
+
+    const currentStyle = styles[type] || styles.info;
+    const toast = document.createElement('div');
+    toast.className = `toast-slide-in pointer-events-auto flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl border shadow-2xl backdrop-blur-xl text-xs font-bold ${currentStyle.bg}`;
+    toast.innerHTML = `
+        <div class="flex items-center gap-2.5">
+            <i class="${currentStyle.icon} text-lg shrink-0"></i>
+            <span class="leading-snug">${escapeHTML(message)}</span>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="opacity-75 hover:opacity-100 p-1 cursor-pointer">
+            <i class="ph-bold ph-x text-sm"></i>
+        </button>
+    `;
+
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 260);
+    }, 4200);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     await loadRetailCatalog();
 
@@ -85,13 +115,9 @@ async function refreshUserWallet() {
     }
 }
 
-// =========================================================================
-// 2. جلب وعرض كتالوج الباقات (البطاقات الكبيرة + صور Imgur + نافذة التعليمات)
-// =========================================================================
 async function loadRetailCatalog() {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
-    grid.innerHTML = `<div class="col-span-full py-14 text-center text-slate-400 text-xs font-bold">جاري تحديث الكتالوج...</div>`;
 
     const { data, error } = await retailSupabase
         .from('retail_catalog')
@@ -101,13 +127,13 @@ async function loadRetailCatalog() {
         .order('retail_price', { ascending: true });
 
     if (error) {
-        grid.innerHTML = `<div class="col-span-full py-10 text-center text-rose-500 text-xs font-bold">تعذر تحميل المنتجات: ${escapeHTML(error.message)}</div>`;
+        grid.innerHTML = `<div class="col-span-full py-12 text-center text-rose-500 text-xs font-bold">تعذر تحميل المنتجات: ${escapeHTML(error.message)}</div>`;
         return;
     }
 
     catalogItems = data || [];
     renderPlatformPills();
-    renderCatalogGrid('ALL');
+    renderCatalogGrid();
 }
 
 function renderPlatformPills() {
@@ -115,37 +141,83 @@ function renderPlatformPills() {
     if (!container) return;
     const platforms = [...new Set(catalogItems.map(i => i.platform).filter(Boolean))];
 
+    const allActive = activePlatformFilter === 'ALL';
     container.innerHTML = `
-        <button type="button" onclick="filterRetailCatalog('ALL')" data-platform="ALL" class="filter-pill px-4 py-2 rounded-xl bg-[#005ba3] text-white shadow-sm whitespace-nowrap transition cursor-pointer">
-            جميع الباقات
+        <button type="button" onclick="filterRetailCatalog('ALL')" data-platform="ALL" class="filter-pill px-4 py-2 rounded-xl ${allActive ? 'bg-[#005ba3] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'} whitespace-nowrap transition cursor-pointer">
+            جميع الباقات (${catalogItems.length})
         </button>
-    ` + platforms.map(pl => `
-        <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" class="filter-pill px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 whitespace-nowrap transition cursor-pointer">
-            ${escapeHTML(pl)}
-        </button>
-    `).join('');
+    ` + platforms.map(pl => {
+        const count = catalogItems.filter(i => i.platform === pl).length;
+        const isSel = activePlatformFilter === pl;
+        return `
+            <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" class="filter-pill px-4 py-2 rounded-xl ${isSel ? 'bg-[#005ba3] text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'} whitespace-nowrap transition cursor-pointer">
+                ${escapeHTML(pl)} <span class="opacity-70 text-[10px]">(${count})</span>
+            </button>
+        `;
+    }).join('');
 }
 
 function filterRetailCatalog(platform) {
-    document.querySelectorAll('.filter-pill').forEach(btn => {
-        const isSelected = btn.getAttribute('data-platform') === platform;
-        btn.className = isSelected
-            ? 'filter-pill px-4 py-2 rounded-xl bg-[#005ba3] text-white shadow-sm whitespace-nowrap transition cursor-pointer'
-            : 'filter-pill px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 whitespace-nowrap transition cursor-pointer';
-    });
-    renderCatalogGrid(platform);
+    activePlatformFilter = platform || 'ALL';
+    renderPlatformPills();
+    renderCatalogGrid();
 }
 
-function renderCatalogGrid(platform) {
+function handleCatalogSearch(query) {
+    activeSearchQuery = (query || '').trim().toLowerCase();
+    const clearBtn = document.getElementById('clear-search-btn');
+    if (clearBtn) {
+        clearBtn.classList.toggle('hidden', activeSearchQuery.length === 0);
+        clearBtn.classList.toggle('flex', activeSearchQuery.length > 0);
+    }
+    renderCatalogGrid();
+}
+
+function clearCatalogSearch() {
+    const input = document.getElementById('catalog-search-input');
+    if (input) input.value = '';
+    handleCatalogSearch('');
+}
+
+function handleCatalogSort(sortOrder) {
+    activeSortOrder = sortOrder || 'default';
+    renderCatalogGrid();
+}
+
+function renderCatalogGrid() {
     const grid = document.getElementById('catalog-grid');
     if (!grid) return;
 
-    const items = (!platform || platform === 'ALL')
-        ? catalogItems
-        : catalogItems.filter(i => i.platform === platform);
+    let items = [...catalogItems];
+
+    if (activePlatformFilter && activePlatformFilter !== 'ALL') {
+        items = items.filter(i => i.platform === activePlatformFilter);
+    }
+
+    if (activeSearchQuery) {
+        items = items.filter(i => {
+            const p = (i.platform || '').toLowerCase();
+            const n = (i.package_name || '').toLowerCase();
+            const pr = String(i.retail_price || '');
+            return p.includes(activeSearchQuery) || n.includes(activeSearchQuery) || pr.includes(activeSearchQuery);
+        });
+    }
+
+    if (activeSortOrder === 'price_asc') {
+        items.sort((a, b) => Number(a.retail_price || 0) - Number(b.retail_price || 0));
+    } else if (activeSortOrder === 'price_desc') {
+        items.sort((a, b) => Number(b.retail_price || 0) - Number(a.retail_price || 0));
+    }
 
     if (items.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-16 text-center text-slate-400 text-sm font-bold">لا توجد باقات متوفرة في هذا القسم حالياً.</div>`;
+        grid.innerHTML = `
+            <div class="col-span-full glass-panel py-16 px-4 text-center space-y-3">
+                <i class="ph-duotone ph-magnifying-glass text-4xl text-slate-400"></i>
+                <p class="text-slate-600 dark:text-slate-300 text-sm font-black">لم يتم العثور على باقات مطابقة لبحثك</p>
+                <button type="button" onclick="clearCatalogSearch(); filterRetailCatalog('ALL');" class="btn-primary px-5 py-2.5 rounded-xl text-white text-xs font-bold cursor-pointer">
+                    عرض جميع الباقات
+                </button>
+            </div>`;
         return;
     }
 
@@ -159,9 +231,7 @@ function renderCatalogGrid(platform) {
         const isID = (item.product_type && item.product_type.toUpperCase() === 'ID');
 
         const badgeText = isID ? 'شحن مباشر (ID)' : 'كود فوري ⚡';
-        const badgeClass = isID
-            ? 'bg-amber-500/95 text-slate-950'
-            : 'bg-emerald-500/95 text-slate-950';
+        const badgeClass = isID ? 'bg-amber-500/95 text-slate-950' : 'bg-emerald-500/95 text-slate-950';
 
         const imgUrl = resolveCardImageUrl(item.image_url);
         const hasInstructions = Boolean(item.instructions && item.instructions.trim());
@@ -183,30 +253,25 @@ function renderCatalogGrid(platform) {
             <article data-id="${safeId}" onclick="openPackageDetailsModal(this.dataset.id)"
                      class="group cursor-pointer rounded-[28px] overflow-hidden bg-white dark:bg-[#111827] border border-slate-200/80 dark:border-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-12px_rgba(0,91,163,0.28)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
 
-                <!-- الجزء العلوي الكبير (~65% من البطاقة لصورة Imgur والفراغ البصري) -->
                 <div class="relative w-full aspect-[16/11] min-h-[220px] bg-slate-900 overflow-hidden">
                     ${visualBlock}
                     <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none"></div>
 
-                    <!-- شارة نوع التسليم -->
                     <span class="absolute top-3.5 right-3.5 px-3 py-1 rounded-full text-[11px] font-black shadow-md backdrop-blur-md ${badgeClass}">
                         ${badgeText}
                     </span>
 
-                    <!-- زر نافذة التعليمات والملاحظات -->
                     <button type="button" data-id="${safeId}" onclick="event.stopPropagation(); openPackageDetailsModal(this.dataset.id);"
                             class="absolute top-3.5 left-3.5 w-9 h-9 rounded-full bg-slate-950/65 hover:bg-[#005ba3] text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition shadow-md cursor-pointer"
                             title="تعليمات وملاحظات الباقة">
                         <i class="ph-bold ${hasInstructions ? 'ph-info text-[#5CE1E6]' : 'ph-eye'} text-base"></i>
                     </button>
 
-                    <!-- اسم المنصة أسفل الصورة -->
                     <span class="absolute bottom-3 right-4 text-[11px] font-extrabold text-white/95 tracking-wide">
                         ${platformName}
                     </span>
                 </div>
 
-                <!-- الجزء السفلي المدمج (اسم الباقة + التعليمات + السعر + زر الشراء) -->
                 <div class="p-5 flex-1 flex flex-col justify-between gap-4">
                     <div class="space-y-1">
                         <h3 class="text-base font-black text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-[#005ba3] dark:group-hover:text-[#5CE1E6] transition-colors">
@@ -236,9 +301,6 @@ function renderCatalogGrid(platform) {
     }).join('');
 }
 
-// =========================================================================
-// 2.1 نافذة تعليمات الشحن وملاحظات الباقة
-// =========================================================================
 window.openPackageDetailsModal = function(itemId) {
     const item = catalogItems.find(i => String(i.id) === String(itemId));
     if (!item) return;
@@ -295,11 +357,27 @@ window.handleCardDirectBuy = function(itemId) {
     openBuyModal(itemId);
 };
 
-// =========================================================================
-// 3. تنفيذ الشراء عبر دالة Vercel الآمنة (/api/buy)
-// =========================================================================
+window.openTopupModal = function() {
+    if (!currentUser) {
+        showRetailToast('يرجى تسجيل الدخول أولاً لشحن رصيد محفظتك', 'info');
+        openAuthModal('login');
+        return;
+    }
+    const emailEl = document.getElementById('topup-user-email');
+    if (emailEl) emailEl.textContent = currentUser.email || '---';
+    const modal = document.getElementById('topup-modal');
+    if (modal) modal.classList.remove('hidden');
+};
+
+window.copyTopupEmail = function() {
+    if (!currentUser || !currentUser.email) return;
+    navigator.clipboard.writeText(currentUser.email);
+    showRetailToast('تم نسخ بريد حسابك بنجاح!', 'success');
+};
+
 function openBuyModal(catalogId) {
     if (!currentUser || !currentSession) {
+        showRetailToast('يرجى تسجيل الدخول لإتمام عملية الشراء', 'info');
         openAuthModal('login');
         return;
     }
@@ -336,13 +414,13 @@ async function executeRetailPurchase() {
     const btn = document.getElementById('btn-confirm-purchase');
 
     if (productType === 'ID' && !playerId) {
-        alert('يرجى إدخال معرّف اللاعب (Player ID) لإتمام الشحن');
+        showRetailToast('يرجى إدخال معرّف اللاعب (Player ID) لإتمام الشحن', 'warning');
         return;
     }
 
     const waiverChecked = document.getElementById('eu-withdrawal-waiver')?.checked;
     if (!waiverChecked) {
-        alert('يرجى الموافقة على شرط التنفيذ الفوري والتنازل عن حق العدول الأوروبي قبل إتمام الدفع.');
+        showRetailToast('يرجى الموافقة على شرط التنفيذ الفوري والتنازل عن حق العدول الأوروبي', 'warning');
         return;
     }
 
@@ -368,7 +446,7 @@ async function executeRetailPurchase() {
             if (result.remaining_balance !== undefined) {
                 document.getElementById('nav-wallet-balance').textContent = `$${Number(result.remaining_balance).toFixed(2)}`;
             }
-            alert(result.error || 'تعذر إتمام عملية الشراء');
+            showRetailToast(result.error || 'تعذر إتمام عملية الشراء', 'error');
             return;
         }
 
@@ -382,15 +460,17 @@ async function executeRetailPurchase() {
             document.getElementById('buy-result-title').textContent = 'تم استلام طلب الشحن المباشر';
             document.getElementById('buy-code-box').classList.add('hidden');
             document.getElementById('buy-pending-box').classList.remove('hidden');
+            showRetailToast('تم إرسال طلب الشحن المباشر وهو قيد التنفيذ', 'success');
         } else {
             document.getElementById('buy-result-title').textContent = 'تم الشراء بنجاح! إليك الكود الرقمي';
             document.getElementById('buy-delivered-code').value = result.card_code;
             document.getElementById('buy-code-box').classList.remove('hidden');
             document.getElementById('buy-pending-box').classList.add('hidden');
+            showRetailToast('تم الشراء بنجاح وتسليم الكود الرقمي!', 'success');
         }
 
     } catch (err) {
-        alert('خطأ في الاتصال بالخادم: ' + err.message);
+        showRetailToast('خطأ في الاتصال بالخادم: ' + err.message, 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="ph-fill ph-check-circle text-lg"></i><span>شراء وتأكيد الدفع الملزم</span>`;
@@ -400,14 +480,15 @@ async function executeRetailPurchase() {
 function copyDeliveredCode() {
     const input = document.getElementById('buy-delivered-code');
     navigator.clipboard.writeText(input.value);
-    alert('تم نسخ الكود بنجاح!');
+    showRetailToast('تم نسخ الكود الرقمي إلى الحافظة!', 'success');
 }
 
-// =========================================================================
-// 4. سجل طلبات الزبون ومزامنة حالة طلبات الـ ID (/api/sync-order)
-// =========================================================================
 async function openOrdersModal() {
-    if (!currentUser) return;
+    if (!currentUser) {
+        showRetailToast('يرجى تسجيل الدخول لعرض سجل مشترياتك', 'info');
+        openAuthModal('login');
+        return;
+    }
     document.getElementById('orders-modal').classList.remove('hidden');
     await loadUserOrdersHistory();
 }
@@ -444,7 +525,7 @@ async function loadUserOrdersHistory() {
             statusHtml = `
                 <div class="flex flex-col items-center gap-1">
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400">قيد التنفيذ</span>
-                    <button onclick="syncPendingOrder('${escapeHTML(o.local_order_ref)}')" class="text-[10px] text-[#005ba3] dark:text-[#5CE1E6] hover:underline font-bold">تحديث الحالة</button>
+                    <button onclick="syncPendingOrder('${escapeHTML(o.local_order_ref)}')" class="text-[10px] text-[#005ba3] dark:text-[#5CE1E6] hover:underline font-bold cursor-pointer">تحديث الحالة</button>
                 </div>`;
         } else {
             statusHtml = `
@@ -475,22 +556,19 @@ async function syncPendingOrder(localOrderRef) {
         });
         const data = await res.json();
         if (data.status === 'rejected') {
-            alert(`تم رفض الطلب (${data.rejection_reason || 'سبب غير محدد'}) وأُعيد المبلغ إلى محفظتك.`);
+            showRetailToast(`تم رفض الطلب (${data.rejection_reason || 'سبب غير محدد'}) وأُعيد المبلغ إلى محفظتك.`, 'warning');
             await refreshUserWallet();
         } else if (data.status === 'completed') {
-            alert('اكتمل شحن الطلب بنجاح!');
+            showRetailToast('اكتمل شحن الطلب بنجاح!', 'success');
         } else {
-            alert('الطلب لا يزال قيد المعالجة لدى المزود.');
+            showRetailToast('الطلب لا يزال قيد المعالجة لدى المزود.', 'info');
         }
         await loadUserOrdersHistory();
     } catch (err) {
-        alert('تعذر تحديث الحالة حالياً');
+        showRetailToast('تعذر تحديث الحالة حالياً', 'error');
     }
 }
 
-// =========================================================================
-// 5. إدارة المصادقة (تسجيل الدخول / إنشاء حساب) والمظهر وحذف الحساب GDPR
-// =========================================================================
 function openAuthModal(mode = 'login') {
     document.getElementById('auth-mode').value = mode;
     updateAuthModalUI();
@@ -531,14 +609,15 @@ async function handleRetailAuthSubmit(e) {
                 options: { data: { full_name: fullName } }
             });
             if (error) throw error;
-            alert('تم إنشاء حسابك بنجاح!');
+            showRetailToast('تم إنشاء حسابك بنجاح!', 'success');
         } else {
             const { error } = await retailSupabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
+            showRetailToast('تم تسجيل الدخول بنجاح', 'success');
         }
         closeModal('auth-modal');
     } catch (err) {
-        alert('خطأ: ' + err.message);
+        showRetailToast(err.message, 'error');
     } finally {
         btn.disabled = false;
         updateAuthModalUI();
@@ -547,6 +626,7 @@ async function handleRetailAuthSubmit(e) {
 
 async function handleRetailLogout() {
     await retailSupabase.auth.signOut();
+    showRetailToast('تم تسجيل الخروج بنجاح', 'info');
 }
 
 function closeModal(id) {
@@ -580,13 +660,14 @@ window.deleteMyRetailAccount = async function() {
         });
         const data = await res.json();
         if (!res.ok || !data.success) {
-            alert(data.error || 'تعذر حذف الحساب حالياً');
+            showRetailToast(data.error || 'تعذر حذف الحساب حالياً', 'error');
             return;
         }
         await retailSupabase.auth.signOut();
         closeModal('orders-modal');
-        alert('تم حذف حسابك وبياناتك بنجاح وفق لائحة GDPR.');
+        showRetailToast('تم حذف حسابك وبياناتك بنجاح وفق لائحة GDPR.', 'success');
     } catch (err) {
-        alert('خطأ في الاتصال بالخادم: ' + err.message);
+        showRetailToast('خطأ في الاتصال بالخادم: ' + err.message, 'error');
     }
 };
+// ==================== نهاية ملف js/retail-app.js ====================
