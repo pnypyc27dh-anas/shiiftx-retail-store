@@ -1,6 +1,6 @@
 // ==================== بداية ملف js/retail-app.js ====================
 const RETAIL_SUPABASE_URL = 'https://qavdmizccaltsggwrdkk.supabase.co';
-const RETAIL_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdmRtaXpjY2FsdHNnZ3dyZGtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0NDUzMTgsImV4cCI6MjExMDAyMTMxOH0.RUqkSQggtLrpfFGcr8Y2RUyD6RoJLqzKD3CVc5fo4KI';
+const RETAIL_ANON_KEY = 'PASTE_YOUR_ANON_KEY_HERE';
 
 const retailSupabase = window.supabase.createClient(RETAIL_SUPABASE_URL, RETAIL_ANON_KEY);
 
@@ -16,8 +16,66 @@ let activeSearchQuery = '';
 let activeSortOrder = 'default';
 let favoriteIds = new Set(JSON.parse(localStorage.getItem('shiiftx_retail_favs') || '[]'));
 
+// إعدادات العملة (USD / EUR) — المرحلة الثالثة
+let activeCurrency = localStorage.getItem('shiiftx_retail_currency') || 'USD';
+const USD_TO_EUR_RATE = 0.92;
+
 let currentHeroSlide = 0;
 let heroAutoTimer = null;
+
+function formatRetailMoney(usdAmount) {
+    const val = Number(usdAmount || 0);
+    if (activeCurrency === 'EUR') {
+        return `€${(val * USD_TO_EUR_RATE).toFixed(2)}`;
+    }
+    return `$${val.toFixed(2)}`;
+}
+
+window.setRetailCurrency = function(curr) {
+    activeCurrency = (curr === 'EUR') ? 'EUR' : 'USD';
+    localStorage.setItem('shiiftx_retail_currency', activeCurrency);
+    syncCurrencyButtonsUI();
+    syncAuthUIState(Boolean(currentUser), currentWalletBalance);
+    renderBrandHubTiles();
+    renderCatalogGrid();
+
+    const activeBuyId = document.getElementById('buy-catalog-id')?.value;
+    const buyModal = document.getElementById('buy-modal');
+    if (activeBuyId && buyModal && !buyModal.classList.contains('hidden')) {
+        const item = catalogItems.find(i => String(i.id) === String(activeBuyId));
+        if (item) {
+            document.getElementById('buy-modal-price').textContent = formatRetailMoney(item.retail_price);
+            updateCheckoutWalletPreview(item.retail_price);
+        }
+    }
+
+    const detailBtn = document.getElementById('pkg-detail-buy-btn');
+    const detailModal = document.getElementById('package-details-modal');
+    if (detailBtn?.dataset?.id && detailModal && !detailModal.classList.contains('hidden')) {
+        const item = catalogItems.find(i => String(i.id) === String(detailBtn.dataset.id));
+        if (item) {
+            document.getElementById('pkg-detail-price').textContent = formatRetailMoney(item.retail_price);
+        }
+    }
+};
+
+function syncCurrencyButtonsUI() {
+    const usdBtn = document.getElementById('currency-btn-usd');
+    const eurBtn = document.getElementById('currency-btn-eur');
+    const badge = document.getElementById('sidebar-currency-badge');
+
+    if (usdBtn) usdBtn.classList.toggle('active', activeCurrency === 'USD');
+    if (eurBtn) eurBtn.classList.toggle('active', activeCurrency === 'EUR');
+    if (badge) badge.textContent = activeCurrency;
+}
+
+// تفعيل طي وفتح الأسئلة الشائعة (Accordion FAQ)
+window.toggleFaqItem = function(triggerBtn) {
+    if (!triggerBtn) return;
+    const item = triggerBtn.closest('.rev-faq-item');
+    if (!item) return;
+    item.classList.toggle('open');
+};
 
 function saveFavoritesStorage() {
     localStorage.setItem('shiiftx_retail_favs', JSON.stringify([...favoriteIds]));
@@ -45,7 +103,7 @@ function savePlayerIdForPlatform(platform, playerId) {
     const map = getSavedPlayerIdsMap();
     const existing = Array.isArray(map[key]) ? map[key].filter(id => id !== cleanId) : [];
     existing.unshift(cleanId);
-    map[key] = existing.slice(0, 4); // حفظ آخر 4 معرّفات لكل لعبة
+    map[key] = existing.slice(0, 4);
     localStorage.setItem('shiiftx_saved_player_ids', JSON.stringify(map));
 }
 
@@ -260,6 +318,7 @@ window.stepHeroSlide = function(delta) {
 // 1. التهيئة ومراقبة جلسة المستخدم
 // =========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
+    syncCurrencyButtonsUI();
     initHeroCarousel();
     updateFavoritesCounter();
     await loadRetailCatalog();
@@ -293,7 +352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function syncAuthUIState(isLoggedIn, balance = 0) {
     currentWalletBalance = Number(balance || 0);
-    const formatted = `$${currentWalletBalance.toFixed(2)}`;
+    const formatted = formatRetailMoney(currentWalletBalance);
     const navPanel = document.getElementById('user-nav-panel');
     const guestBtn = document.getElementById('guest-login-btn');
     const navBal = document.getElementById('nav-wallet-balance');
@@ -490,7 +549,7 @@ function renderBrandHubTiles() {
                 <div class="min-w-0 flex-1">
                     <div class="text-xs font-black truncate">${escapeHTML(pl)}</div>
                     <div class="text-[11px] font-bold text-[#68707d] dark:text-slate-400 mt-0.5">
-                        ${plItems.length} باقات • من <span class="financial-amount font-extrabold text-[#191c1f] dark:text-white" dir="ltr">$${minPrice.toFixed(2)}</span>
+                        ${plItems.length} باقات • من <span class="financial-amount font-extrabold text-[#191c1f] dark:text-white" dir="ltr">${formatRetailMoney(minPrice)}</span>
                     </div>
                 </div>
             </button>
@@ -605,7 +664,7 @@ function renderCatalogGrid() {
         const safeId = escapeHTML(item.id);
         const platformName = escapeHTML(item.platform || 'بطاقة رقمية');
         const pkgName = escapeHTML(item.package_name || 'باقة شحن');
-        const price = Number(item.retail_price || 0).toFixed(2);
+        const priceFormatted = formatRetailMoney(item.retail_price);
         const isID = (item.product_type && item.product_type.toUpperCase() === 'ID');
         const isFav = favoriteIds.has(String(item.id));
         const region = detectPackageRegion(item.platform, item.package_name);
@@ -664,7 +723,7 @@ function renderCatalogGrid() {
                     <div class="pt-3 border-t border-black/6 dark:border-white/8 flex items-center justify-between gap-3">
                         <div>
                             <span class="block text-[10px] font-bold text-[#68707d] dark:text-slate-400">شامل الضريبة</span>
-                            <span class="financial-amount text-xl font-black" dir="ltr">$${price}</span>
+                            <span class="financial-amount text-xl font-black" dir="ltr">${priceFormatted}</span>
                         </div>
 
                         <button type="button" data-id="${safeId}" onclick="event.stopPropagation(); handleCardDirectBuy(this.dataset.id);"
@@ -718,7 +777,7 @@ window.openPackageDetailsModal = function(itemId) {
     if (platEl) platEl.textContent = item.platform || 'بطاقة رقمية';
     if (regEl) regEl.textContent = `${region.flag} ${region.label}`;
     if (titleEl) titleEl.textContent = item.package_name || 'باقة شحن';
-    if (priceEl) priceEl.textContent = `$${Number(item.retail_price || 0).toFixed(2)}`;
+    if (priceEl) priceEl.textContent = formatRetailMoney(item.retail_price);
 
     const isID = (item.product_type && item.product_type.toUpperCase() === 'ID');
     const defaultNote = isID
@@ -762,7 +821,7 @@ window.copyTopupEmail = function() {
 };
 
 // =========================================================================
-// 3. تنفيذ الشراء الذكي عبر دالة Vercel الآمنة (/api/buy) — المرحلة الثانية
+// 3. تنفيذ الشراء الذكي عبر دالة Vercel الآمنة (/api/buy)
 // =========================================================================
 function updateCheckoutWalletPreview(price) {
     const itemPrice = Number(price || 0);
@@ -772,14 +831,14 @@ function updateCheckoutWalletPreview(price) {
     const shortfallBox = document.getElementById('checkout-shortfall-box');
     const confirmBtn = document.getElementById('btn-confirm-purchase');
 
-    if (currentEl) currentEl.textContent = `$${currentWalletBalance.toFixed(2)}`;
+    if (currentEl) currentEl.textContent = formatRetailMoney(currentWalletBalance);
 
     const diff = currentWalletBalance - itemPrice;
     if (diff >= -0.0001) {
         const remaining = Math.max(0, diff);
         if (afterLabel) afterLabel.textContent = 'المتبقي بعد الدفع:';
         if (afterEl) {
-            afterEl.textContent = `$${remaining.toFixed(2)}`;
+            afterEl.textContent = formatRetailMoney(remaining);
             afterEl.className = 'financial-amount font-black text-emerald-600 dark:text-emerald-400';
         }
         if (shortfallBox) shortfallBox.classList.add('hidden');
@@ -788,7 +847,7 @@ function updateCheckoutWalletPreview(price) {
         const needed = Math.abs(diff);
         if (afterLabel) afterLabel.textContent = 'المبلغ الناقص لإتمام الطلب:';
         if (afterEl) {
-            afterEl.textContent = `-$${needed.toFixed(2)}`;
+            afterEl.textContent = `-${formatRetailMoney(needed)}`;
             afterEl.className = 'financial-amount font-black text-rose-600 dark:text-rose-400';
         }
         if (shortfallBox) shortfallBox.classList.remove('hidden');
@@ -819,7 +878,7 @@ async function openBuyModal(catalogId, prefillPlayerId = '') {
     document.getElementById('buy-product-type').value = item.product_type;
     document.getElementById('buy-modal-platform').textContent = item.platform;
     document.getElementById('buy-modal-package').textContent = item.package_name;
-    document.getElementById('buy-modal-price').textContent = `$${Number(item.retail_price).toFixed(2)}`;
+    document.getElementById('buy-modal-price').textContent = formatRetailMoney(item.retail_price);
 
     const regEl = document.getElementById('buy-modal-region');
     if (regEl) regEl.textContent = `${region.flag} ${region.label}`;
@@ -1029,7 +1088,7 @@ async function loadUserOrdersHistory() {
                 <td class="py-3.5 px-2 font-mono font-bold">${escapeHTML(o.local_order_ref)}</td>
                 <td class="py-3.5 px-2 font-bold">${escapeHTML(pkgTitle)}</td>
                 <td class="py-3.5 px-2">${deliveryInfo}</td>
-                <td class="py-3.5 px-2 financial-amount font-extrabold text-emerald-600 dark:text-emerald-400" dir="ltr">$${Number(o.retail_price).toFixed(2)}</td>
+                <td class="py-3.5 px-2 financial-amount font-extrabold text-emerald-600 dark:text-emerald-400" dir="ltr">${formatRetailMoney(o.retail_price)}</td>
                 <td class="py-3.5 px-2 text-center">${statusHtml}</td>
             </tr>
         `;
