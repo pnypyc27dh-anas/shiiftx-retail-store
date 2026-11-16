@@ -17,7 +17,7 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/retail-pro.css?v=9">
+    <link rel="stylesheet" href="css/retail-pro.css?v=11">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -66,7 +66,7 @@
                     <div id="sidebar-user-box" class="hidden relative z-10 space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-[11px] font-bold text-slate-300">الرصيد المتاح</span>
-                            <span class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-extrabold">USD</span>
+                            <span id="sidebar-currency-badge" class="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-extrabold">USD</span>
                         </div>
                         <div id="sidebar-wallet-balance" class="financial-amount text-2xl font-black tracking-tight" dir="ltr">$0.00</div>
                         <div class="flex items-center gap-2 pt-1">
@@ -109,6 +109,14 @@
                         </span>
                         <i class="ph-bold ph-caret-left text-xs opacity-50"></i>
                     </button>
+
+                    <button type="button" onclick="toggleMobileSidebar(false); document.getElementById('faq-section')?.scrollIntoView({behavior: 'smooth'});" class="rev-nav-item">
+                        <span class="flex items-center gap-2.5">
+                            <span class="rev-nav-icon"><i class="ph-fill ph-question"></i></span>
+                            <span>الأسئلة الشائعة</span>
+                        </span>
+                        <i class="ph-bold ph-caret-left text-xs opacity-50"></i>
+                    </button>
                 </div>
 
                 <!-- قائمة المنصات والألعاب -->
@@ -141,14 +149,14 @@
         <!-- ==================== مساحة العمل الرئيسية ==================== -->
         <div class="flex-1 flex flex-col min-w-0">
 
-            <!-- الشريط العلوي النظيف -->
+            <!-- الشريط العلوي النظيف مع مبدّل العملات (USD / EUR) -->
             <header class="rev-topbar sticky top-0 z-30">
-                <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5 lg:hidden">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2 lg:hidden">
                         <button type="button" onclick="toggleMobileSidebar(true)" class="rev-btn-secondary w-10 h-10 shrink-0" title="القائمة">
                             <i class="ph-bold ph-list text-lg"></i>
                         </button>
-                        <span class="font-black text-sm tracking-tight">SHIIFT X</span>
+                        <span class="font-black text-sm tracking-tight hidden sm:inline">SHIIFT X</span>
                     </div>
 
                     <div class="relative flex-grow max-w-xl">
@@ -160,6 +168,12 @@
                     </div>
 
                     <div class="flex items-center gap-2 shrink-0">
+                        <!-- مبدّل العملات الفوري ($ USD / € EUR) -->
+                        <div class="rev-currency-switch" title="تغيير عملة العرض">
+                            <button type="button" id="currency-btn-usd" onclick="setRetailCurrency('USD')" class="rev-currency-btn active">$ USD</button>
+                            <button type="button" id="currency-btn-eur" onclick="setRetailCurrency('EUR')" class="rev-currency-btn">€ EUR</button>
+                        </div>
+
                         <button onclick="toggleRetailTheme()" class="rev-btn-secondary w-9 h-9 text-slate-700 dark:text-amber-400" title="تبديل المظهر">
                             <i class="ph-fill ph-moon text-base dark:hidden"></i>
                             <i class="ph-fill ph-sun text-base hidden dark:inline"></i>
@@ -356,6 +370,71 @@
                     </div>
                 </section>
 
+                <!-- 6. قسم الأسئلة الشائعة ومعلومات التسليم (Interactive Accordion FAQ — المرحلة الثالثة) -->
+                <section id="faq-section" class="pt-6 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+                        <div>
+                            <h2 class="text-base font-black tracking-tight flex items-center gap-2">
+                                <i class="ph-fill ph-seal-question text-[#005ba3] dark:text-[#5CE1E6] text-lg"></i>
+                                <span>الأسئلة الشائعة وضمانات المشتري</span>
+                            </h2>
+                            <p class="text-xs text-[#68707d] dark:text-slate-400 mt-0.5">
+                                كل ما تحتاج معرفته حول التسليم الفوري، توافق المناطق، وحماية المستهلك الأوروبي.
+                            </p>
+                        </div>
+                        <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="rev-btn-secondary px-4 py-2 text-xs self-start sm:self-auto">
+                            <i class="ph-fill ph-whatsapp-logo text-emerald-500 text-base"></i>
+                            <span>تحدث مع الدعم المباشر</span>
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- سؤال 1 -->
+                        <div class="rev-faq-item open">
+                            <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
+                                <span>متى أستلم الكود الرقمي أو الشحن بعد الدفع؟</span>
+                                <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
+                            </button>
+                            <div class="rev-faq-content">
+                                باقات <strong>الكود الفوري ⚡</strong> تظهر لك فوراً على الشاشة في نفس اللحظة بعد تأكيد الدفع وتحفظ دائماً في قسم «طلباتي». أما باقات <strong>الشحن المباشر بالمعرّف (Player ID)</strong> فيتم إرسالها آلياً إلى حسابك داخل اللعبة خلال دقائق معدودة.
+                            </div>
+                        </div>
+
+                        <!-- سؤال 2 -->
+                        <div class="rev-faq-item">
+                            <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
+                                <span>كيف أتأكد من توافق منطقة البطاقة (Region) مع حسابي؟</span>
+                                <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
+                            </button>
+                            <div class="rev-faq-content">
+                                تحمل كل بطاقة في متجرنا شارة واضحة للمنطقة الجغرافية (مثل <strong>🇺🇸 المتجر الأمريكي</strong> أو <strong>🇪🇺 المتجر الأوروبي</strong> أو <strong>🌍 عالمي</strong>). تأكد دائماً من مطابقة شارة البطاقة لبلد حسابك في Google Play أو PlayStation أو Apple قبل إتمام الشراء.
+                            </div>
+                        </div>
+
+                        <!-- سؤال 3 -->
+                        <div class="rev-faq-item">
+                            <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
+                                <span>كيف يمكنني إيداع وشحن رصيد محفظتي في SHIIFT X؟</span>
+                                <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
+                            </button>
+                            <div class="rev-faq-content">
+                                اضغط على زر <strong>«إيداع»</strong> في بطاقة المحفظة وانسخ بريد حسابك المسجّل، ثم تواصل مع فريق الدعم أو الوكيل المعتمد عبر واتساب ليتم شحن رصيدك فوراً وبدون أي عمولات خفية.
+                            </div>
+                        </div>
+
+                        <!-- سؤال 4 -->
+                        <div class="rev-faq-item">
+                            <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
+                                <span>ماذا يحدث إذا تم رفض طلب الشحن بمعرّف اللاعب (ID)؟</span>
+                                <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
+                            </button>
+                            <div class="rev-faq-content">
+                                في حال تعذر إتمام الشحن المباشر بسبب خطأ في رقم المعرّف (Player ID) أو صيانة لدى ناشر اللعبة، يقوم نظامنا تلقائياً بإلغاء الطلب وإعادة كامل المبلغ فوراً إلى رصيد محفظتك في المتجر.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
             </main>
 
             <!-- التذييل الموحد -->
@@ -531,7 +610,7 @@
         </div>
     </div>
 
-    <!-- 4. درج إتمام الشراء الذكي (Smart Checkout Drawer — المرحلة الثانية) -->
+    <!-- 4. درج إتمام الشراء الذكي (Smart Checkout Drawer) -->
     <div id="buy-modal" class="hidden rev-overlay" onclick="closeModal('buy-modal')">
         <div class="rev-drawer-panel text-right" onclick="event.stopPropagation()">
             <div class="rev-sheet-handle"></div>
@@ -715,7 +794,7 @@
         <button type="button" onclick="acceptEuCookies('essential')" class="px-5 py-2 rounded-full bg-white text-[#191c1f] font-extrabold shrink-0 cursor-pointer">موافق</button>
     </div>
 
-    <script src="js/retail-app.js?v=10"></script>
+    <script src="js/retail-app.js?v=11"></script>
 </body>
 </html>
 <!-- ==================== نهاية ملف index.html ==================== -->
