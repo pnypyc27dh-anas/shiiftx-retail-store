@@ -51,11 +51,7 @@
             </div>
 
             <div class="p-3.5 flex-1 min-h-0 overflow-y-auto no-scrollbar space-y-5">
-                <!-- زر المحفظة المدمج عند طيّ القائمة على الحاسوب -->
-                <button type="button" onclick="openTopupModal()" class="sidebar-collapsed-only w-11 h-11 mx-auto rounded-2xl bg-gradient-to-br from-[#0b1324] to-[#005ba3] text-[#5CE1E6] items-center justify-center shadow-md hover:scale-105 transition cursor-pointer" title="محفظة SHIIFT X / إيداع">
-                    <i class="ph-fill ph-wallet text-xl"></i>
-                </button>
-
+               
                 <!-- بطاقة المحفظة -->
                 <div class="rev-wallet-widget sidebar-hide-collapsed">
                     <div id="sidebar-guest-box" class="relative z-10 space-y-2.5">
@@ -264,17 +260,7 @@
                             <i class="ph-fill ph-moon text-base dark:hidden"></i>
                             <i class="ph-fill ph-sun text-base hidden dark:inline"></i>
                         </button>
-
-                        <!-- 4. كبسولة المحفظة للمستخدم المسجل -->
-                        <div id="user-nav-panel" class="hidden items-center gap-1.5">
-                            <button type="button" onclick="openTopupModal()" class="h-9 pl-2 pr-3 rounded-full bg-white dark:bg-[#181d29] border border-black/10 dark:border-white/10 flex items-center gap-2 text-xs font-black shadow-xs hover:border-[#005ba3] transition cursor-pointer" title="شحن المحفظة">
-                                <span id="nav-wallet-balance" class="financial-amount" dir="ltr">$0.00</span>
-                                <span class="w-5 h-5 rounded-full bg-[#005ba3] text-white dark:bg-[#5CE1E6] dark:text-[#080a0f] flex items-center justify-center text-[10px]">
-                                    <i class="ph-bold ph-plus"></i>
-                                </span>
-                            </button>
-                        </div>
-
+                        
                         <!-- زر الدخول للزوار -->
                         <button id="guest-login-btn" onclick="openAuthModal('login')" class="rev-btn-primary h-9 px-4 text-xs">
                             <i class="ph-bold ph-user text-sm"></i>
