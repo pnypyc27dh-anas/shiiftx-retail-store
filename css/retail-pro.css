@@ -834,4 +834,17 @@ html.dark .rev-input:focus {
     border-radius: 9999px;
     padding: 0.75rem 1.25rem;
     box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.28);
-    backdrop-
+    backdrop-filter: blur(16px);
+    animation: revToastDrop 0.32s var(--rev-spring) forwards;
+}
+@keyframes revToastDrop {
+    from { opacity: 0; transform: translateY(-18px) scale(0.94); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.fade-in { animation: revFadeIn 0.35s var(--rev-spring) forwards; }
+@keyframes revFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* ==================== نهاية ملف css/retail-pro.css ==================== */
