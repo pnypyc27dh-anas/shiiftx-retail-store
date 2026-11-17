@@ -1,0 +1,875 @@
+<!-- ==================== بداية ملف admin.html ==================== -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>SHIIFT X — لوحة إدارة متجر التجزئة</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: 'Tajawal', 'Plus Jakarta Sans', sans-serif;
+            background-color: #080a0d;
+            color: #f8fafc;
+        }
+        .num-font {
+            font-family: 'Plus Jakarta Sans', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        .adm-card {
+            background: #11141b;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 22px;
+        }
+        .adm-input {
+            background: #181c25;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .adm-input:focus {
+            border-color: #5CE1E6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(92, 225, 230, 0.15);
+        }
+        .adm-tab.active {
+            background: #5CE1E6;
+            color: #080a0d;
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased pb-16">
+
+    <!-- حاوية الإشعارات السريعة -->
+    <div id="adm-toast-box" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 w-[92%] max-w-md pointer-events-none"></div>
+
+    <!-- 1. شاشة تسجيل الدخول للمدير -->
+    <div id="adm-auth-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="adm-card w-full max-w-md p-7 space-y-6 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] font-extrabold text-[#5CE1E6] uppercase tracking-wider">SHIIFT X RETAIL</span>
+                    <h1 class="text-xl font-black mt-0.5">لوحة الإدارة المركزية</h1>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-[#005ba3]/20 border border-[#5CE1E6]/30 flex items-center justify-center text-[#5CE1E6] text-2xl">
+                    <i class="ph-fill ph-shield-check"></i>
+                </div>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-xs">
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-slate-400">البريد الإداري المعتمد</label>
+                    <input id="adm-login-email" type="email" required placeholder="anas@shiiftx.com" dir="ltr" class="adm-input w-full px-4 py-3 font-bold text-left">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-slate-400">كلمة المرور</label>
+                    <input id="adm-login-pass" type="password" required placeholder="••••••••" dir="ltr" class="adm-input w-full px-4 py-3 font-bold text-left">
+                </div>
+                <button type="submit" id="adm-login-btn" class="w-full py-3.5 rounded-full bg-[#5CE1E6] hover:bg-white text-[#080a0d] font-black text-xs transition cursor-pointer">
+                    دخول إلى لوحة الإدارة
+                </button>
+            </form>
+
+            <div class="pt-3 border-t border-white/10 text-center">
+                <a href="/" class="text-xs font-bold text-slate-400 hover:text-white transition">← العودة إلى واجهة المتجر</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. واجهة لوحة الإدارة الرئيسية (تظهر بعد التحقق من صلاحية المدير) -->
+    <div id="adm-dashboard" class="hidden">
+        <!-- الشريط العلوي -->
+        <header class="sticky top-0 z-40 bg-[#080a0d]/90 backdrop-blur-xl border-b border-white/10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-[#005ba3] text-[#5CE1E6] flex items-center justify-center font-black">SX</span>
+                    <div>
+                        <div class="text-sm font-black flex items-center gap-2">
+                            <span>إدارة متجر التجزئة</span>
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-extrabold">متصل بالبزنس</span>
+                        </div>
+                        <div id="adm-user-email" class="text-[11px] text-slate-400 num-font" dir="ltr">---</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="refreshAllAdminData()" class="px-3.5 py-2 rounded-full bg-white/8 hover:bg-white/15 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
+                        <i class="ph-bold ph-arrows-clockwise"></i>
+                        <span class="hidden sm:inline">تحديث البيانات</span>
+                    </button>
+                    <a href="/" target="_blank" class="px-3.5 py-2 rounded-full bg-white/8 hover:bg-white/15 text-xs font-bold flex items-center gap-1.5 transition">
+                        <i class="ph-bold ph-storefront"></i>
+                        <span class="hidden sm:inline">معاينة المتجر</span>
+                    </a>
+                    <button type="button" onclick="handleAdminLogout()" class="px-3.5 py-2 rounded-full bg-rose-500/15 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-bold transition cursor-pointer">
+                        خروج
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+            <!-- بطاقات الإحصائيات السريعة -->
+            <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="adm-card p-4 space-y-1">
+                    <div class="text-[11px] font-bold text-slate-400 flex items-center justify-between">
+                        <span>الباقات المفعّلة</span>
+                        <i class="ph-fill ph-package text-[#5CE1E6] text-base"></i>
+                    </div>
+                    <div id="stat-active-pkgs" class="num-font text-2xl font-black">0</div>
+                </div>
+
+                <div class="adm-card p-4 space-y-1">
+                    <div class="text-[11px] font-bold text-slate-400 flex items-center justify-between">
+                        <span>إجمالي أرصدة الزبائن</span>
+                        <i class="ph-fill ph-wallet text-emerald-400 text-base"></i>
+                    </div>
+                    <div id="stat-total-wallets" class="num-font text-2xl font-black text-emerald-400" dir="ltr">$0.00</div>
+                </div>
+
+                <div class="adm-card p-4 space-y-1">
+                    <div class="text-[11px] font-bold text-slate-400 flex items-center justify-between">
+                        <span>طلبات قيد التنفيذ (ID)</span>
+                        <i class="ph-fill ph-clock-countdown text-amber-400 text-base"></i>
+                    </div>
+                    <div id="stat-pending-orders" class="num-font text-2xl font-black text-amber-400">0</div>
+                </div>
+
+                <div class="adm-card p-4 space-y-1">
+                    <div class="text-[11px] font-bold text-slate-400 flex items-center justify-between">
+                        <span>مبيعات مكتملة</span>
+                        <i class="ph-fill ph-chart-line-up text-sky-400 text-base"></i>
+                    </div>
+                    <div id="stat-completed-sales" class="num-font text-2xl font-black text-sky-400" dir="ltr">$0.00</div>
+                </div>
+            </section>
+
+            <!-- شريط التبويبات الإدارية -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1">
+                <button type="button" onclick="switchAdminTab('catalog')" id="tab-btn-catalog" class="adm-tab active px-5 py-2.5 rounded-full bg-[#181c25] text-xs font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-fill ph-squares-four text-sm"></i>
+                    <span>1. إدارة الباقات والتصنيفات</span>
+                </button>
+                <button type="button" onclick="switchAdminTab('users')" id="tab-btn-users" class="adm-tab px-5 py-2.5 rounded-full bg-[#181c25] text-xs font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-fill ph-users text-sm"></i>
+                    <span>2. الزبائن وشحن المحافظ</span>
+                </button>
+                <button type="button" onclick="switchAdminTab('orders')" id="tab-btn-orders" class="adm-tab px-5 py-2.5 rounded-full bg-[#181c25] text-xs font-bold flex items-center gap-2 transition cursor-pointer">
+                    <i class="ph-fill ph-receipt text-sm"></i>
+                    <span>3. الطلبات ومزامنة البزنس</span>
+                </button>
+            </div>
+
+            <!-- ==================== التبويب 1: إدارة الباقات والتصنيفات ==================== -->
+            <section id="adm-view-catalog" class="space-y-4">
+                <div class="adm-card p-4 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2 flex-grow">
+                        <input id="adm-pkg-search" type="text" oninput="renderAdminCatalog()" placeholder="ابحث باسم المنصة أو الباقة..." class="adm-input px-3.5 py-2 text-xs font-bold w-full sm:w-64">
+                        <select id="adm-pkg-cat-filter" onchange="renderAdminCatalog()" class="adm-input px-3.5 py-2 text-xs font-bold cursor-pointer">
+                            <option value="ALL">كل التصنيفات</option>
+                            <option value="GAMES">الألعاب (GAMES)</option>
+                            <option value="CARDS">بطاقات المتاجر والهدايا (CARDS)</option>
+                            <option value="STREAMING">تطبيقات البث والدردشة (STREAMING)</option>
+                            <option value="SUBSCRIPTIONS">الاشتراكات والبرامج (SUBSCRIPTIONS)</option>
+                        </select>
+                    </div>
+                    <button type="button" onclick="openPackageEditor()" class="px-5 py-2.5 rounded-full bg-[#5CE1E6] hover:bg-white text-[#080a0d] text-xs font-black flex items-center gap-1.5 transition cursor-pointer">
+                        <i class="ph-bold ph-plus-circle text-sm"></i>
+                        <span>إضافة باقة جديدة</span>
+                    </button>
+                </div>
+
+                <div class="adm-card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="border-b border-white/10 text-slate-400 bg-white/3">
+                                    <th class="py-3.5 px-3">التصنيف</th>
+                                    <th class="py-3.5 px-3">المنصة</th>
+                                    <th class="py-3.5 px-3">اسم الباقة</th>
+                                    <th class="py-3.5 px-3">النوع</th>
+                                    <th class="py-3.5 px-3">معرّف الربط بالبزنس</th>
+                                    <th class="py-3.5 px-3">سعر البيع (USD)</th>
+                                    <th class="py-3.5 px-3 text-center">الحالة</th>
+                                    <th class="py-3.5 px-3 text-center">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adm-catalog-tbody" class="divide-y divide-white/6">
+                                <tr><td colspan="8" class="py-10 text-center text-slate-500">جاري تحميل الباقات...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== التبويب 2: الزبائن وشحن المحافظ ==================== -->
+            <section id="adm-view-users" class="hidden space-y-4">
+                <div class="adm-card p-4 flex flex-wrap items-center justify-between gap-3">
+                    <input id="adm-user-search" type="text" oninput="renderAdminUsers()" placeholder="ابحث بالبريد الإلكتروني أو اسم الزبون..." class="adm-input px-4 py-2 text-xs font-bold w-full sm:w-80">
+                    <span class="text-[11px] text-slate-400">اضغط على «+ شحن رصيد» لإضافة أو خصم مبلغ فوري من محفظة الزبون</span>
+                </div>
+
+                <div class="adm-card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="border-b border-white/10 text-slate-400 bg-white/3">
+                                    <th class="py-3.5 px-4">البريد الإلكتروني / المعرّف</th>
+                                    <th class="py-3.5 px-4">الاسم</th>
+                                    <th class="py-3.5 px-4">الرصيد الحالي (USD)</th>
+                                    <th class="py-3.5 px-4">تاريخ التسجيل</th>
+                                    <th class="py-3.5 px-4 text-center">شحن وتعديل الرصيد</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adm-users-tbody" class="divide-y divide-white/6">
+                                <tr><td colspan="5" class="py-10 text-center text-slate-500">جاري تحميل قائمة الزبائن...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== التبويب 3: الطلبات ومزامنة البزنس ==================== -->
+            <section id="adm-view-orders" class="hidden space-y-4">
+                <div class="adm-card p-4 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <select id="adm-order-status-filter" onchange="renderAdminOrders()" class="adm-input px-3.5 py-2 text-xs font-bold cursor-pointer">
+                            <option value="ALL">جميع الطلبات</option>
+                            <option value="pending">قيد التنفيذ فقط (Pending)</option>
+                            <option value="completed">المكتملة (Completed)</option>
+                            <option value="rejected">المرفوضة والمسترجعة (Rejected)</option>
+                        </select>
+                    </div>
+                    <span class="text-[11px] text-slate-400">طلبات الشحن المباشر تُرسل تلقائياً إلى SHIIFT X Business ويمكنك مزامنتها أو إدارتها من هنا</span>
+                </div>
+
+                <div class="adm-card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs">
+                            <thead>
+                                <tr class="border-b border-white/10 text-slate-400 bg-white/3">
+                                    <th class="py-3.5 px-3">رقم الطلب</th>
+                                    <th class="py-3.5 px-3">الباقة</th>
+                                    <th class="py-3.5 px-3">الكود / Player ID</th>
+                                    <th class="py-3.5 px-3">السعر</th>
+                                    <th class="py-3.5 px-3">التاريخ</th>
+                                    <th class="py-3.5 px-3 text-center">الحالة</th>
+                                    <th class="py-3.5 px-3 text-center">إجراءات الإدارة والبزنس</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adm-orders-tbody" class="divide-y divide-white/6">
+                                <tr><td colspan="7" class="py-10 text-center text-slate-500">جاري تحميل الطلبات...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ==================== نافذة إضافة / تعديل باقة (مع حقل الربط بمنصة البزنس) ==================== -->
+    <div id="pkg-editor-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onclick="closePkgEditor()">
+        <div class="adm-card w-full max-w-lg p-6 space-y-4 max-h-[92vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                <h3 id="pkg-editor-title" class="text-base font-black">إضافة / تعديل باقة</h3>
+                <button type="button" onclick="closePkgEditor()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center cursor-pointer">
+                    <i class="ph-bold ph-x text-xs"></i>
+                </button>
+            </div>
+
+            <form onsubmit="savePackageForm(event)" class="space-y-3.5 text-xs">
+                <input type="hidden" id="edit-pkg-id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="block font-bold text-slate-300">التصنيف (Category) *</label>
+                        <select id="edit-pkg-category" required class="adm-input w-full px-3 py-2.5 font-bold cursor-pointer">
+                            <option value="GAMES">الألعاب (GAMES)</option>
+                            <option value="CARDS">بطاقات المتاجر والهدايا (CARDS)</option>
+                            <option value="STREAMING">تطبيقات البث والدردشة (STREAMING)</option>
+                            <option value="SUBSCRIPTIONS">الاشتراكات والبرامج (SUBSCRIPTIONS)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block font-bold text-slate-300">اسم المنصة / اللعبة *</label>
+                        <input id="edit-pkg-platform" type="text" required placeholder="مثال: PUBG Mobile" class="adm-input w-full px-3.5 py-2.5 font-bold">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block font-bold text-slate-300">اسم الباقة المعروض للزبون *</label>
+                    <input id="edit-pkg-name" type="text" required placeholder="مثال: شحن 325 شدة ببجي عالمي" class="adm-input w-full px-3.5 py-2.5 font-bold">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="block font-bold text-slate-300">نوع التسليم *</label>
+                        <select id="edit-pkg-type" required class="adm-input w-full px-3 py-2.5 font-bold cursor-pointer">
+                            <option value="CODE">كود فوري (CODE)</option>
+                            <option value="ID">شحن مباشر بالمعرّف (ID)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block font-bold text-emerald-400">سعر البيع النهائي (USD $) *</label>
+                        <input id="edit-pkg-price" type="number" step="0.01" min="0.01" required placeholder="4.99" dir="ltr" class="adm-input w-full px-3.5 py-2.5 font-bold num-font text-left">
+                    </div>
+                </div>
+
+                <!-- حقل الربط المباشر مع منصة الجملة SHIIFT X Business -->
+                <div class="p-3.5 rounded-2xl bg-[#005ba3]/15 border border-[#5CE1E6]/25 space-y-1.5">
+                    <label class="block font-extrabold text-[#5CE1E6] flex items-center justify-between">
+                        <span>معرّف الباقة في منصة الجملة (SHIIFT X Business ID)</span>
+                        <span id="detected-b2b-col-badge" class="font-mono text-[10px] px-2 py-0.5 rounded bg-black/40 text-slate-300">business_product_id</span>
+                    </label>
+                    <input id="edit-pkg-b2b-id" type="text" placeholder="UUID أو رقم المنتج في منصة البزنس..." dir="ltr" class="adm-input w-full px-3.5 py-2 font-mono font-bold text-left text-xs">
+                    <p class="text-[10px] text-slate-400">يُستخدم هذا المعرّف لإرسال طلبات الكود الفوري أو الشحن المباشر تلقائياً إلى منصة الجملة عند شراء الزبون.</p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block font-bold text-slate-300">رابط صورة البطاقة (اختياري)</label>
+                    <input id="edit-pkg-img" type="url" placeholder="https://i.imgur.com/..." dir="ltr" class="adm-input w-full px-3.5 py-2 font-mono text-left">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block font-bold text-slate-300">تعليمات وملاحظات الباقة (اختياري)</label>
+                    <textarea id="edit-pkg-instructions" rows="2" placeholder="ملاحظات تظهر للزبون قبل الشراء..." class="adm-input w-full p-3"></textarea>
+                </div>
+
+                <label class="flex items-center gap-2.5 pt-1 cursor-pointer">
+                    <input type="checkbox" id="edit-pkg-active" checked class="w-4 h-4 rounded accent-[#5CE1E6]">
+                    <span class="font-bold text-slate-200">الباقة مفعّلة وظاهرة للزبائن في المتجر</span>
+                </label>
+
+                <div class="pt-3 flex items-center justify-end gap-2 border-t border-white/10">
+                    <button type="button" onclick="closePkgEditor()" class="px-5 py-2.5 rounded-full bg-white/10 text-xs font-bold cursor-pointer">إلغاء</button>
+                    <button type="submit" id="save-pkg-btn" class="px-6 py-2.5 rounded-full bg-[#5CE1E6] hover:bg-white text-[#080a0d] text-xs font-black transition cursor-pointer">
+                        حفظ الباقة
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // إعداد الاتصال بقاعدة بيانات متجر التجزئة
+        // الصق مفتاح anon العام في السطر التالي كما هو في ملف js/retail-app.js
+        // =========================================================================
+        const RETAIL_SUPABASE_URL = 'https://qavdmizccaltsggwrdkk.supabase.co';
+        const RETAIL_ANON_KEY = 'PASTE_YOUR_ANON_KEY_HERE';
+
+        const ALLOWED_ADMIN_EMAILS = ['anas@shiiftx.com', 'support@shiiftx.com'];
+        const admSupabase = window.supabase.createClient(RETAIL_SUPABASE_URL, RETAIL_ANON_KEY);
+
+        let admCatalog = [];
+        let admUsers = [];
+        let admOrders = [];
+        let detectedB2bColumn = 'business_product_id'; // يتعرّف تلقائياً على اسم عمود الربط في جدولك
+
+        function esc(str) {
+            if (str === null || str === undefined) return '';
+            const d = document.createElement('div');
+            d.textContent = String(str);
+            return d.innerHTML;
+        }
+
+        function notifyAdmin(msg, type = 'info') {
+            const box = document.getElementById('adm-toast-box');
+            if (!box) return;
+            const colors = {
+                success: 'bg-emerald-600 text-white',
+                error: 'bg-rose-600 text-white',
+                info: 'bg-[#181c25] border border-[#5CE1E6]/40 text-white'
+            };
+            const el = document.createElement('div');
+            el.className = `pointer-events-auto px-5 py-2.5 rounded-full shadow-xl text-xs font-black ${colors[type] || colors.info}`;
+            el.textContent = msg;
+            box.appendChild(el);
+            setTimeout(() => el.remove(), 3800);
+        }
+
+        // التحقق من جلسة المدير عند فتح الصفحة
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await admSupabase.auth.getSession();
+            verifyAdminSession(session);
+
+            admSupabase.auth.onAuthStateChange((_event, session) => {
+                verifyAdminSession(session);
+            });
+        });
+
+        async function verifyAdminSession(session) {
+            const authScreen = document.getElementById('adm-auth-screen');
+            const dashboard = document.getElementById('adm-dashboard');
+
+            if (!session || !session.user) {
+                authScreen.classList.remove('hidden');
+                dashboard.classList.add('hidden');
+                return;
+            }
+
+            const email = (session.user.email || '').toLowerCase();
+            if (!ALLOWED_ADMIN_EMAILS.includes(email)) {
+                notifyAdmin('غير مصرح لهذا البريد بالدخول إلى لوحة الإدارة', 'error');
+                await admSupabase.auth.signOut();
+                return;
+            }
+
+            document.getElementById('adm-user-email').textContent = email;
+            authScreen.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            await refreshAllAdminData();
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('adm-login-email').value.trim();
+            const password = document.getElementById('adm-login-pass').value;
+            const btn = document.getElementById('adm-login-btn');
+
+            btn.disabled = true;
+            btn.textContent = 'جاري التحقق...';
+            try {
+                const { error } = await admSupabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                notifyAdmin('تم تسجيل الدخول بنجاح', 'success');
+            } catch (err) {
+                notifyAdmin(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'دخول إلى لوحة الإدارة';
+            }
+        }
+
+        async function handleAdminLogout() {
+            await admSupabase.auth.signOut();
+        }
+
+        window.switchAdminTab = function(tab) {
+            ['catalog', 'users', 'orders'].forEach(t => {
+                document.getElementById(`adm-view-${t}`).classList.toggle('hidden', t !== tab);
+                document.getElementById(`tab-btn-${t}`).classList.toggle('active', t === tab);
+            });
+        };
+
+        async function refreshAllAdminData() {
+            await Promise.all([
+                loadAdminCatalog(),
+                loadAdminUsers(),
+                loadAdminOrders()
+            ]);
+            updateAdminStats();
+        }
+
+        function updateAdminStats() {
+            const activePkgs = admCatalog.filter(p => p.is_active).length;
+            const totalWallets = admUsers.reduce((sum, u) => sum + Number(u.wallet_balance || 0), 0);
+            const pendingOrders = admOrders.filter(o => o.status === 'pending').length;
+            const completedSales = admOrders
+                .filter(o => o.status === 'completed')
+                .reduce((sum, o) => sum + Number(o.retail_price || 0), 0);
+
+            document.getElementById('stat-active-pkgs').textContent = String(activePkgs);
+            document.getElementById('stat-total-wallets').textContent = `$${totalWallets.toFixed(2)}`;
+            document.getElementById('stat-pending-orders').textContent = String(pendingOrders);
+            document.getElementById('stat-completed-sales').textContent = `$${completedSales.toFixed(2)}`;
+        }
+
+        // =========================================================================
+        // 1. إدارة الباقات والتعرف التلقائي على عمود الربط مع البزنس
+        // =========================================================================
+        async function loadAdminCatalog() {
+            const { data, error } = await admSupabase
+                .from('retail_catalog')
+                .select('*')
+                .order('category', { ascending: true })
+                .order('platform', { ascending: true })
+                .order('retail_price', { ascending: true });
+
+            if (error) {
+                notifyAdmin('خطأ في تحميل الباقات: ' + error.message, 'error');
+                return;
+            }
+
+            admCatalog = data || [];
+
+            // اكتشاف اسم عمود الربط بمنصة البزنس تلقائياً من هيكل الجدول
+            if (admCatalog.length > 0) {
+                const sampleKeys = Object.keys(admCatalog[0]);
+                const candidate = ['business_product_id', 'b2b_product_id', 'source_product_id', 'product_id', 'external_id']
+                    .find(k => sampleKeys.includes(k));
+                if (candidate) {
+                    detectedB2bColumn = candidate;
+                    const badge = document.getElementById('detected-b2b-col-badge');
+                    if (badge) badge.textContent = detectedB2bColumn;
+                }
+            }
+
+            renderAdminCatalog();
+        }
+
+        function renderAdminCatalog() {
+            const tbody = document.getElementById('adm-catalog-tbody');
+            const q = (document.getElementById('adm-pkg-search')?.value || '').trim().toLowerCase();
+            const cat = document.getElementById('adm-pkg-cat-filter')?.value || 'ALL';
+
+            let list = [...admCatalog];
+            if (cat !== 'ALL') {
+                list = list.filter(i => String(i.category || 'CARDS').toUpperCase() === cat);
+            }
+            if (q) {
+                list = list.filter(i =>
+                    (i.platform || '').toLowerCase().includes(q) ||
+                    (i.package_name || '').toLowerCase().includes(q)
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500">لا توجد باقات مطابقة</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(item => {
+                const b2bVal = item[detectedB2bColumn] || '---';
+                const isID = (item.product_type && item.product_type.toUpperCase() === 'ID');
+                return `
+                    <tr class="hover:bg-white/4 transition">
+                        <td class="py-3 px-3">
+                            <span class="px-2.5 py-1 rounded-full bg-white/8 text-[10px] font-black text-[#5CE1E6]">${esc(item.category || 'CARDS')}</span>
+                        </td>
+                        <td class="py-3 px-3 font-extrabold">${esc(item.platform)}</td>
+                        <td class="py-3 px-3 font-bold">${esc(item.package_name)}</td>
+                        <td class="py-3 px-3">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${isID ? 'bg-amber-500/15 text-amber-300' : 'bg-emerald-500/15 text-emerald-300'}">
+                                ${isID ? 'ID مباشر' : 'CODE فوري'}
+                            </span>
+                        </td>
+                        <td class="py-3 px-3 font-mono text-[11px] text-slate-400 max-w-[140px] truncate" dir="ltr" title="${esc(b2bVal)}">${esc(b2bVal)}</td>
+                        <td class="py-3 px-3 num-font font-black text-emerald-400" dir="ltr">$${Number(item.retail_price || 0).toFixed(2)}</td>
+                        <td class="py-3 px-3 text-center">
+                            <button type="button" onclick="togglePkgActive('${esc(item.id)}', ${!item.is_active})"
+                                class="px-3 py-1 rounded-full text-[10px] font-extrabold cursor-pointer transition ${item.is_active ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">
+                                ${item.is_active ? 'مفعّل ✓' : 'مخفي'}
+                            </button>
+                        </td>
+                        <td class="py-3 px-3 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button type="button" onclick="openPackageEditor('${esc(item.id)}')" class="px-3 py-1 rounded-full bg-white/10 hover:bg-[#5CE1E6] hover:text-[#080a0d] text-[11px] font-bold transition cursor-pointer">
+                                    تعديل
+                                </button>
+                                <button type="button" onclick="deletePackage('${esc(item.id)}')" class="px-2.5 py-1 rounded-full bg-rose-500/15 hover:bg-rose-600 text-rose-400 hover:text-white text-[11px] transition cursor-pointer" title="حذف">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.openPackageEditor = function(pkgId = '') {
+            const modal = document.getElementById('pkg-editor-modal');
+            const item = pkgId ? admCatalog.find(i => String(i.id) === String(pkgId)) : null;
+
+            document.getElementById('pkg-editor-title').textContent = item ? 'تعديل بيانات الباقة' : 'إضافة باقة جديدة';
+            document.getElementById('edit-pkg-id').value = item ? item.id : '';
+            document.getElementById('edit-pkg-category').value = item ? (item.category || 'CARDS').toUpperCase() : 'GAMES';
+            document.getElementById('edit-pkg-platform').value = item ? (item.platform || '') : '';
+            document.getElementById('edit-pkg-name').value = item ? (item.package_name || '') : '';
+            document.getElementById('edit-pkg-type').value = item ? (item.product_type || 'CODE').toUpperCase() : 'CODE';
+            document.getElementById('edit-pkg-price').value = item ? Number(item.retail_price || 0) : '';
+            document.getElementById('edit-pkg-b2b-id').value = item ? (item[detectedB2bColumn] || '') : '';
+            document.getElementById('edit-pkg-img').value = item ? (item.image_url || '') : '';
+            document.getElementById('edit-pkg-instructions').value = item ? (item.instructions || '') : '';
+            document.getElementById('edit-pkg-active').checked = item ? Boolean(item.is_active) : true;
+
+            modal.classList.remove('hidden');
+        };
+
+        window.closePkgEditor = function() {
+            document.getElementById('pkg-editor-modal').classList.add('hidden');
+        };
+
+        async function savePackageForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-pkg-id').value;
+            const b2bVal = document.getElementById('edit-pkg-b2b-id').value.trim();
+
+            const payload = {
+                category: document.getElementById('edit-pkg-category').value,
+                platform: document.getElementById('edit-pkg-platform').value.trim(),
+                package_name: document.getElementById('edit-pkg-name').value.trim(),
+                product_type: document.getElementById('edit-pkg-type').value,
+                retail_price: Number(document.getElementById('edit-pkg-price').value),
+                image_url: document.getElementById('edit-pkg-img').value.trim() || null,
+                instructions: document.getElementById('edit-pkg-instructions').value.trim() || null,
+                is_active: document.getElementById('edit-pkg-active').checked
+            };
+
+            // حفظ معرّف الربط بمنصة البزنس إذا كان العمود موجوداً أو مدخلاً
+            if (b2bVal || (admCatalog[0] && detectedB2bColumn in admCatalog[0])) {
+                payload[detectedB2bColumn] = b2bVal || null;
+            }
+
+            const btn = document.getElementById('save-pkg-btn');
+            btn.disabled = true;
+            btn.textContent = 'جاري الحفظ...';
+
+            try {
+                let res;
+                if (id) {
+                    res = await admSupabase.from('retail_catalog').update(payload).eq('id', id);
+                } else {
+                    res = await admSupabase.from('retail_catalog').insert([payload]);
+                }
+                if (res.error) throw res.error;
+
+                notifyAdmin('تم حفظ بيانات الباقة بنجاح', 'success');
+                closePkgEditor();
+                await loadAdminCatalog();
+                updateAdminStats();
+            } catch (err) {
+                notifyAdmin('تعذر حفظ الباقة: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'حفظ الباقة';
+            }
+        }
+
+        window.togglePkgActive = async function(id, newState) {
+            const { error } = await admSupabase
+                .from('retail_catalog')
+                .update({ is_active: newState })
+                .eq('id', id);
+
+            if (error) {
+                notifyAdmin(error.message, 'error');
+                return;
+            }
+            notifyAdmin(newState ? 'تم تفعيل الباقة في المتجر' : 'تم إخفاء الباقة مؤقتاً', 'info');
+            await loadAdminCatalog();
+            updateAdminStats();
+        };
+
+        window.deletePackage = async function(id) {
+            if (!confirm('هل أنت متأكد من حذف هذه الباقة نهائياً؟')) return;
+            const { error } = await admSupabase.from('retail_catalog').delete().eq('id', id);
+            if (error) {
+                notifyAdmin('لا يمكن حذف باقة مرتبطة بطلبات سابقة (يمكنك إخفاؤها بدلاً من ذلك)', 'error');
+                return;
+            }
+            notifyAdmin('تم حذف الباقة', 'success');
+            await loadAdminCatalog();
+            updateAdminStats();
+        };
+
+        // =========================================================================
+        // 2. إدارة الزبائن وشحن المحافظ الفوري
+        // =========================================================================
+        async function loadAdminUsers() {
+            const { data, error } = await admSupabase
+                .from('retail_users')
+                .select('*')
+                .order('wallet_balance', { ascending: false });
+
+            if (error) {
+                notifyAdmin('خطأ في جلب الزبائن: ' + error.message, 'error');
+                return;
+            }
+            admUsers = data || [];
+            renderAdminUsers();
+        }
+
+        function renderAdminUsers() {
+            const tbody = document.getElementById('adm-users-tbody');
+            const q = (document.getElementById('adm-user-search')?.value || '').trim().toLowerCase();
+
+            let list = [...admUsers];
+            if (q) {
+                list = list.filter(u =>
+                    (u.email || '').toLowerCase().includes(q) ||
+                    (u.full_name || '').toLowerCase().includes(q) ||
+                    String(u.id || '').toLowerCase().includes(q)
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-500">لا يوجد زبائن مطابقون للبحث</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(u => {
+                const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('en-GB') : '---';
+                return `
+                    <tr class="hover:bg-white/4 transition">
+                        <td class="py-3.5 px-4 font-mono font-bold text-slate-200" dir="ltr">${esc(u.email || u.id)}</td>
+                        <td class="py-3.5 px-4 font-bold">${esc(u.full_name || '---')}</td>
+                        <td class="py-3.5 px-4 num-font font-black text-base text-emerald-400" dir="ltr">$${Number(u.wallet_balance || 0).toFixed(2)}</td>
+                        <td class="py-3.5 px-4 num-font text-slate-400" dir="ltr">${esc(dateStr)}</td>
+                        <td class="py-3.5 px-4 text-center">
+                            <button type="button" onclick="promptWalletTopup('${esc(u.id)}', '${esc(u.email || u.full_name || u.id)}')"
+                                class="px-4 py-1.5 rounded-full bg-[#5CE1E6] hover:bg-white text-[#080a0d] text-xs font-black transition cursor-pointer">
+                                + شحن / تعديل الرصيد
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.promptWalletTopup = async function(userId, label) {
+            const raw = prompt(`أدخل المبلغ بالدولار (USD) لإضافته إلى محفظة [${label}]\n(أدخل رقماً سالباً مثل -5 للخصم):`, '25');
+            if (raw === null) return;
+            const amount = Number(raw);
+            if (isNaN(amount) || amount === 0) {
+                notifyAdmin('يرجى إدخال مبلغ رقمي صحيح', 'error');
+                return;
+            }
+
+            const { data, error } = await admSupabase.rpc('admin_topup_retail_wallet', {
+                p_user_id: userId,
+                p_amount: amount
+            });
+
+            if (error) {
+                notifyAdmin('فشل تحديث الرصيد: ' + error.message, 'error');
+                return;
+            }
+
+            notifyAdmin(`تم تحديث المحفظة بنجاح — الرصيد الجديد: $${Number(data).toFixed(2)}`, 'success');
+            await loadAdminUsers();
+            updateAdminStats();
+        };
+
+        // =========================================================================
+        // 3. متابعة الطلبات ومزامنتها مع منصة البزنس
+        // =========================================================================
+        async function loadAdminOrders() {
+            const { data, error } = await admSupabase
+                .from('retail_orders')
+                .select('*, retail_catalog(platform, package_name)')
+                .order('created_at', { ascending: false })
+                .limit(200);
+
+            if (error) {
+                notifyAdmin('خطأ في جلب الطلبات: ' + error.message, 'error');
+                return;
+            }
+            admOrders = data || [];
+            renderAdminOrders();
+        }
+
+        function renderAdminOrders() {
+            const tbody = document.getElementById('adm-orders-tbody');
+            const st = document.getElementById('adm-order-status-filter')?.value || 'ALL';
+
+            let list = [...admOrders];
+            if (st !== 'ALL') {
+                list = list.filter(o => o.status === st);
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500">لا توجد طلبات في هذا القسم</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(o => {
+                const pkgTitle = o.retail_catalog ? `${o.retail_catalog.platform} — ${o.retail_catalog.package_name}` : 'باقة رقمية';
+                const targetInfo = o.delivered_code
+                    ? `<span class="font-mono text-[#5CE1E6] font-bold" dir="ltr">${esc(o.delivered_code)}</span>`
+                    : `<span class="font-mono text-amber-300 font-bold" dir="ltr">ID: ${esc(o.player_id || '---')}</span>`;
+                const dateStr = o.created_at ? new Date(o.created_at).toLocaleString('en-GB') : '---';
+
+                let statusBadge = '';
+                if (o.status === 'completed') {
+                    statusBadge = `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-black">مكتمل ✓</span>`;
+                } else if (o.status === 'pending') {
+                    statusBadge = `<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black">قيد التنفيذ</span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 text-[10px] font-black">مرفوض (مسترجع)</span>`;
+                }
+
+                const actionsHtml = o.status === 'pending'
+                    ? `<div class="flex items-center justify-center gap-1.5 flex-wrap">
+                           <button type="button" onclick="syncOrderWithBusiness('${esc(o.local_order_ref)}')" class="px-2.5 py-1 rounded-full bg-[#005ba3] hover:bg-[#5CE1E6] hover:text-[#080a0d] text-white text-[10px] font-bold transition cursor-pointer">
+                               مزامنة البزنس
+                           </button>
+                           <button type="button" onclick="adminManualOrderAction('${esc(o.local_order_ref)}', 'completed')" class="px-2.5 py-1 rounded-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 text-[10px] font-bold transition cursor-pointer">
+                               إكمال
+                           </button>
+                           <button type="button" onclick="adminManualOrderAction('${esc(o.local_order_ref)}', 'rejected')" class="px-2.5 py-1 rounded-full bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white text-[10px] font-bold transition cursor-pointer">
+                               رفض وإرجاع الرصيد
+                           </button>
+                       </div>`
+                    : `<span class="text-[10px] text-slate-500">${esc(o.rejection_reason || '---')}</span>`;
+
+                return `
+                    <tr class="hover:bg-white/4 transition">
+                        <td class="py-3 px-3 font-mono font-bold" dir="ltr">${esc(o.local_order_ref)}</td>
+                        <td class="py-3 px-3 font-bold">${esc(pkgTitle)}</td>
+                        <td class="py-3 px-3">${targetInfo}</td>
+                        <td class="py-3 px-3 num-font font-black text-emerald-400" dir="ltr">$${Number(o.retail_price || 0).toFixed(2)}</td>
+                        <td class="py-3 px-3 num-font text-[11px] text-slate-400" dir="ltr">${esc(dateStr)}</td>
+                        <td class="py-3 px-3 text-center">${statusBadge}</td>
+                        <td class="py-3 px-3 text-center">${actionsHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.syncOrderWithBusiness = async function(orderRef) {
+            notifyAdmin('جاري مزامنة حالة الطلب مع منصة الجملة...', 'info');
+            try {
+                const res = await fetch('/api/sync-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ local_order_ref: orderRef })
+                });
+                const data = await res.json();
+                notifyAdmin(`حالة الطلب في البزنس: ${data.status || 'pending'}`, 'success');
+                await refreshAllAdminData();
+            } catch (err) {
+                notifyAdmin('تعذر الاتصال بنقطة المزامنة: ' + err.message, 'error');
+            }
+        };
+
+        window.adminManualOrderAction = async function(orderRef, newStatus) {
+            const promptMsg = newStatus === 'rejected'
+                ? 'أدخل سبب الرفض (سيتم إرجاع سعر الباقة تلقائياً إلى محفظة الزبون):'
+                : 'أدخل ملاحظة الإكمال أو الكود (اختياري):';
+            const note = prompt(promptMsg, newStatus === 'rejected' ? 'معرّف اللاعب غير صحيح - تم إرجاع الرصيد' : '');
+            if (note === null) return;
+
+            const { error } = await admSupabase.rpc('admin_update_retail_order', {
+                p_order_ref: orderRef,
+                p_status: newStatus,
+                p_note: note
+            });
+
+            if (error) {
+                notifyAdmin('خطأ: ' + error.message, 'error');
+                return;
+            }
+
+            notifyAdmin(newStatus === 'rejected' ? 'تم رفض الطلب وإرجاع الرصيد لمحفظة الزبون' : 'تم اعتماد الطلب كمكتمل', 'success');
+            await refreshAllAdminData();
+        };
+    </script>
+</body>
+</html>
+<!-- ==================== نهاية ملف admin.html ==================== -->
