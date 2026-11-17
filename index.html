@@ -414,64 +414,90 @@
                     <div class="rev-panel h-56 animate-pulse hidden xl:block"></div>
                 </section>
 
-                <!-- 6. قسم الأسئلة الشائعة -->
-                <section id="faq-section" class="pt-6 space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
-                        <div>
-                            <h2 class="text-base font-black tracking-tight flex items-center gap-2">
-                                <i class="ph-fill ph-seal-question text-[#005ba3] dark:text-[#5CE1E6] text-lg"></i>
-                                <span data-i18n="faq_heading">الأسئلة الشائعة وضمانات المشتري</span>
-                            </h2>
-                            <p data-i18n="faq_subheading" class="text-xs text-[#64748b] dark:text-slate-400 mt-0.5">
-                                كل ما تحتاج معرفته حول التسليم الفوري، توافق المناطق، والدفع عبر PayPal وبطاقات Visa / Mastercard.
-                            </p>
-                        </div>
-                        <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="rev-btn-secondary px-4 py-2 text-xs self-start sm:self-auto">
-                            <i class="ph-fill ph-whatsapp-logo text-emerald-500 text-base"></i>
-                            <span data-i18n="btn_contact_support">تحدث مع الدعم المباشر</span>
-                        </a>
-                    </div>
+                <!-- 6. قسم الأسئلة الشائعة وضمانات المشتري بالتصميم الجديد -->
+                <section id="faq-section" class="pt-4">
+                    <div class="rev-faq-wrapper space-y-6">
 
-                    <div class="rev-faq-grid">
-                        <div class="rev-faq-item open">
-                            <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
-                                <span data-i18n="faq_q1">متى أستلم الكود الرقمي أو الشحن بعد الدفع؟</span>
-                                <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
-                            </button>
-                            <div data-i18n="faq_a1" class="rev-faq-content">
-                                باقات الكود الفوري تظهر لك فوراً على الشاشة في نفس اللحظة بعد تأكيد الدفع وتحفظ دائماً في قسم «طلباتي». أما باقات الشحن المباشر بالمعرّف (Player ID) فيتم إرسالها آلياً إلى حسابك داخل اللعبة خلال دقائق معدودة.
+                        <!-- ترويسة القسم مع شارات الضمان وزر الدعم -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-black/6 dark:border-white/8">
+                            <div class="space-y-1.5">
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#005ba3]/10 dark:bg-[#5CE1E6]/10 text-[#005ba3] dark:text-[#5CE1E6] text-[11px] font-extrabold">
+                                    <i class="ph-fill ph-shield-check text-sm"></i>
+                                    <span>مركز المساعدة وضمان المشتري</span>
+                                </div>
+                                <h2 data-i18n="faq_heading" class="text-base sm:text-lg font-black tracking-tight">
+                                    الأسئلة الشائعة وضمانات التسليم الفوري
+                                </h2>
+                                <p data-i18n="faq_subheading" class="text-xs text-[#64748b] dark:text-slate-400">
+                                    إجابات واضحة حول استلام الأكواد، الشحن المباشر بالمعرّف، والتوافق الجغرافي.
+                                </p>
+                            </div>
+
+                            <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="rev-btn-primary px-5 py-2.5 text-xs self-start md:self-auto shrink-0">
+                                <i class="ph-fill ph-whatsapp-logo text-emerald-400 text-base"></i>
+                                <span data-i18n="btn_contact_support">تحدث مع الدعم المباشر</span>
+                            </a>
+                        </div>
+
+                        <!-- شبكة الأسئلة القابلة للطي بأيقونات مخصصة -->
+                        <div class="rev-faq-grid">
+                            <!-- السؤال 1 -->
+                            <div class="rev-faq-item open">
+                                <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
+                                    <span class="flex items-center gap-3 min-w-0">
+                                        <span class="rev-faq-q-badge"><i class="ph-fill ph-lightning"></i></span>
+                                        <span data-i18n="faq_q1" class="leading-snug">متى أستلم الكود الرقمي أو الشحن بعد الدفع؟</span>
+                                    </span>
+                                    <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
+                                </button>
+                                <div data-i18n="faq_a1" class="rev-faq-content">
+                                    باقات الكود الفوري تظهر لك فوراً على الشاشة في نفس اللحظة بعد تأكيد الدفع وتُحفظ دائماً في قسم «سجل المشتريات». أما باقات الشحن المباشر بالمعرّف (Player ID) فيتم إرسالها آلياً إلى حسابك داخل اللعبة خلال دقائق معدودة.
+                                </div>
+                            </div>
+
+                            <!-- السؤال 2 -->
+                            <div class="rev-faq-item">
+                                <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
+                                    <span class="flex items-center gap-3 min-w-0">
+                                        <span class="rev-faq-q-badge"><i class="ph-fill ph-credit-card"></i></span>
+                                        <span data-i18n="faq_q2" class="leading-snug">ما هي وسائل الدفع والعملات المعتمدة في المتجر؟</span>
+                                    </span>
+                                    <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
+                                </button>
+                                <div data-i18n="faq_a2" class="rev-faq-content">
+                                    يمكنك شحن محفظتك والدفع بسهولة وأمان عبر حساب PayPal أو باستخدام بطاقات الدفع العالمية Visa وMastercard، مع إمكانية عرض الأسعار بالدولار الأمريكي ($ USD) أو اليورو (€ EUR) أو الليرة السورية (SYP).
+                                </div>
+                            </div>
+
+                            <!-- السؤال 3 -->
+                            <div class="rev-faq-item">
+                                <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
+                                    <span class="flex items-center gap-3 min-w-0">
+                                        <span class="rev-faq-q-badge"><i class="ph-fill ph-globe-hemisphere-west"></i></span>
+                                        <span data-i18n="faq_q3" class="leading-snug">كيف أتأكد من توافق منطقة البطاقة (Region) مع حسابي؟</span>
+                                    </span>
+                                    <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
+                                </button>
+                                <div data-i18n="faq_a3" class="rev-faq-content">
+                                    تحمل كل بطاقة في متجرنا شارة واضحة للمنطقة الجغرافية (مثل 🇺🇸 المتجر الأمريكي أو 🇪🇺 المتجر الأوروبي أو 🌍 عالمي). تأكد دائماً من مطابقة شارة البطاقة لبلد حسابك قبل إتمام الشراء.
+                                </div>
+                            </div>
+
+                            <!-- السؤال 4 -->
+                            <div class="rev-faq-item">
+                                <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
+                                    <span class="flex items-center gap-3 min-w-0">
+                                        <span class="rev-faq-q-badge"><i class="ph-fill ph-arrows-counter-clockwise"></i></span>
+                                        <span data-i18n="faq_q4" class="leading-snug">ماذا يحدث إذا تم رفض طلب الشحن بمعرّف اللاعب (ID)؟</span>
+                                    </span>
+                                    <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
+                                </button>
+                                <div data-i18n="faq_a4" class="rev-faq-content">
+                                    في حال تعذر إتمام الشحن المباشر بسبب خطأ في رقم المعرّف (Player ID) أو صيانة لدى ناشر اللعبة، يقوم نظامنا تلقائياً بإلغاء الطلب وإعادة كامل المبلغ فوراً إلى رصيد محفظتك في المتجر.
+                                </div>
                             </div>
                         </div>
 
-                        <div class="rev-faq-item">
-                            <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
-                                <span data-i18n="faq_q2">ما هي وسائل الدفع المعتمدة في المتجر؟</span>
-                                <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
-                            </button>
-                            <div data-i18n="faq_a2" class="rev-faq-content">
-                                يمكنك شحن محفظتك والدفع بسهولة وأمان عبر حساب PayPal أو باستخدام بطاقات الدفع العالمية Visa وMastercard، مع إمكانية عرض الأسعار بالدولار الأمريكي ($ USD) أو اليورو (€ EUR) أو الليرة السورية (SYP).
-                            </div>
-                        </div>
-
-                        <div class="rev-faq-item">
-                            <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
-                                <span data-i18n="faq_q3">كيف أتأكد من توافق منطقة البطاقة (Region) مع حسابي؟</span>
-                                <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
-                            </button>
-                            <div data-i18n="faq_a3" class="rev-faq-content">
-                                تحمل كل بطاقة في متجرنا شارة واضحة للمنطقة الجغرافية (مثل 🇺🇸 المتجر الأمريكي أو 🇪🇺 المتجر الأوروبي أو 🌍 عالمي). تأكد دائماً من مطابقة شارة البطاقة لبلد حسابك قبل إتمام الشراء.
-                            </div>
-                        </div>
-
-                        <div class="rev-faq-item">
-                            <button type="button" onclick="toggleFaqItem(this)" class="rev-faq-trigger">
-                                <span data-i18n="faq_q4">ماذا يحدث إذا تم رفض طلب الشحن بمعرّف اللاعب (ID)؟</span>
-                                <span class="rev-faq-icon"><i class="ph-bold ph-caret-down text-xs"></i></span>
-                            </button>
-                            <div data-i18n="faq_a4" class="rev-faq-content">
-                                في حال تعذر إتمام الشحن المباشر بسبب خطأ في رقم المعرّف (Player ID) أو صيانة لدى ناشر اللعبة، يقوم نظامنا تلقائياً بإلغاء الطلب وإعادة كامل المبلغ فوراً إلى رصيد محفظتك في المتجر.
-                            </div>
-                        </div>
                     </div>
                 </section>
 
