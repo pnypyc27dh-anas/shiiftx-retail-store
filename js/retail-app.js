@@ -14,8 +14,15 @@ const CURRENCY_RATES = {
     SYP: 15000
 };
 
+const CURRENCY_LABELS = {
+    USD: '$ USD',
+    EUR: '€ EUR',
+    SYP: 'SYP'
+};
+
 let activeCurrency = localStorage.getItem('shiiftx_retail_currency') || 'USD';
 let activeLang = localStorage.getItem('shiiftx_retail_lang') || 'ar';
+let isSidebarCollapsed = localStorage.getItem('shiiftx_sidebar_collapsed') === 'true';
 
 let currentUser = null;
 let currentSession = null;
@@ -23,6 +30,7 @@ let currentWalletBalance = 0;
 let catalogItems = [];
 let pendingOrderRefs = [];
 let activeAppView = 'store'; // 'store' | 'favorites'
+let activeBusinessCategory = 'ALL'; // 'ALL' | 'GAMES' | 'CARDS' | 'STREAMING' | 'SUBSCRIPTIONS'
 let activePlatformFilter = 'ALL';
 let activeDeliveryTypeFilter = 'ALL';
 let activeSearchQuery = '';
@@ -70,6 +78,11 @@ const RETAIL_I18N = {
         slide3_desc: 'دفع آمن عبر PayPal وVisa وMastercard وفواتير رقمية موثقة ودعم فني مباشر.',
         section_browse_brands: 'تصفّح حسب المنصة واللعبة',
         btn_show_all_brands: 'عرض جميع المنصات',
+        cat_all: 'الكل',
+        cat_games: 'الألعاب',
+        cat_cards: 'بطاقات المتاجر والهدايا',
+        cat_streaming: 'تطبيقات البث والدردشة',
+        cat_subscriptions: 'الاشتراكات والبرامج',
         breadcrumb_store: 'المتجر',
         breadcrumb_all_packages: 'جميع الباقات',
         breadcrumb_favorites: 'الباقات المفضلة',
@@ -165,7 +178,7 @@ const RETAIL_I18N = {
         empty_fav_title: 'قائمة المفضلة فارغة حالياً',
         empty_fav_desc: 'اضغط على أيقونة القلب أعلى أي بطاقة لحفظها هنا للوصول السريع.',
         empty_search_title: 'لم يتم العثور على باقات مطابقة',
-        empty_search_desc: 'جرّب تغيير نوع التسليم أو إعادة ضبط الفلاتر.',
+        empty_search_desc: 'جرّب تغيير القسم أو إعادة ضبط الفلاتر.',
         default_inst_id: 'يتم شحن هذه الباقة مباشرة إلى معرّف اللاعب (Player ID) الخاص بك خلال دقائق. يرجى التأكد من كتابة المعرّف بدقة قبل تأكيد الطلب.',
         default_inst_code: 'يتم تسليم الكود الرقمي فوراً داخل حسابك فور إتمام عملية الدفع. يرجى التأكد من توافق منطقة الحساب (Region) مع البطاقة قبل الشراء.'
     },
@@ -200,6 +213,11 @@ const RETAIL_I18N = {
         slide3_desc: 'Secure checkout via PayPal, Visa & Mastercard with official digital invoices and live support.',
         section_browse_brands: 'Browse by Platform & Game',
         btn_show_all_brands: 'Show All Brands',
+        cat_all: 'All Categories',
+        cat_games: 'Games Top-Up',
+        cat_cards: 'Store & Gift Cards',
+        cat_streaming: 'Live & Social Apps',
+        cat_subscriptions: 'Subscriptions & Software',
         breadcrumb_store: 'Store',
         breadcrumb_all_packages: 'All Packages',
         breadcrumb_favorites: 'Favorite Packages',
@@ -295,13 +313,13 @@ const RETAIL_I18N = {
         empty_fav_title: 'Your Favorites List is Empty',
         empty_fav_desc: 'Tap the heart icon on any card to save it here for quick access.',
         empty_search_title: 'No Matching Packages Found',
-        empty_search_desc: 'Try changing the delivery type or resetting filters.',
+        empty_search_desc: 'Try changing the category or resetting filters.',
         default_inst_id: 'This package is credited directly to your Player ID within minutes. Please verify your ID carefully before confirming.',
         default_inst_code: 'Your digital code is delivered immediately upon payment. Please verify region compatibility with your account before purchasing.'
     },
     de: {
         wallet_title: 'SHIIFT X Guthaben',
-        wallet_guest_desc: 'Melden Sie sich an, um Ihr Guthaben zu verwalten und Karten sofort zu kaufen.',
+        wallet_guest_desc: 'Melden Sie sich an, um Ihr Guthaben zu veralten und Karten sofort zu kaufen.',
         btn_login_register: 'Anmelden / Registrieren',
         wallet_available: 'Verfügbares Guthaben',
         btn_topup: 'Aufladen',
@@ -330,6 +348,11 @@ const RETAIL_I18N = {
         slide3_desc: 'Sichere Zahlung per PayPal, Visa & Mastercard mit offiziellen digitalen Belegen und Direkt-Support.',
         section_browse_brands: 'Nach Plattform & Spiel filtern',
         btn_show_all_brands: 'Alle Marken anzeigen',
+        cat_all: 'Alle Kategorien',
+        cat_games: 'Spiele-Aufladung',
+        cat_cards: 'Store- & Geschenkkarten',
+        cat_streaming: 'Live- & Chat-Apps',
+        cat_subscriptions: 'Abos & Software',
         breadcrumb_store: 'Shop',
         breadcrumb_all_packages: 'Alle Pakete',
         breadcrumb_favorites: 'Meine Favoriten',
@@ -425,7 +448,7 @@ const RETAIL_I18N = {
         empty_fav_title: 'Keine Favoriten gespeichert',
         empty_fav_desc: 'Tippen Sie auf das Herz-Symbol einer Karte, um sie hier zu speichern.',
         empty_search_title: 'Keine passenden Pakete gefunden',
-        empty_search_desc: 'Bitte ändern Sie die Filter oder den Suchbegriff.',
+        empty_search_desc: 'Bitte ändern Sie die Kategorie oder den Suchbegriff.',
         default_inst_id: 'Dieses Paket wird innerhalb weniger Minuten direkt Ihrer Player-ID gutgeschrieben. Bitte prüfen Sie die ID sorgfältig.',
         default_inst_code: 'Der digitale Code wird sofort nach Zahlung ausgeliefert. Bitte achten Sie vor dem Kauf auf die richtige Kontoregion.'
     }
@@ -435,6 +458,100 @@ function t(key) {
     const dict = RETAIL_I18N[activeLang] || RETAIL_I18N.ar;
     return dict[key] || RETAIL_I18N.ar[key] || key;
 }
+
+// =========================================================================
+// تصنيف المنصات حسب هيكل SHIIFT X Business
+// GAMES | CARDS | STREAMING | SUBSCRIPTIONS
+// =========================================================================
+function classifyBusinessCategory(platformName) {
+    const p = (platformName || '').toLowerCase();
+    if (
+        p.includes('pubg') || p.includes('ببجي') ||
+        p.includes('free fire') || p.includes('فري فاير') ||
+        p.includes('call of duty') || p.includes('كول اوف ديوتي') ||
+        p.includes('valorant') || p.includes('فالورانت') ||
+        p.includes('mobile legends') || p.includes('موبايل ليجند') ||
+        p.includes('roblox') || p.includes('روبلوكس') ||
+        p.includes('fortnite') || p.includes('فورتنايت') ||
+        p.includes('clash') || p.includes('كلاش') ||
+        p.includes('jawaker') || p.includes('جواكر') ||
+        p.includes('genshin') || p.includes('ea sports') || p.includes('fifa')
+    ) {
+        return 'GAMES';
+    }
+    if (
+        p.includes('likee') || p.includes('لايكي') ||
+        p.includes('tiktok') || p.includes('تيك توك') ||
+        p.includes('bigo') || p.includes('بيجو') ||
+        p.includes('tango') || p.includes('تانجو') ||
+        p.includes('yalla') || p.includes('يلا لودو') ||
+        p.includes('imo') || p.includes('ايمو') ||
+        p.includes('discord') || p.includes('ديسكورد') ||
+        p.includes('poppo') || p.includes('weplay')
+    ) {
+        return 'STREAMING';
+    }
+    if (
+        p.includes('netflix') || p.includes('نتفلكس') ||
+        p.includes('spotify') || p.includes('سبوتيفاي') ||
+        p.includes('shahid') || p.includes('شاهد') ||
+        p.includes('osn') || p.includes('watch it') ||
+        p.includes('windows') || p.includes('ويندوز') ||
+        p.includes('office') || p.includes('اوفيس') || p.includes('أوفيس') ||
+        p.includes('microsoft') || p.includes('مايكروسوفت') ||
+        p.includes('outlook') || p.includes('chatgpt') || p.includes('canva') || p.includes('telegram')
+    ) {
+        return 'SUBSCRIPTIONS';
+    }
+    return 'CARDS';
+}
+
+function getBusinessCategoryTitle(catKey) {
+    if (catKey === 'GAMES') return t('cat_games');
+    if (catKey === 'CARDS') return t('cat_cards');
+    if (catKey === 'STREAMING') return t('cat_streaming');
+    if (catKey === 'SUBSCRIPTIONS') return t('cat_subscriptions');
+    return t('cat_all');
+}
+
+window.setBusinessCategoryFilter = function(catKey) {
+    activeBusinessCategory = ['ALL', 'GAMES', 'CARDS', 'STREAMING', 'SUBSCRIPTIONS'].includes(catKey) ? catKey : 'ALL';
+    activePlatformFilter = 'ALL';
+
+    document.querySelectorAll('#business-category-tabs .rev-cat-tab').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-cat') === activeBusinessCategory);
+    });
+
+    renderSidebarPlatforms();
+    renderBrandHubTiles();
+    renderCatalogGrid();
+};
+
+// =========================================================================
+// إدارة القوائم المنسدلة في الشريط العلوي (اللغات والعملات)
+// =========================================================================
+window.toggleHeaderDropdown = function(menuId, event) {
+    if (event) event.stopPropagation();
+    const target = document.getElementById(menuId);
+    if (!target) return;
+
+    const isHidden = target.classList.contains('hidden');
+    closeAllHeaderDropdowns();
+    if (isHidden) {
+        target.classList.remove('hidden');
+    }
+};
+
+function closeAllHeaderDropdowns() {
+    ['lang-dropdown-menu', 'currency-dropdown-menu'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+}
+
+document.addEventListener('click', () => {
+    closeAllHeaderDropdowns();
+});
 
 // =========================================================================
 // تنسيق المبالغ المالية حسب العملة المختارة (USD / EUR / SYP)
@@ -455,6 +572,7 @@ function formatRetailMoney(usdAmount) {
 window.setRetailCurrency = function(curr) {
     activeCurrency = ['USD', 'EUR', 'SYP'].includes(curr) ? curr : 'USD';
     localStorage.setItem('shiiftx_retail_currency', activeCurrency);
+    closeAllHeaderDropdowns();
     syncCurrencyButtonsUI();
     syncAuthUIState(Boolean(currentUser), currentWalletBalance);
     renderBrandHubTiles();
@@ -482,15 +600,15 @@ window.setRetailCurrency = function(curr) {
 };
 
 function syncCurrencyButtonsUI() {
-    const usdBtn = document.getElementById('currency-btn-usd');
-    const eurBtn = document.getElementById('currency-btn-eur');
-    const sypBtn = document.getElementById('currency-btn-syp');
+    const currLabel = document.getElementById('current-currency-label');
     const badge = document.getElementById('sidebar-currency-badge');
 
-    if (usdBtn) usdBtn.classList.toggle('active', activeCurrency === 'USD');
-    if (eurBtn) eurBtn.classList.toggle('active', activeCurrency === 'EUR');
-    if (sypBtn) sypBtn.classList.toggle('active', activeCurrency === 'SYP');
+    if (currLabel) currLabel.textContent = CURRENCY_LABELS[activeCurrency] || '$ USD';
     if (badge) badge.textContent = activeCurrency;
+
+    document.querySelectorAll('.curr-menu-item').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-curr') === activeCurrency);
+    });
 }
 
 // =========================================================================
@@ -499,6 +617,7 @@ function syncCurrencyButtonsUI() {
 window.setRetailLanguage = function(lang) {
     activeLang = ['ar', 'en', 'de'].includes(lang) ? lang : 'ar';
     localStorage.setItem('shiiftx_retail_lang', activeLang);
+    closeAllHeaderDropdowns();
     applyLanguageToDOM();
 };
 
@@ -507,9 +626,11 @@ function applyLanguageToDOM() {
     document.documentElement.lang = activeLang;
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
 
-    ['ar', 'en', 'de'].forEach(l => {
-        const btn = document.getElementById(`lang-btn-${l}`);
-        if (btn) btn.classList.toggle('active', activeLang === l);
+    const langLabel = document.getElementById('current-lang-label');
+    if (langLabel) langLabel.textContent = activeLang.toUpperCase();
+
+    document.querySelectorAll('.lang-menu-item').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === activeLang);
     });
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -525,12 +646,38 @@ function applyLanguageToDOM() {
     updateAuthModalUI();
     syncAuthUIState(Boolean(currentUser), currentWalletBalance);
     renderTopupAmountChips();
+    renderSidebarPlatforms();
     renderBrandHubTiles();
     renderCatalogGrid();
 }
 
 // =========================================================================
-// إصلاح فتح وإغلاق الأسئلة الشائعة بشكل مستقل (Independent Accordion FAQ)
+// طيّ وفتح القائمة الجانبية على الحاسوب والجوال
+// =========================================================================
+function applyDesktopSidebarState() {
+    const sidebar = document.getElementById('app-sidebar');
+    if (!sidebar) return;
+    sidebar.classList.toggle('collapsed', isSidebarCollapsed);
+}
+
+window.toggleDesktopSidebar = function() {
+    isSidebarCollapsed = !isSidebarCollapsed;
+    localStorage.setItem('shiiftx_sidebar_collapsed', String(isSidebarCollapsed));
+    applyDesktopSidebarState();
+};
+
+window.toggleMobileSidebar = function(forceOpen) {
+    const sidebar = document.getElementById('app-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (!sidebar) return;
+
+    const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !sidebar.classList.contains('open');
+    sidebar.classList.toggle('open', shouldOpen);
+    if (backdrop) backdrop.classList.toggle('hidden', !shouldOpen);
+};
+
+// =========================================================================
+// فتح وإغلاق الأسئلة الشائعة بشكل مستقل (Independent Accordion FAQ)
 // =========================================================================
 window.toggleFaqItem = function(triggerBtn) {
     if (!triggerBtn) return;
@@ -538,7 +685,6 @@ window.toggleFaqItem = function(triggerBtn) {
     if (!item) return;
 
     const isOpen = item.classList.contains('open');
-    // إغلاق أي سؤال آخر مفتوح لضمان عدم تمدد الصفوف نهائياً
     document.querySelectorAll('#faq-section .rev-faq-item.open').forEach(other => {
         if (other !== item) other.classList.remove('open');
     });
@@ -663,7 +809,7 @@ function detectPackageRegion(platform, packageName) {
 // أيقونة ولون هوية مخصص لكل علامة تجارية
 function getPlatformBrandMeta(platformName) {
     const p = (platformName || '').toLowerCase();
-    if (p.includes('pubg') || p.includes('free fire') || p.includes('call of duty') || p.includes('valorant') || p.includes('mobile legends')) {
+    if (p.includes('pubg') || p.includes('ببجي') || p.includes('free fire') || p.includes('call of duty') || p.includes('valorant') || p.includes('mobile legends') || p.includes('roblox') || p.includes('jawaker')) {
         return { icon: 'ph-fill ph-game-controller', bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' };
     }
     if (p.includes('google')) {
@@ -687,7 +833,7 @@ function getPlatformBrandMeta(platformName) {
     if (p.includes('netflix') || p.includes('spotify') || p.includes('shahid') || p.includes('watch')) {
         return { icon: 'ph-fill ph-television-simple', bg: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)' };
     }
-    if (p.includes('likee') || p.includes('tiktok') || p.includes('bigo') || p.includes('discord')) {
+    if (p.includes('likee') || p.includes('tiktok') || p.includes('bigo') || p.includes('discord') || p.includes('tango') || p.includes('yalla')) {
         return { icon: 'ph-fill ph-chats-circle', bg: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)' };
     }
     if (p.includes('windows') || p.includes('office') || p.includes('outlook') || p.includes('microsoft')) {
@@ -786,6 +932,7 @@ window.stepHeroSlide = function(delta) {
 // 1. التهيئة ومراقبة جلسة المستخدم
 // =========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
+    applyDesktopSidebarState();
     syncCurrencyButtonsUI();
     applyLanguageToDOM();
     initHeroCarousel();
@@ -868,18 +1015,8 @@ async function refreshUserWallet() {
 }
 
 // =========================================================================
-// 2. القائمة الجانبية، بطاقات العلامات التجارية، المفضلة، والفلترة
+// 2. القائمة الجانبية المصنّفة، بطاقات العلامات التجارية، المفضلة، والفلترة
 // =========================================================================
-window.toggleMobileSidebar = function(forceOpen) {
-    const sidebar = document.getElementById('app-sidebar');
-    const backdrop = document.getElementById('sidebar-backdrop');
-    if (!sidebar) return;
-
-    const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !sidebar.classList.contains('open');
-    sidebar.classList.toggle('open', shouldOpen);
-    if (backdrop) backdrop.classList.toggle('hidden', !shouldOpen);
-};
-
 window.switchAppView = function(view) {
     activeAppView = view === 'favorites' ? 'favorites' : 'store';
 
@@ -957,6 +1094,7 @@ async function loadRetailCatalog() {
     renderCatalogGrid();
 }
 
+// رسم المنصات داخل القائمة الجانبية مقسّمة حسب تصنيف SHIIFT X Business
 function renderSidebarPlatforms() {
     const container = document.getElementById('sidebar-platform-list');
     if (!container) return;
@@ -972,35 +1110,57 @@ function renderSidebarPlatforms() {
         return;
     }
 
-    container.innerHTML = platforms.map(pl => {
-        const count = catalogItems.filter(i => i.platform === pl).length;
-        const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
-        const meta = getPlatformBrandMeta(pl);
-        return `
-            <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" class="sidebar-platform-btn rev-nav-item ${isSel ? 'active' : ''}">
-                <span class="flex items-center gap-2.5 truncate">
-                    <span class="rev-nav-icon"><i class="${meta.icon}"></i></span>
-                    <span class="truncate">${escapeHTML(pl)}</span>
-                </span>
-                <span class="text-[11px] font-extrabold opacity-70 shrink-0">${count}</span>
-            </button>
+    const categoriesOrder = ['GAMES', 'CARDS', 'STREAMING', 'SUBSCRIPTIONS'];
+    let htmlOut = '';
+
+    categoriesOrder.forEach(catKey => {
+        const catPlatforms = platforms.filter(pl => classifyBusinessCategory(pl) === catKey);
+        if (catPlatforms.length === 0) return;
+
+        htmlOut += `
+            <div class="space-y-1">
+                <div class="rev-sidebar-cat-header sidebar-hide-collapsed">
+                    <span>${escapeHTML(getBusinessCategoryTitle(catKey))}</span>
+                    <span>${catPlatforms.length}</span>
+                </div>
+                ${catPlatforms.map(pl => {
+                    const count = catalogItems.filter(i => i.platform === pl).length;
+                    const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
+                    const meta = getPlatformBrandMeta(pl);
+                    return `
+                        <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" title="${escapeHTML(pl)}" class="sidebar-platform-btn rev-nav-item ${isSel ? 'active' : ''}">
+                            <span class="flex items-center gap-2.5 truncate">
+                                <span class="rev-nav-icon"><i class="${meta.icon}"></i></span>
+                                <span class="sidebar-hide-collapsed truncate">${escapeHTML(pl)}</span>
+                            </span>
+                            <span class="sidebar-hide-collapsed text-[11px] font-extrabold opacity-70 shrink-0">${count}</span>
+                        </button>
+                    `;
+                }).join('')}
+            </div>
         `;
-    }).join('');
+    });
+
+    container.innerHTML = htmlOut;
 }
 
-// رسم بطاقات العلامات التجارية المجمّعة (Brand Hub Tiles)
+// رسم بطاقات العلامات التجارية المجمّعة (Brand Hub Tiles) حسب التصنيف المختار
 function renderBrandHubTiles() {
     const grid = document.getElementById('brand-hub-grid');
     const resetBtn = document.getElementById('brand-reset-btn');
     if (!grid) return;
 
     if (resetBtn) {
-        resetBtn.classList.toggle('hidden', activePlatformFilter === 'ALL');
+        resetBtn.classList.toggle('hidden', activePlatformFilter === 'ALL' && activeBusinessCategory === 'ALL');
     }
 
-    const platforms = [...new Set(catalogItems.map(i => i.platform).filter(Boolean))];
+    let platforms = [...new Set(catalogItems.map(i => i.platform).filter(Boolean))];
+    if (activeBusinessCategory !== 'ALL') {
+        platforms = platforms.filter(pl => classifyBusinessCategory(pl) === activeBusinessCategory);
+    }
+
     if (platforms.length === 0) {
-        grid.innerHTML = '';
+        grid.innerHTML = `<div class="col-span-full py-4 text-xs text-[#68707d] px-1">${escapeHTML(t('empty_search_title'))}</div>`;
         return;
     }
 
@@ -1029,6 +1189,12 @@ function renderBrandHubTiles() {
 function filterRetailCatalog(platform) {
     activeAppView = 'store';
     activePlatformFilter = platform || 'ALL';
+    if (activePlatformFilter === 'ALL') {
+        activeBusinessCategory = 'ALL';
+        document.querySelectorAll('#business-category-tabs .rev-cat-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-cat') === 'ALL');
+        });
+    }
 
     const btnFav = document.getElementById('nav-btn-favorites');
     const carousel = document.getElementById('hero-carousel');
@@ -1082,6 +1248,9 @@ function renderCatalogGrid() {
     } else if (activePlatformFilter && activePlatformFilter !== 'ALL') {
         items = items.filter(i => i.platform === activePlatformFilter);
         viewTitle = activePlatformFilter;
+    } else if (activeBusinessCategory && activeBusinessCategory !== 'ALL') {
+        items = items.filter(i => classifyBusinessCategory(i.platform) === activeBusinessCategory);
+        viewTitle = getBusinessCategoryTitle(activeBusinessCategory);
     }
 
     if (activeDeliveryTypeFilter === 'ID') {
