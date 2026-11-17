@@ -1906,4 +1906,191 @@ window.deleteMyRetailAccount = async function() {
         showRetailToast(err.message, 'error');
     }
 };
+
+// =========================================================================
+// 6. إعدادات الحساب + حذف الحساب برمز التحقق (OTP) ومهلة 14 يوماً
+// =========================================================================
+let deleteOtpCountdown = null;
+
+window.shareRetailPlatform = function() {
+    const shareData = {
+        title: 'SHIIFT X',
+        text: 'متجر SHIIFT X للبطاقات الرقمية والشحن الفوري',
+        url: window.location.origin
+    };
+    if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(window.location.origin);
+        showRetailToast('تم نسخ رابط المتجر للمشاركة', 'success');
+    }
+};
+
+window.openProfileSettingsModal = async function() {
+    if (!currentUser) {
+        openAuthModal('login');
+        return;
+    }
+    document.getElementById('prof-retail-email').value = currentUser.email || '';
+
+    const { data } = await retailSupabase
+        .from('retail_users')
+        .select('full_name, phone, deletion_scheduled_at')
+        .eq('id', currentUser.id)
+        .single();
+
+    document.getElementById('prof-retail-name').value = data?.full_name || currentUser.user_metadata?.full_name || '';
+    document.getElementById('prof-retail-phone').value = data?.phone || '';
+    document.getElementById('profile-settings-modal').classList.remove('hidden');
+};
+
+window.saveRetailProfile = async function() {
+    if (!currentUser) return;
+    const fullName = document.getElementById('prof-retail-name').value.trim();
+    const phone = document.getElementById('prof-retail-phone').value.trim();
+    const btn = document.getElementById('prof-retail-save-btn');
+
+    btn.disabled = true;
+    try {
+        const { error } = await retailSupabase
+            .from('retail_users')
+            .update({ full_name: fullName, phone: phone })
+            .eq('id', currentUser.id);
+        if (error) throw error;
+        showRetailToast('تم حفظ وتحديث بيانات الحساب بنجاح', 'success');
+        closeModal('profile-settings-modal');
+    } catch (err) {
+        showRetailToast(err.message, 'error');
+    } finally {
+        btn.disabled = false;
+    }
+};
+
+window.openDeleteAccountOTPModal = function() {
+    if (!currentUser) return;
+    document.getElementById('del-account-email-display').value = currentUser.email || '';
+    document.getElementById('del-otp-code-input').value = '';
+    document.getElementById('del-otp-step-1').classList.remove('hidden');
+    document.getElementById('del-otp-step-2').classList.add('hidden');
+    document.getElementById('delete-account-otp-modal').classList.remove('hidden');
+};
+
+window.closeDeleteAccountOTPModal = function() {
+    document.getElementById('delete-account-otp-modal').classList.add('hidden');
+    if (deleteOtpCountdown) clearInterval(deleteOtpCountdown);
+};
+
+function startDeleteOtpTimer() {
+    const resendBtn = document.getElementById('del-resend-btn');
+    const timerSpan = document.getElementById('del-resend-timer');
+    let sec = 60;
+    resendBtn.disabled = true;
+    timerSpan.textContent = `(${sec}s)`;
+
+    if (deleteOtpCountdown) clearInterval(deleteOtpCountdown);
+    deleteOtpCountdown = setInterval(() => {
+        sec--;
+        if (sec <= 0) {
+            clearInterval(deleteOtpCountdown);
+            resendBtn.disabled = false;
+            timerSpan.textContent = '';
+        } else {
+            timerSpan.textContent = `(${sec}s)`;
+        }
+    }, 1000);
+}
+
+window.handleSendDeleteAccountOTP = async function() {
+    if (!currentUser?.email) return;
+    const btn = document.getElementById('send-del-otp-btn');
+    btn.disabled = true;
+
+    try {
+        const { error } = await retailSupabase.auth.signInWithOtp({
+            email: currentUser.email,
+            options: { shouldCreateUser: false }
+        });
+        if (error) throw error;
+
+        document.getElementById('del-otp-step-1').classList.add('hidden');
+        document.getElementById('del-otp-step-2').classList.remove('hidden');
+        startDeleteOtpTimer();
+        showRetailToast('تم إرسال رمز التحقق المكون من 6 أرقام إلى بريدك', 'success');
+    } catch (err) {
+        showRetailToast(err.message, 'error');
+    } finally {
+        btn.disabled = false;
+    }
+};
+
+window.handleVerifyAndDeleteAccount = async function() {
+    const code = document.getElementById('del-otp-code-input').value.trim();
+    if (code.length < 6) {
+        showRetailToast('يرجى إدخال رمز التحقق المكون من 6 أرقام', 'warning');
+        return;
+    }
+
+    const btn = document.getElementById('confirm-del-with-otp-btn');
+    btn.disabled = true;
+
+    try {
+        const { error: otpErr } = await retailSupabase.auth.verifyOtp({
+            email: currentUser.email,
+            token: code,
+            type: 'email'
+        });
+        if (otpErr) throw otpErr;
+
+        const { error: rpcErr } = await retailSupabase.rpc('schedule_retail_account_deletion');
+        if (rpcErr) throw rpcErr;
+
+        window.closeDeleteAccountOTPModal();
+        await retailSupabase.auth.signOut();
+        showRetailToast('تمت جدولة حذف حسابك بعد 14 يوماً. يمكنك استعادته بتسجيل الدخول خلال المهلة.', 'warning');
+    } catch (err) {
+        showRetailToast('رمز التحقق غير صحيح أو منتهي الصلاحية: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+    }
+};
+
+// فحص حالة جدولة الحذف عند تسجيل الدخول لإظهار نافذة الاستعادة
+async function checkAccountDeletionGracePeriod() {
+    if (!currentUser) return;
+    const { data } = await retailSupabase
+        .from('retail_users')
+        .select('deletion_scheduled_at')
+        .eq('id', currentUser.id)
+        .single();
+
+    if (data && data.deletion_scheduled_at) {
+        const delDate = new Date(data.deletion_scheduled_at).toLocaleDateString('en-GB');
+        const desc = document.getElementById('reactivate-modal-desc');
+        if (desc) {
+            desc.textContent = `حسابك مجدول للحذف النهائي بتاريخ (${delDate}). هل ترغب في إلغاء طلب الحذف واستعادة حسابك الآن؟`;
+        }
+        document.getElementById('reactivate-modal')?.classList.remove('hidden');
+    }
+}
+
+window.handleConfirmReactivate = async function() {
+    const { error } = await retailSupabase.rpc('cancel_retail_account_deletion');
+    if (error) {
+        showRetailToast(error.message, 'error');
+        return;
+    }
+    document.getElementById('reactivate-modal')?.classList.add('hidden');
+    showRetailToast('تم إلغاء طلب الحذف واستعادة حسابك بنجاح', 'success');
+};
+
+window.handleCancelReactivate = async function() {
+    document.getElementById('reactivate-modal')?.classList.add('hidden');
+    await retailSupabase.auth.signOut();
+};
+
+retailSupabase.auth.onAuthStateChange((_event, session) => {
+    if (session?.user) {
+        setTimeout(checkAccountDeletionGracePeriod, 400);
+    }
+});
 // ==================== نهاية ملف js/retail-app.js ====================
