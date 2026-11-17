@@ -1120,7 +1120,6 @@ async function loadRetailCatalog() {
     renderCatalogGrid();
 }
 
-// 1. القائمة الجانبية: عرض صورة أول باقة مباشرة بدون أيقونات قديمة
 function renderSidebarPlatforms() {
     const container = document.getElementById('sidebar-platform-list');
     if (!container) return;
@@ -1132,7 +1131,7 @@ function renderSidebarPlatforms() {
 
     const dbCategories = getActiveDatabaseCategories();
     if (dbCategories.length === 0) {
-        container.innerHTML = `<div class="px-3 py-2 text-xs text-[#68707d]">---</div>`;
+        container.innerHTML = `<div class="px-3 py-2 text-xs text-[#64748b]">---</div>`;
         return;
     }
 
@@ -1151,12 +1150,15 @@ function renderSidebarPlatforms() {
                     const count = catItems.filter(i => i.platform === pl).length;
                     const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
                     const firstImg = getPlatformFirstImageUrl(pl);
+                    const initial = escapeHTML((pl || 'S').trim().charAt(0).toUpperCase());
 
                     return `
                         <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" title="${escapeHTML(pl)}" class="sidebar-platform-btn rev-nav-item ${isSel ? 'active' : ''}">
-                            <span class="flex items-center gap-2.5 truncate">
-                                <span class="w-8 h-8 rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 shrink-0 flex items-center justify-center">
-                                    ${firstImg ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover object-center">` : ''}
+                            <span class="flex items-center gap-2.5 min-w-0">
+                                <span class="rev-nav-icon">
+                                    ${firstImg
+                                        ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover object-center">`
+                                        : `<span class="text-xs font-black">${initial}</span>`}
                                 </span>
                                 <span class="sidebar-hide-collapsed truncate">${escapeHTML(pl)}</span>
                             </span>
@@ -1169,7 +1171,6 @@ function renderSidebarPlatforms() {
     }).join('');
 }
 
-// 2. بطاقات المنصات العلوية: عرض صورة أول باقة فقط بدون الخلفيات والأيقونات القديمة
 function renderBrandHubTiles() {
     const grid = document.getElementById('brand-hub-grid');
     const resetBtn = document.getElementById('brand-reset-btn');
@@ -1186,7 +1187,7 @@ function renderBrandHubTiles() {
     const platforms = [...new Set(filteredByCat.map(i => i.platform).filter(Boolean))];
 
     if (platforms.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-4 text-xs text-[#68707d] px-1">${escapeHTML(t('empty_search_title'))}</div>`;
+        grid.innerHTML = `<div class="col-span-full py-4 text-xs text-[#64748b] px-1">${escapeHTML(t('empty_search_title'))}</div>`;
         return;
     }
 
@@ -1197,21 +1198,34 @@ function renderBrandHubTiles() {
 
         const firstPkgWithImg = plItems.find(i => i.image_url && String(i.image_url).trim() !== '');
         const firstImg = firstPkgWithImg ? resolveCardImageUrl(firstPkgWithImg.image_url) : getPlatformFirstImageUrl(pl);
+        const initial = escapeHTML((pl || 'S').trim().charAt(0).toUpperCase());
 
         return `
             <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" class="rev-brand-tile ${isSel ? 'active' : ''}">
-                <div class="w-12 h-12 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/8 dark:border-white/10 shrink-0 flex items-center justify-center">
-                    ${firstImg ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover object-center">` : ''}
+                <div class="w-11 h-11 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/8 dark:border-white/10 shrink-0 flex items-center justify-center">
+                    ${firstImg
+                        ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover object-center">`
+                        : `<span class="text-sm font-black text-[#005ba3] dark:text-[#5CE1E6]">${initial}</span>`}
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="text-xs font-black truncate">${escapeHTML(pl)}</div>
-                    <div class="text-[11px] font-bold text-[#68707d] dark:text-slate-400 mt-0.5">
-                        ${plItems.length} ${escapeHTML(t('brand_tile_packages_word'))} <span class="financial-amount font-extrabold text-[#191c1f] dark:text-white" dir="ltr">${formatRetailMoney(minPrice)}</span>
+                    <div class="text-[11px] font-bold text-[#64748b] dark:text-slate-400 mt-0.5">
+                        ${plItems.length} ${escapeHTML(t('brand_tile_packages_word'))} <span class="financial-amount font-extrabold text-[#0f172a] dark:text-white" dir="ltr">${formatRetailMoney(minPrice)}</span>
                     </div>
                 </div>
             </button>
         `;
     }).join('');
+}
+
+function handleDeliveryTypeFilter(typeVal) {
+    activeDeliveryTypeFilter = typeVal || 'ALL';
+    const sel = document.getElementById('catalog-type-filter');
+    if (sel) sel.value = activeDeliveryTypeFilter;
+    document.querySelectorAll('#delivery-type-pills .rev-type-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-type') === activeDeliveryTypeFilter);
+    });
+    renderCatalogGrid();
 }
 function filterRetailCatalog(platform) {
     activeAppView = 'store';
@@ -1231,16 +1245,6 @@ function filterRetailCatalog(platform) {
     renderSidebarPlatforms();
     renderBrandHubTiles();
     window.toggleMobileSidebar(false);
-    renderCatalogGrid();
-}
-
-function handleCatalogSearch(query) {
-    activeSearchQuery = (query || '').trim().toLowerCase();
-    const clearBtn = document.getElementById('clear-search-btn');
-    if (clearBtn) {
-        clearBtn.classList.toggle('hidden', activeSearchQuery.length === 0);
-        clearBtn.classList.toggle('flex', activeSearchQuery.length > 0);
-    }
     renderCatalogGrid();
 }
 
