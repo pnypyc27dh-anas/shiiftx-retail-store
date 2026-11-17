@@ -1120,7 +1120,7 @@ async function loadRetailCatalog() {
     renderCatalogGrid();
 }
 
-// رسم المنصات داخل القائمة الجانبية مع أخذ الصورة الديناميكية من أول باقة
+// 1. القائمة الجانبية: عرض صورة أول باقة مباشرة بدون أيقونات قديمة
 function renderSidebarPlatforms() {
     const container = document.getElementById('sidebar-platform-list');
     if (!container) return;
@@ -1150,20 +1150,14 @@ function renderSidebarPlatforms() {
                 ${catPlatforms.map(pl => {
                     const count = catItems.filter(i => i.platform === pl).length;
                     const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
-                    const meta = getPlatformBrandMeta(pl);
                     const firstImg = getPlatformFirstImageUrl(pl);
-
-                    const iconHtml = firstImg
-                        ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer"
-                                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
-                                class="w-full h-full object-cover object-center rounded-[10px]">
-                           <i class="${meta.icon}" style="display:none;"></i>`
-                        : `<i class="${meta.icon}"></i>`;
 
                     return `
                         <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" title="${escapeHTML(pl)}" class="sidebar-platform-btn rev-nav-item ${isSel ? 'active' : ''}">
                             <span class="flex items-center gap-2.5 truncate">
-                                <span class="rev-nav-icon overflow-hidden">${iconHtml}</span>
+                                <span class="w-8 h-8 rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 shrink-0 flex items-center justify-center">
+                                    ${firstImg ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover object-center">` : ''}
+                                </span>
                                 <span class="sidebar-hide-collapsed truncate">${escapeHTML(pl)}</span>
                             </span>
                             <span class="sidebar-hide-collapsed text-[11px] font-extrabold opacity-70 shrink-0">${count}</span>
@@ -1175,7 +1169,7 @@ function renderSidebarPlatforms() {
     }).join('');
 }
 
-// رسم بطاقات العلامات التجارية المجمّعة (Brand Hub Tiles) بأخذ الصورة من أول باقة ديناميكياً 100%
+// 2. بطاقات المنصات العلوية: عرض صورة أول باقة فقط بدون الخلفيات والأيقونات القديمة
 function renderBrandHubTiles() {
     const grid = document.getElementById('brand-hub-grid');
     const resetBtn = document.getElementById('brand-reset-btn');
@@ -1200,23 +1194,14 @@ function renderBrandHubTiles() {
         const plItems = filteredByCat.filter(i => i.platform === pl);
         const minPrice = Math.min(...plItems.map(i => Number(i.retail_price || 0)));
         const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
-        const meta = getPlatformBrandMeta(pl);
 
-        // أخذ الصورة من أول باقة متوفرة في هذه المنصة
         const firstPkgWithImg = plItems.find(i => i.image_url && String(i.image_url).trim() !== '');
         const firstImg = firstPkgWithImg ? resolveCardImageUrl(firstPkgWithImg.image_url) : getPlatformFirstImageUrl(pl);
 
-        const avatarContent = firstImg
-            ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
-                    class="w-full h-full object-cover object-center">
-               <i class="${meta.icon}" style="display:none;"></i>`
-            : `<i class="${meta.icon}"></i>`;
-
         return `
             <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" class="rev-brand-tile ${isSel ? 'active' : ''}">
-                <div class="rev-brand-avatar overflow-hidden relative" style="background: ${meta.bg};">
-                    ${avatarContent}
+                <div class="w-12 h-12 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/8 dark:border-white/10 shrink-0 flex items-center justify-center">
+                    ${firstImg ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover object-center">` : ''}
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="text-xs font-black truncate">${escapeHTML(pl)}</div>
@@ -1228,7 +1213,6 @@ function renderBrandHubTiles() {
         `;
     }).join('');
 }
-
 function filterRetailCatalog(platform) {
     activeAppView = 'store';
     activePlatformFilter = platform || 'ALL';
