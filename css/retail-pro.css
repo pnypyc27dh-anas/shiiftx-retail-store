@@ -71,9 +71,12 @@ html[dir="ltr"] body {
 header .max-w-6xl,
 main.max-w-6xl,
 footer.max-w-6xl {
-    max-width: 1480px !important;
-    padding-left: clamp(0.75rem, 2.2vw, 2.25rem) !important;
-    padding-right: clamp(0.75rem, 2.2vw, 2.25rem) !important;
+    width: 100%;
+    max-width: 1420px !important;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: clamp(1.15rem, 3.5vw, 2.75rem) !important;
+    padding-right: clamp(1.15rem, 3.5vw, 2.75rem) !important;
 }
 
 /* ==================== هيكل التطبيق والقائمة الجانبية القابلة للطي والفتح ==================== */
@@ -614,55 +617,96 @@ html.dark .rev-product-card:hover {
     color: #ffffff !important;
 }
 
-/* ==================== قسم الأسئلة الشائعة القابل للطي ==================== */
+/* ==================== قسم الأسئلة الشائعة الاحترافي ==================== */
+.rev-faq-wrapper {
+    background: var(--rev-surface);
+    border: 1px solid var(--rev-border);
+    border-radius: 26px;
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    box-shadow: var(--rev-shadow-card);
+}
+
 .rev-faq-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 14px;
     align-items: start;
 }
 @media (min-width: 768px) {
     .rev-faq-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 }
 
 .rev-faq-item {
-    background: var(--rev-surface);
-    border: 1px solid var(--rev-border);
+    background: var(--rev-bg);
+    border: 1.5px solid var(--rev-border);
     border-radius: 20px;
     overflow: hidden;
     align-self: start;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.25s var(--rev-spring);
+}
+.rev-faq-item:hover {
+    border-color: var(--rev-border-strong);
 }
 .rev-faq-item.open {
-    border-color: rgba(0, 91, 163, 0.35);
-    box-shadow: var(--rev-shadow-card);
+    background: var(--rev-surface);
+    border-color: #005ba3;
+    box-shadow: 0 12px 28px -10px rgba(0, 91, 163, 0.14);
 }
 html.dark .rev-faq-item.open {
-    border-color: rgba(92, 225, 230, 0.35);
+    border-color: #5CE1E6;
+    box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.5);
 }
 
 .rev-faq-trigger {
     width: 100%;
-    padding: 15px 18px;
+    padding: 16px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     text-align: start;
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 800;
     color: var(--rev-text-primary);
     cursor: pointer;
     background: transparent;
 }
 
+.rev-faq-q-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    background: rgba(0, 91, 163, 0.1);
+    color: #005ba3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+html.dark .rev-faq-q-badge {
+    background: rgba(92, 225, 230, 0.12);
+    color: #5CE1E6;
+}
+.rev-faq-item.open .rev-faq-q-badge {
+    background: #005ba3;
+    color: #ffffff;
+}
+html.dark .rev-faq-item.open .rev-faq-q-badge {
+    background: #5CE1E6;
+    color: #080a0f;
+}
+
 .rev-faq-icon {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     border-radius: 9999px;
     background: var(--rev-surface-subtle);
+    color: var(--rev-text-secondary);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -671,28 +715,26 @@ html.dark .rev-faq-item.open {
 }
 .rev-faq-item.open .rev-faq-icon {
     transform: rotate(180deg);
-    background: #005ba3;
-    color: #ffffff;
+    background: rgba(0, 91, 163, 0.12);
+    color: #005ba3;
 }
 html.dark .rev-faq-item.open .rev-faq-icon {
-    background: #5CE1E6;
-    color: #080a0d;
+    background: rgba(92, 225, 230, 0.15);
+    color: #5CE1E6;
 }
 
 .rev-faq-content {
     display: none;
-    padding: 12px 18px 16px;
+    padding: 0 18px 18px;
     font-size: 12px;
-    line-height: 1.75;
+    line-height: 1.8;
     color: var(--rev-text-secondary);
-    border-top: 1px solid var(--rev-border);
     text-align: start;
 }
 .rev-faq-item.open .rev-faq-content {
     display: block;
     animation: revFadeIn 0.25s ease forwards;
 }
-
 /* الأزرار الكبسولية */
 .rev-btn-primary {
     background: #191c1f;
