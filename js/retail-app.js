@@ -1126,51 +1126,31 @@ function renderSidebarPlatforms() {
 
     const btnStore = document.getElementById('nav-btn-store');
     if (btnStore) {
-        btnStore.classList.toggle('active', activeAppView === 'store' && activePlatformFilter === 'ALL');
+        btnStore.classList.toggle('active', activeAppView === 'store' && activeBusinessCategory === 'ALL' && activePlatformFilter === 'ALL');
     }
 
     const dbCategories = getActiveDatabaseCategories();
     if (dbCategories.length === 0) {
-        container.innerHTML = `<div class="px-3 py-2 text-xs text-[#64748b]">---</div>`;
+        container.innerHTML = `<div class="px-3 py-2 text-xs text-slate-500">---</div>`;
         return;
     }
 
     container.innerHTML = dbCategories.map(catKey => {
         const catMeta = getCategoryMeta(catKey);
-        const catItems = catalogItems.filter(i => normalizeCategoryValue(i.category) === catKey);
-        const catPlatforms = [...new Set(catItems.map(i => i.platform).filter(Boolean))];
+        const count = catalogItems.filter(i => normalizeCategoryValue(i.category) === catKey).length;
+        const isSel = (activeAppView === 'store' && activeBusinessCategory === catKey);
 
         return `
-            <div class="space-y-1">
-                <div class="rev-sidebar-cat-header sidebar-hide-collapsed">
-                    <span>${escapeHTML(catMeta.label)}</span>
-                    <span>${catPlatforms.length}</span>
-                </div>
-                ${catPlatforms.map(pl => {
-                    const count = catItems.filter(i => i.platform === pl).length;
-                    const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
-                    const firstImg = getPlatformFirstImageUrl(pl);
-                    const initial = escapeHTML((pl || 'S').trim().charAt(0).toUpperCase());
-
-                    return `
-                        <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" title="${escapeHTML(pl)}" class="sidebar-platform-btn rev-nav-item ${isSel ? 'active' : ''}">
-                            <span class="flex items-center gap-2.5 min-w-0">
-                                <span class="rev-nav-icon">
-                                    ${firstImg
-                                        ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover object-center">`
-                                        : `<span class="text-xs font-black">${initial}</span>`}
-                                </span>
-                                <span class="sidebar-hide-collapsed truncate">${escapeHTML(pl)}</span>
-                            </span>
-                            <span class="sidebar-hide-collapsed text-[11px] font-extrabold opacity-70 shrink-0">${count}</span>
-                        </button>
-                    `;
-                }).join('')}
-            </div>
+            <button type="button" onclick="switchAppView('store'); setBusinessCategoryFilter('${escapeHTML(catKey)}'); toggleMobileSidebar(false);" title="${escapeHTML(catMeta.label)}" class="sidebar-platform-btn rev-nav-item ${isSel ? 'active' : ''}">
+                <span class="flex items-center gap-3 min-w-0">
+                    <span class="rev-nav-icon"><i class="${catMeta.icon}"></i></span>
+                    <span class="sidebar-hide-collapsed truncate">${escapeHTML(catMeta.label)}</span>
+                </span>
+                <span class="sidebar-hide-collapsed px-2 py-0.5 rounded-md bg-white/5 text-[10px] font-extrabold opacity-75 shrink-0">${count}</span>
+            </button>
         `;
     }).join('');
 }
-
 function renderBrandHubTiles() {
     const grid = document.getElementById('brand-hub-grid');
     const resetBtn = document.getElementById('brand-reset-btn');
