@@ -461,7 +461,6 @@ function t(key) {
 
 // =========================================================================
 // نظام التصنيفات الديناميكي المعتمد 100% على عمود category في قاعدة البيانات
-// يدعم الرموز القياسية وأي نص حر تكتبه في قاعدة البيانات أو لوحة الإدارة
 // =========================================================================
 function normalizeCategoryValue(rawCat) {
     const clean = String(rawCat || '').trim();
@@ -493,7 +492,6 @@ function getCategoryMeta(catValue) {
     if (upper === 'SUBSCRIPTIONS' || lower.includes('اشتراكات') || lower.includes('برامج') || lower.includes('sub')) {
         return { key: raw, label: upper === 'SUBSCRIPTIONS' ? t('cat_subscriptions') : raw, icon: 'ph-fill ph-desktop' };
     }
-    // أي تصنيف نصي حر جديد تضيفه في قاعدة البيانات أو لوحة الإدارة
     return { key: raw, label: raw, icon: 'ph-fill ph-tag' };
 }
 
@@ -518,7 +516,6 @@ function getBusinessCategoryTitle(catKey) {
     return getCategoryMeta(catKey).label;
 }
 
-// توليد أزرار التصنيفات في الصفحة الرئيسية تلقائياً من قاعدة البيانات
 function renderBusinessCategoryTabs() {
     const tabsContainer = document.getElementById('business-category-tabs');
     if (!tabsContainer) return;
@@ -719,7 +716,6 @@ function saveFavoritesStorage() {
     localStorage.setItem('shiiftx_retail_favs', JSON.stringify([...favoriteIds]));
 }
 
-// إدارة معرّفات اللاعبين المحفوظة لكل منصة (Saved Player IDs)
 function getSavedPlayerIdsMap() {
     try {
         return JSON.parse(localStorage.getItem('shiiftx_saved_player_ids') || '{}');
@@ -806,6 +802,12 @@ function resolveCardImageUrl(rawUrl) {
     return clean;
 }
 
+// جلب صورة أول باقة متوفرة داخل المنصة لتكون أيقونة ديناميكية 100% للمنصة
+function getPlatformFirstImageUrl(platformName) {
+    const match = catalogItems.find(i => i.platform === platformName && i.image_url && String(i.image_url).trim() !== '');
+    return match ? resolveCardImageUrl(match.image_url) : '';
+}
+
 // استخراج شارة المنطقة الجغرافية تلقائياً وترجمتها حسب اللغة المختارة
 function detectPackageRegion(platform, packageName) {
     const text = `${platform || ''} ${packageName || ''}`.toLowerCase();
@@ -830,10 +832,10 @@ function detectPackageRegion(platform, packageName) {
     return { flag: '🌍', label: t('region_global') };
 }
 
-// أيقونة ولون هوية مخصص لكل علامة تجارية
+// أيقونة احتياطية في حال لم يكن لأول باقة في المنصة رابط صورة
 function getPlatformBrandMeta(platformName) {
     const p = (platformName || '').toLowerCase();
-    if (p.includes('pubg') || p.includes('ببجي') || p.includes('free fire') || p.includes('call of duty') || p.includes('valorant') || p.includes('mobile legends') || p.includes('roblox') || p.includes('jawaker')) {
+    if (p.includes('pubg') || p.includes('ببجي') || p.includes('free fire') || p.includes('call of duty') || p.includes('valorant') || p.includes('mobile legends') || p.includes('roblox') || p.includes('rblx') || p.includes('jawaker') || p.includes('جواكر')) {
         return { icon: 'ph-fill ph-game-controller', bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' };
     }
     if (p.includes('google')) {
@@ -854,19 +856,18 @@ function getPlatformBrandMeta(platformName) {
     if (p.includes('razer')) {
         return { icon: 'ph-fill ph-coin-vertical', bg: 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)' };
     }
-    if (p.includes('netflix') || p.includes('spotify') || p.includes('shahid') || p.includes('watch')) {
+    if (p.includes('netflix') || p.includes('spotify') || p.includes('shahid') || p.includes('شاهد') || p.includes('انغامي') || p.includes('watch')) {
         return { icon: 'ph-fill ph-television-simple', bg: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)' };
     }
-    if (p.includes('likee') || p.includes('tiktok') || p.includes('bigo') || p.includes('discord') || p.includes('tango') || p.includes('yalla')) {
+    if (p.includes('likee') || p.includes('tiktok') || p.includes('bigo') || p.includes('بيكو') || p.includes('discord') || p.includes('tango') || p.includes('yalla') || p.includes('يلا') || p.includes('تيلغرام') || p.includes('telegram')) {
         return { icon: 'ph-fill ph-chats-circle', bg: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)' };
     }
-    if (p.includes('windows') || p.includes('office') || p.includes('outlook') || p.includes('microsoft')) {
+    if (p.includes('windows') || p.includes('windos') || p.includes('office') || p.includes('outlook') || p.includes('microsoft')) {
         return { icon: 'ph-fill ph-windows-logo', bg: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' };
     }
     return { icon: 'ph-fill ph-credit-card', bg: 'linear-gradient(135deg, #005ba3 0%, #004278 100%)' };
 }
 
-// إشعارات الكبسولة العائمة بأسلوب Revolut (Pill Toasts)
 function showRetailToast(message, type = 'info') {
     const container = document.getElementById('retail-toast-container');
     if (!container) return;
@@ -1039,7 +1040,7 @@ async function refreshUserWallet() {
 }
 
 // =========================================================================
-// 2. القائمة الجانبية المصنّفة، بطاقات العلامات التجارية، المفضلة، والفلترة
+// 2. القائمة الجانبية المصنّفة، بطاقات العلامات التجارية بصور أول باقة، والفلترة
 // =========================================================================
 window.switchAppView = function(view) {
     activeAppView = view === 'favorites' ? 'favorites' : 'store';
@@ -1119,7 +1120,7 @@ async function loadRetailCatalog() {
     renderCatalogGrid();
 }
 
-// رسم المنصات داخل القائمة الجانبية مقسّمة مباشرة حسب عمود category في قاعدة البيانات
+// رسم المنصات داخل القائمة الجانبية مع أخذ الصورة الديناميكية من أول باقة
 function renderSidebarPlatforms() {
     const container = document.getElementById('sidebar-platform-list');
     if (!container) return;
@@ -1150,10 +1151,19 @@ function renderSidebarPlatforms() {
                     const count = catItems.filter(i => i.platform === pl).length;
                     const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
                     const meta = getPlatformBrandMeta(pl);
+                    const firstImg = getPlatformFirstImageUrl(pl);
+
+                    const iconHtml = firstImg
+                        ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
+                                class="w-full h-full object-cover object-center rounded-[10px]">
+                           <i class="${meta.icon}" style="display:none;"></i>`
+                        : `<i class="${meta.icon}"></i>`;
+
                     return `
                         <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" data-platform="${escapeHTML(pl)}" title="${escapeHTML(pl)}" class="sidebar-platform-btn rev-nav-item ${isSel ? 'active' : ''}">
                             <span class="flex items-center gap-2.5 truncate">
-                                <span class="rev-nav-icon"><i class="${meta.icon}"></i></span>
+                                <span class="rev-nav-icon overflow-hidden">${iconHtml}</span>
                                 <span class="sidebar-hide-collapsed truncate">${escapeHTML(pl)}</span>
                             </span>
                             <span class="sidebar-hide-collapsed text-[11px] font-extrabold opacity-70 shrink-0">${count}</span>
@@ -1165,7 +1175,7 @@ function renderSidebarPlatforms() {
     }).join('');
 }
 
-// رسم بطاقات العلامات التجارية المجمّعة (Brand Hub Tiles) حسب التصنيف المختار من الجدول
+// رسم بطاقات العلامات التجارية المجمّعة (Brand Hub Tiles) بأخذ الصورة من أول باقة ديناميكياً 100%
 function renderBrandHubTiles() {
     const grid = document.getElementById('brand-hub-grid');
     const resetBtn = document.getElementById('brand-reset-btn');
@@ -1192,10 +1202,21 @@ function renderBrandHubTiles() {
         const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
         const meta = getPlatformBrandMeta(pl);
 
+        // أخذ الصورة من أول باقة متوفرة في هذه المنصة
+        const firstPkgWithImg = plItems.find(i => i.image_url && String(i.image_url).trim() !== '');
+        const firstImg = firstPkgWithImg ? resolveCardImageUrl(firstPkgWithImg.image_url) : getPlatformFirstImageUrl(pl);
+
+        const avatarContent = firstImg
+            ? `<img src="${escapeHTML(firstImg)}" alt="${escapeHTML(pl)}" loading="lazy" referrerpolicy="no-referrer"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
+                    class="w-full h-full object-cover object-center">
+               <i class="${meta.icon}" style="display:none;"></i>`
+            : `<i class="${meta.icon}"></i>`;
+
         return `
             <button type="button" onclick="filterRetailCatalog('${escapeHTML(pl)}')" class="rev-brand-tile ${isSel ? 'active' : ''}">
-                <div class="rev-brand-avatar" style="background: ${meta.bg};">
-                    <i class="${meta.icon}"></i>
+                <div class="rev-brand-avatar overflow-hidden relative" style="background: ${meta.bg};">
+                    ${avatarContent}
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="text-xs font-black truncate">${escapeHTML(pl)}</div>
