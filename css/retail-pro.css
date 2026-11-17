@@ -841,4 +841,33 @@ html.dark .rev-input:focus {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* شريط التنقل العائم المطابق لمنصة SHIIFT X */
+@media (min-width: 768px) {
+    #floating-nav-bar nav {
+        width: 56px;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+    #floating-nav-bar nav:hover {
+        width: 165px;
+    }
+
+    #floating-nav-bar .dock-label {
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        display: inline-block;
+        transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+        margin: 0;
+    }
+
+    #floating-nav-bar nav:hover .dock-label {
+        max-width: 100px;
+        opacity: 1;
+        margin-right: 8px;
+    }
+}
 /* ==================== نهاية ملف css/retail-pro.css ==================== */
