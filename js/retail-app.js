@@ -463,59 +463,24 @@ function t(key) {
 // تصنيف المنصات حسب هيكل SHIIFT X Business
 // GAMES | CARDS | STREAMING | SUBSCRIPTIONS
 // =========================================================================
+// قراءة التصنيف المعتمد للمنصة مباشرة من عمود category في قاعدة البيانات
 function classifyBusinessCategory(platformName) {
-    const p = (platformName || '').toLowerCase();
-    if (
-        p.includes('pubg') || p.includes('ببجي') ||
-        p.includes('free fire') || p.includes('فري فاير') ||
-        p.includes('call of duty') || p.includes('كول اوف ديوتي') ||
-        p.includes('valorant') || p.includes('فالورانت') ||
-        p.includes('mobile legends') || p.includes('موبايل ليجند') ||
-        p.includes('roblox') || p.includes('روبلوكس') ||
-        p.includes('fortnite') || p.includes('فورتنايت') ||
-        p.includes('clash') || p.includes('كلاش') ||
-        p.includes('jawaker') || p.includes('جواكر') ||
-        p.includes('genshin') || p.includes('ea sports') || p.includes('fifa')
-    ) {
-        return 'GAMES';
-    }
-    if (
-        p.includes('likee') || p.includes('لايكي') ||
-        p.includes('tiktok') || p.includes('تيك توك') ||
-        p.includes('bigo') || p.includes('بيجو') ||
-        p.includes('tango') || p.includes('تانجو') ||
-        p.includes('yalla') || p.includes('يلا لودو') ||
-        p.includes('imo') || p.includes('ايمو') ||
-        p.includes('discord') || p.includes('ديسكورد') ||
-        p.includes('poppo') || p.includes('weplay')
-    ) {
-        return 'STREAMING';
-    }
-    if (
-        p.includes('netflix') || p.includes('نتفلكس') ||
-        p.includes('spotify') || p.includes('سبوتيفاي') ||
-        p.includes('shahid') || p.includes('شاهد') ||
-        p.includes('osn') || p.includes('watch it') ||
-        p.includes('windows') || p.includes('ويندوز') ||
-        p.includes('office') || p.includes('اوفيس') || p.includes('أوفيس') ||
-        p.includes('microsoft') || p.includes('مايكروسوفت') ||
-        p.includes('outlook') || p.includes('chatgpt') || p.includes('canva') || p.includes('telegram')
-    ) {
-        return 'SUBSCRIPTIONS';
-    }
-    return 'CARDS';
+    const match = catalogItems.find(i => i.platform === platformName && i.category);
+    return match ? String(match.category).trim().toUpperCase() : 'CARDS';
 }
 
 function getBusinessCategoryTitle(catKey) {
-    if (catKey === 'GAMES') return t('cat_games');
-    if (catKey === 'CARDS') return t('cat_cards');
-    if (catKey === 'STREAMING') return t('cat_streaming');
-    if (catKey === 'SUBSCRIPTIONS') return t('cat_subscriptions');
-    return t('cat_all');
+    const key = String(catKey || '').trim().toUpperCase();
+    if (key === 'GAMES') return t('cat_games');
+    if (key === 'CARDS') return t('cat_cards');
+    if (key === 'STREAMING') return t('cat_streaming');
+    if (key === 'SUBSCRIPTIONS') return t('cat_subscriptions');
+    if (key === 'ALL') return t('cat_all');
+    return catKey; // يعرض اسم أي تصنيف جديد تضيفه في قاعدة البيانات كما هو
 }
 
 window.setBusinessCategoryFilter = function(catKey) {
-    activeBusinessCategory = ['ALL', 'GAMES', 'CARDS', 'STREAMING', 'SUBSCRIPTIONS'].includes(catKey) ? catKey : 'ALL';
+    activeBusinessCategory = catKey ? String(catKey).trim().toUpperCase() : 'ALL';
     activePlatformFilter = 'ALL';
 
     document.querySelectorAll('#business-category-tabs .rev-cat-tab').forEach(btn => {
@@ -526,7 +491,6 @@ window.setBusinessCategoryFilter = function(catKey) {
     renderBrandHubTiles();
     renderCatalogGrid();
 };
-
 // =========================================================================
 // إدارة القوائم المنسدلة في الشريط العلوي (اللغات والعملات)
 // =========================================================================
@@ -1073,11 +1037,11 @@ async function loadRetailCatalog() {
     if (!grid) return;
 
     const { data, error } = await retailSupabase
-        .from('retail_catalog')
-        .select('id, platform, package_name, product_type, retail_price, image_url, instructions, is_active')
-        .eq('is_active', true)
-        .order('platform', { ascending: true })
-        .order('retail_price', { ascending: true });
+    .from('retail_catalog')
+    .select('id, category, platform, package_name, product_type, retail_price, image_url, instructions, is_active')
+    .eq('is_active', true)
+    .order('platform', { ascending: true })
+    .order('retail_price', { ascending: true });
 
     if (error) {
         grid.innerHTML = `<div class="col-span-full rev-panel py-12 text-center text-rose-500 text-xs font-bold">${escapeHTML(error.message)}</div>`;
@@ -1110,7 +1074,12 @@ function renderSidebarPlatforms() {
         return;
     }
 
-    const categoriesOrder = ['GAMES', 'CARDS', 'STREAMING', 'SUBSCRIPTIONS'];
+    const dbCategories = [...new Set(catalogItems.map(i => (i.category || 'CARDS').trim().toUpperCase()))];
+const defaultOrder = ['GAMES', 'CARDS', 'STREAMING', 'SUBSCRIPTIONS'];
+const categoriesOrder = [
+    ...defaultOrder.filter(c => dbCategories.includes(c)),
+    ...dbCategories.filter(c => !defaultOrder.includes(c))
+];
     let htmlOut = '';
 
     categoriesOrder.forEach(catKey => {
@@ -1246,7 +1215,7 @@ function renderCatalogGrid() {
         items = items.filter(i => favoriteIds.has(String(i.id)));
         viewTitle = t('breadcrumb_favorites');
     } else if (activePlatformFilter && activePlatformFilter !== 'ALL') {
-        items = items.filter(i => i.platform === activePlatformFilter);
+        items = items.filter(i => String(i.category || 'CARDS').trim().toUpperCase() === activeBusinessCategory);
         viewTitle = activePlatformFilter;
     } else if (activeBusinessCategory && activeBusinessCategory !== 'ALL') {
         items = items.filter(i => classifyBusinessCategory(i.platform) === activeBusinessCategory);
