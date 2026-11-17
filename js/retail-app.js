@@ -30,7 +30,7 @@ let currentWalletBalance = 0;
 let catalogItems = [];
 let pendingOrderRefs = [];
 let activeAppView = 'store'; // 'store' | 'favorites'
-let activeBusinessCategory = 'ALL'; // 'ALL' | 'GAMES' | 'CARDS' | 'STREAMING' | 'SUBSCRIPTIONS'
+let activeBusinessCategory = 'ALL';
 let activePlatformFilter = 'ALL';
 let activeDeliveryTypeFilter = 'ALL';
 let activeSearchQuery = '';
@@ -319,7 +319,7 @@ const RETAIL_I18N = {
     },
     de: {
         wallet_title: 'SHIIFT X Guthaben',
-        wallet_guest_desc: 'Melden Sie sich an, um Ihr Guthaben zu veralten und Karten sofort zu kaufen.',
+        wallet_guest_desc: 'Melden Sie sich an, um Ihr Guthaben zu verwalten und Karten sofort zu kaufen.',
         btn_login_register: 'Anmelden / Registrieren',
         wallet_available: 'Verfügbares Guthaben',
         btn_topup: 'Aufladen',
@@ -460,37 +460,96 @@ function t(key) {
 }
 
 // =========================================================================
-// تصنيف المنصات حسب هيكل SHIIFT X Business
-// GAMES | CARDS | STREAMING | SUBSCRIPTIONS
+// نظام التصنيفات الديناميكي المعتمد 100% على عمود category في قاعدة البيانات
+// يدعم الرموز القياسية وأي نص حر تكتبه في قاعدة البيانات أو لوحة الإدارة
 // =========================================================================
-// قراءة التصنيف المعتمد للمنصة مباشرة من عمود category في قاعدة البيانات
-function classifyBusinessCategory(platformName) {
-    const match = catalogItems.find(i => i.platform === platformName && i.category);
-    return match ? String(match.category).trim().toUpperCase() : 'CARDS';
+function normalizeCategoryValue(rawCat) {
+    const clean = String(rawCat || '').trim();
+    if (!clean) return 'CARDS';
+    const upper = clean.toUpperCase();
+    if (['GAMES', 'CARDS', 'STREAMING', 'SUBSCRIPTIONS'].includes(upper)) {
+        return upper;
+    }
+    return clean;
+}
+
+function getCategoryMeta(catValue) {
+    const raw = normalizeCategoryValue(catValue);
+    const upper = raw.toUpperCase();
+    const lower = raw.toLowerCase();
+
+    if (upper === 'ALL') {
+        return { key: 'ALL', label: t('cat_all'), icon: 'ph-fill ph-grid-four' };
+    }
+    if (upper === 'GAMES' || lower.includes('العاب') || lower.includes('ألعاب') || lower.includes('game')) {
+        return { key: raw, label: upper === 'GAMES' ? t('cat_games') : raw, icon: 'ph-fill ph-game-controller' };
+    }
+    if (upper === 'CARDS' || lower.includes('بطاقات') || lower.includes('هدايا') || lower.includes('متاجر') || lower.includes('card')) {
+        return { key: raw, label: upper === 'CARDS' ? t('cat_cards') : raw, icon: 'ph-fill ph-gift' };
+    }
+    if (upper === 'STREAMING' || lower.includes('بث') || lower.includes('دردشة') || lower.includes('تطبيقات') || lower.includes('stream')) {
+        return { key: raw, label: upper === 'STREAMING' ? t('cat_streaming') : raw, icon: 'ph-fill ph-chats-circle' };
+    }
+    if (upper === 'SUBSCRIPTIONS' || lower.includes('اشتراكات') || lower.includes('برامج') || lower.includes('sub')) {
+        return { key: raw, label: upper === 'SUBSCRIPTIONS' ? t('cat_subscriptions') : raw, icon: 'ph-fill ph-desktop' };
+    }
+    // أي تصنيف نصي حر جديد تضيفه في قاعدة البيانات أو لوحة الإدارة
+    return { key: raw, label: raw, icon: 'ph-fill ph-tag' };
+}
+
+function getActiveDatabaseCategories() {
+    const seen = new Set();
+    const dbList = [];
+    catalogItems.forEach(item => {
+        const cat = normalizeCategoryValue(item.category);
+        if (!seen.has(cat)) {
+            seen.add(cat);
+            dbList.push(cat);
+        }
+    });
+    const preferredOrder = ['GAMES', 'CARDS', 'STREAMING', 'SUBSCRIPTIONS'];
+    return [
+        ...preferredOrder.filter(c => dbList.includes(c)),
+        ...dbList.filter(c => !preferredOrder.includes(c))
+    ];
 }
 
 function getBusinessCategoryTitle(catKey) {
-    const key = String(catKey || '').trim().toUpperCase();
-    if (key === 'GAMES') return t('cat_games');
-    if (key === 'CARDS') return t('cat_cards');
-    if (key === 'STREAMING') return t('cat_streaming');
-    if (key === 'SUBSCRIPTIONS') return t('cat_subscriptions');
-    if (key === 'ALL') return t('cat_all');
-    return catKey; // يعرض اسم أي تصنيف جديد تضيفه في قاعدة البيانات كما هو
+    return getCategoryMeta(catKey).label;
+}
+
+// توليد أزرار التصنيفات في الصفحة الرئيسية تلقائياً من قاعدة البيانات
+function renderBusinessCategoryTabs() {
+    const tabsContainer = document.getElementById('business-category-tabs');
+    if (!tabsContainer) return;
+
+    const dbCategories = getActiveDatabaseCategories();
+    const allTabs = ['ALL', ...dbCategories];
+
+    tabsContainer.innerHTML = allTabs.map(catKey => {
+        const meta = getCategoryMeta(catKey);
+        const isActive = (activeBusinessCategory === catKey);
+        return `
+            <button type="button" onclick="setBusinessCategoryFilter('${escapeHTML(catKey)}')" data-cat="${escapeHTML(catKey)}" class="rev-cat-tab ${isActive ? 'active' : ''}">
+                <i class="${meta.icon}"></i>
+                <span>${escapeHTML(meta.label)}</span>
+            </button>
+        `;
+    }).join('');
 }
 
 window.setBusinessCategoryFilter = function(catKey) {
-    activeBusinessCategory = catKey ? String(catKey).trim().toUpperCase() : 'ALL';
+    activeBusinessCategory = (!catKey || String(catKey).trim().toUpperCase() === 'ALL')
+        ? 'ALL'
+        : normalizeCategoryValue(catKey);
     activePlatformFilter = 'ALL';
 
-    document.querySelectorAll('#business-category-tabs .rev-cat-tab').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-cat') === activeBusinessCategory);
-    });
-
+    renderBusinessCategoryTabs();
     renderSidebarPlatforms();
     renderBrandHubTiles();
     renderCatalogGrid();
 };
+
 // =========================================================================
 // إدارة القوائم المنسدلة في الشريط العلوي (اللغات والعملات)
 // =========================================================================
@@ -610,6 +669,7 @@ function applyLanguageToDOM() {
     updateAuthModalUI();
     syncAuthUIState(Boolean(currentUser), currentWalletBalance);
     renderTopupAmountChips();
+    renderBusinessCategoryTabs();
     renderSidebarPlatforms();
     renderBrandHubTiles();
     renderCatalogGrid();
@@ -1037,11 +1097,11 @@ async function loadRetailCatalog() {
     if (!grid) return;
 
     const { data, error } = await retailSupabase
-    .from('retail_catalog')
-    .select('id, category, platform, package_name, product_type, retail_price, image_url, instructions, is_active')
-    .eq('is_active', true)
-    .order('platform', { ascending: true })
-    .order('retail_price', { ascending: true });
+        .from('retail_catalog')
+        .select('id, category, platform, package_name, product_type, retail_price, image_url, instructions, is_active')
+        .eq('is_active', true)
+        .order('platform', { ascending: true })
+        .order('retail_price', { ascending: true });
 
     if (error) {
         grid.innerHTML = `<div class="col-span-full rev-panel py-12 text-center text-rose-500 text-xs font-bold">${escapeHTML(error.message)}</div>`;
@@ -1053,47 +1113,41 @@ async function loadRetailCatalog() {
     if (totalEl) totalEl.textContent = String(catalogItems.length);
 
     updateFavoritesCounter();
+    renderBusinessCategoryTabs();
     renderSidebarPlatforms();
     renderBrandHubTiles();
     renderCatalogGrid();
 }
 
-// رسم المنصات داخل القائمة الجانبية مقسّمة حسب تصنيف SHIIFT X Business
+// رسم المنصات داخل القائمة الجانبية مقسّمة مباشرة حسب عمود category في قاعدة البيانات
 function renderSidebarPlatforms() {
     const container = document.getElementById('sidebar-platform-list');
     if (!container) return;
 
-    const platforms = [...new Set(catalogItems.map(i => i.platform).filter(Boolean))];
     const btnStore = document.getElementById('nav-btn-store');
     if (btnStore) {
         btnStore.classList.toggle('active', activeAppView === 'store' && activePlatformFilter === 'ALL');
     }
 
-    if (platforms.length === 0) {
+    const dbCategories = getActiveDatabaseCategories();
+    if (dbCategories.length === 0) {
         container.innerHTML = `<div class="px-3 py-2 text-xs text-[#68707d]">---</div>`;
         return;
     }
 
-    const dbCategories = [...new Set(catalogItems.map(i => (i.category || 'CARDS').trim().toUpperCase()))];
-const defaultOrder = ['GAMES', 'CARDS', 'STREAMING', 'SUBSCRIPTIONS'];
-const categoriesOrder = [
-    ...defaultOrder.filter(c => dbCategories.includes(c)),
-    ...dbCategories.filter(c => !defaultOrder.includes(c))
-];
-    let htmlOut = '';
+    container.innerHTML = dbCategories.map(catKey => {
+        const catMeta = getCategoryMeta(catKey);
+        const catItems = catalogItems.filter(i => normalizeCategoryValue(i.category) === catKey);
+        const catPlatforms = [...new Set(catItems.map(i => i.platform).filter(Boolean))];
 
-    categoriesOrder.forEach(catKey => {
-        const catPlatforms = platforms.filter(pl => classifyBusinessCategory(pl) === catKey);
-        if (catPlatforms.length === 0) return;
-
-        htmlOut += `
+        return `
             <div class="space-y-1">
                 <div class="rev-sidebar-cat-header sidebar-hide-collapsed">
-                    <span>${escapeHTML(getBusinessCategoryTitle(catKey))}</span>
+                    <span>${escapeHTML(catMeta.label)}</span>
                     <span>${catPlatforms.length}</span>
                 </div>
                 ${catPlatforms.map(pl => {
-                    const count = catalogItems.filter(i => i.platform === pl).length;
+                    const count = catItems.filter(i => i.platform === pl).length;
                     const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
                     const meta = getPlatformBrandMeta(pl);
                     return `
@@ -1108,12 +1162,10 @@ const categoriesOrder = [
                 }).join('')}
             </div>
         `;
-    });
-
-    container.innerHTML = htmlOut;
+    }).join('');
 }
 
-// رسم بطاقات العلامات التجارية المجمّعة (Brand Hub Tiles) حسب التصنيف المختار
+// رسم بطاقات العلامات التجارية المجمّعة (Brand Hub Tiles) حسب التصنيف المختار من الجدول
 function renderBrandHubTiles() {
     const grid = document.getElementById('brand-hub-grid');
     const resetBtn = document.getElementById('brand-reset-btn');
@@ -1123,10 +1175,11 @@ function renderBrandHubTiles() {
         resetBtn.classList.toggle('hidden', activePlatformFilter === 'ALL' && activeBusinessCategory === 'ALL');
     }
 
-    let platforms = [...new Set(catalogItems.map(i => i.platform).filter(Boolean))];
-    if (activeBusinessCategory !== 'ALL') {
-        platforms = platforms.filter(pl => classifyBusinessCategory(pl) === activeBusinessCategory);
-    }
+    const filteredByCat = activeBusinessCategory === 'ALL'
+        ? catalogItems
+        : catalogItems.filter(i => normalizeCategoryValue(i.category) === activeBusinessCategory);
+
+    const platforms = [...new Set(filteredByCat.map(i => i.platform).filter(Boolean))];
 
     if (platforms.length === 0) {
         grid.innerHTML = `<div class="col-span-full py-4 text-xs text-[#68707d] px-1">${escapeHTML(t('empty_search_title'))}</div>`;
@@ -1134,7 +1187,7 @@ function renderBrandHubTiles() {
     }
 
     grid.innerHTML = platforms.map(pl => {
-        const plItems = catalogItems.filter(i => i.platform === pl);
+        const plItems = filteredByCat.filter(i => i.platform === pl);
         const minPrice = Math.min(...plItems.map(i => Number(i.retail_price || 0)));
         const isSel = (activeAppView === 'store' && activePlatformFilter === pl);
         const meta = getPlatformBrandMeta(pl);
@@ -1160,9 +1213,6 @@ function filterRetailCatalog(platform) {
     activePlatformFilter = platform || 'ALL';
     if (activePlatformFilter === 'ALL') {
         activeBusinessCategory = 'ALL';
-        document.querySelectorAll('#business-category-tabs .rev-cat-tab').forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-cat') === 'ALL');
-        });
     }
 
     const btnFav = document.getElementById('nav-btn-favorites');
@@ -1172,6 +1222,7 @@ function filterRetailCatalog(platform) {
     if (carousel) carousel.classList.remove('hidden');
     if (brandHub) brandHub.classList.remove('hidden');
 
+    renderBusinessCategoryTabs();
     renderSidebarPlatforms();
     renderBrandHubTiles();
     window.toggleMobileSidebar(false);
@@ -1215,10 +1266,10 @@ function renderCatalogGrid() {
         items = items.filter(i => favoriteIds.has(String(i.id)));
         viewTitle = t('breadcrumb_favorites');
     } else if (activePlatformFilter && activePlatformFilter !== 'ALL') {
-        items = items.filter(i => String(i.category || 'CARDS').trim().toUpperCase() === activeBusinessCategory);
+        items = items.filter(i => i.platform === activePlatformFilter);
         viewTitle = activePlatformFilter;
     } else if (activeBusinessCategory && activeBusinessCategory !== 'ALL') {
-        items = items.filter(i => classifyBusinessCategory(i.platform) === activeBusinessCategory);
+        items = items.filter(i => normalizeCategoryValue(i.category) === activeBusinessCategory);
         viewTitle = getBusinessCategoryTitle(activeBusinessCategory);
     }
 
@@ -1232,9 +1283,10 @@ function renderCatalogGrid() {
         items = items.filter(i => {
             const p = (i.platform || '').toLowerCase();
             const n = (i.package_name || '').toLowerCase();
+            const c = (i.category || '').toLowerCase();
             const pr = String(i.retail_price || '');
             const reg = detectPackageRegion(i.platform, i.package_name).label.toLowerCase();
-            return p.includes(activeSearchQuery) || n.includes(activeSearchQuery) || pr.includes(activeSearchQuery) || reg.includes(activeSearchQuery);
+            return p.includes(activeSearchQuery) || n.includes(activeSearchQuery) || c.includes(activeSearchQuery) || pr.includes(activeSearchQuery) || reg.includes(activeSearchQuery);
         });
     }
 
