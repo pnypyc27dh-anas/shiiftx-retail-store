@@ -1309,12 +1309,12 @@ function renderCatalogGrid() {
     if (items.length === 0) {
         const isFavEmpty = activeAppView === 'favorites' && !activeSearchQuery;
         grid.innerHTML = `
-            <div class="col-span-full rev-panel py-16 px-4 text-center space-y-3">
-                <i class="ph-duotone ${isFavEmpty ? 'ph-heart-break' : 'ph-magnifying-glass'} text-4xl text-[#68707d]"></i>
+            <div class="col-span-full rev-panel py-14 px-4 text-center space-y-3">
+                <i class="ph-duotone ${isFavEmpty ? 'ph-heart-break' : 'ph-magnifying-glass'} text-3xl text-[#68707d]"></i>
                 <p class="text-sm font-black">${escapeHTML(isFavEmpty ? t('empty_fav_title') : t('empty_search_title'))}</p>
                 <p class="text-xs text-[#68707d] dark:text-slate-400">${escapeHTML(isFavEmpty ? t('empty_fav_desc') : t('empty_search_desc'))}</p>
                 <div class="pt-1">
-                    <button type="button" onclick="clearCatalogSearch(); activeDeliveryTypeFilter='ALL'; document.getElementById('catalog-type-filter').value='ALL'; switchAppView('store'); filterRetailCatalog('ALL');" class="rev-btn-primary px-6 py-2.5 text-xs">
+                    <button type="button" onclick="clearCatalogSearch(); activeDeliveryTypeFilter='ALL'; document.getElementById('catalog-type-filter').value='ALL'; switchAppView('store'); filterRetailCatalog('ALL');" class="rev-btn-primary px-5 py-2 text-xs">
                         ${escapeHTML(t('breadcrumb_all_packages'))}
                     </button>
                 </div>
@@ -1322,7 +1322,8 @@ function renderCatalogGrid() {
         return;
     }
 
-    grid.className = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6';
+    // شبكة مدمجة: 4 بطاقات في الصف على الشاشات الكبيرة و3 على المتوسطة و2 على الصغيرة
+    grid.className = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4';
 
     grid.innerHTML = items.map(item => {
         const safeId = escapeHTML(item.id);
@@ -1342,57 +1343,55 @@ function renderCatalogGrid() {
             ? `<img src="${escapeHTML(imgUrl)}" alt="${pkgName}" loading="lazy" referrerpolicy="no-referrer"
                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                     class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
-               <div style="display:none;" class="w-full h-full bg-gradient-to-br from-[#0b1324] via-[#102544] to-[#005ba3] flex-col items-center justify-center p-6 text-center">
-                   <i class="ph-duotone ph-gift text-5xl text-[#5CE1E6]/85 mb-2"></i>
+               <div style="display:none;" class="w-full h-full bg-gradient-to-br from-[#0b1324] via-[#102544] to-[#005ba3] flex-col items-center justify-center p-4 text-center">
                    <span class="text-xs font-extrabold text-white/85 tracking-wide">${platformName}</span>
                </div>`
-            : `<div class="w-full h-full bg-gradient-to-br from-[#0b1324] via-[#102544] to-[#005ba3] flex flex-col items-center justify-center p-6 text-center">
-                   <i class="ph-duotone ph-credit-card text-5xl text-[#5CE1E6]/85 mb-2"></i>
+            : `<div class="w-full h-full bg-gradient-to-br from-[#0b1324] via-[#102544] to-[#005ba3] flex flex-col items-center justify-center p-4 text-center">
                    <span class="text-xs font-extrabold text-white/85 tracking-wide">${platformName}</span>
                </div>`;
 
         return `
-            <article data-id="${safeId}" onclick="openPackageDetailsModal(this.dataset.id)" class="rev-product-card group">
-                <div class="relative w-full aspect-[16/11] min-h-[215px] bg-[#0b1324] overflow-hidden">
+            <article data-id="${safeId}" onclick="openPackageDetailsModal(this.dataset.id)" class="rev-product-card group rounded-[20px]">
+                <div class="relative w-full h-32 sm:h-36 bg-[#0b1324] overflow-hidden">
                     ${visualBlock}
-                    <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none"></div>
+                    <div class="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none"></div>
 
-                    <span class="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white text-[11px] font-extrabold inline-flex items-center gap-1.5">
+                    <span class="absolute top-2.5 right-2.5 px-2.5 py-0.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15 text-white text-[10px] font-extrabold inline-flex items-center gap-1">
                         <span class="w-1.5 h-1.5 rounded-full ${badgeDot}"></span>
                         <span>${escapeHTML(badgeText)}</span>
                     </span>
 
                     <button type="button" data-id="${safeId}" onclick="event.stopPropagation(); toggleFavoritePackage(this.dataset.id);"
-                            class="rev-fav-btn ${isFav ? 'is-fav' : ''} absolute top-3.5 left-3.5 w-9 h-9 rounded-full bg-black/55 hover:bg-rose-500 text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition cursor-pointer">
-                        <i class="ph-fill ph-heart text-base"></i>
+                            class="rev-fav-btn ${isFav ? 'is-fav' : ''} absolute top-2.5 left-2.5 w-7 h-7 rounded-full bg-black/55 hover:bg-rose-500 text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition cursor-pointer">
+                        <i class="ph-fill ph-heart text-xs"></i>
                     </button>
 
-                    <span class="absolute bottom-3 right-4 text-[11px] font-extrabold text-white/95 tracking-wide">
+                    <span class="absolute bottom-2 right-3 text-[10px] font-extrabold text-white/95 tracking-wide truncate max-w-[85%]">
                         ${platformName}
                     </span>
                 </div>
 
-                <div class="p-5 flex-1 flex flex-col justify-between gap-4">
-                    <div class="space-y-2">
-                        <div class="rev-region-badge">
+                <div class="p-3.5 flex-1 flex flex-col justify-between gap-2.5">
+                    <div class="space-y-1.5">
+                        <div class="rev-region-badge text-[10px] px-2 py-0.5">
                             <span>${region.flag}</span>
-                            <span>${escapeHTML(region.label)}</span>
+                            <span class="truncate">${escapeHTML(region.label)}</span>
                         </div>
-                        <h3 class="text-base font-black leading-snug line-clamp-2 group-hover:text-[#005ba3] dark:group-hover:text-[#5CE1E6] transition-colors">
+                        <h3 class="text-xs sm:text-sm font-black leading-snug line-clamp-2 group-hover:text-[#005ba3] dark:group-hover:text-[#5CE1E6] transition-colors">
                             ${pkgName}
                         </h3>
                     </div>
 
-                    <div class="pt-3 border-t border-black/6 dark:border-white/8 flex items-center justify-between gap-3">
-                        <div>
-                            <span class="block text-[10px] font-bold text-[#68707d] dark:text-slate-400">${escapeHTML(t('label_tax_included'))}</span>
-                            <span class="financial-amount text-xl font-black" dir="ltr">${priceFormatted}</span>
+                    <div class="pt-2.5 border-t border-black/6 dark:border-white/8 flex items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <span class="block text-[9px] font-bold text-[#68707d] dark:text-slate-400 truncate">${escapeHTML(t('label_tax_included'))}</span>
+                            <span class="financial-amount text-sm sm:text-base font-black" dir="ltr">${priceFormatted}</span>
                         </div>
 
                         <button type="button" data-id="${safeId}" onclick="event.stopPropagation(); handleCardDirectBuy(this.dataset.id);"
-                                class="rev-btn-primary px-5 py-2.5 text-xs shrink-0">
+                                class="rev-btn-primary px-3.5 py-2 text-[11px] shrink-0">
                             <span>${escapeHTML(t('btn_buy'))}</span>
-                            <i class="ph-bold ph-arrow-left text-xs"></i>
+                            <i class="ph-bold ph-arrow-left text-[10px]"></i>
                         </button>
                     </div>
                 </div>
@@ -1400,7 +1399,6 @@ function renderCatalogGrid() {
         `;
     }).join('');
 }
-
 // =========================================================================
 // 2.1 الأدراج الجانبية: تفاصيل الباقة + شحن المحفظة عبر PayPal أو Visa/Mastercard
 // =========================================================================
