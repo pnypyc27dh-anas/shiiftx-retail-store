@@ -1890,4 +1890,10 @@ window.deleteMyRetailAccount = async function() {
         showRetailToast(err.message, 'error');
     }
 };
+
+// فتح وإغلاق القائمة الجانبية المنزلقة من اليسار (مطابقة لمنصة SHIIFT X)
+window.toggleSideMenu = function(forceOpen) {
+    const panel = document.getElementById('side-menu-panel');
+    const overlay = document.getElementById('side-menu-overlay');
+    if (!panel ||
 // ==================== نهاية ملف js/retail-app.js ====================
