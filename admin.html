@@ -296,12 +296,8 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="space-y-1">
                         <label class="block font-bold text-slate-300">التصنيف (Category) *</label>
-                        <select id="edit-pkg-category" required class="adm-input w-full px-3 py-2.5 font-bold cursor-pointer">
-                            <option value="GAMES">الألعاب (GAMES)</option>
-                            <option value="CARDS">بطاقات المتاجر والهدايا (CARDS)</option>
-                            <option value="STREAMING">تطبيقات البث والدردشة (STREAMING)</option>
-                            <option value="SUBSCRIPTIONS">الاشتراكات والبرامج (SUBSCRIPTIONS)</option>
-                        </select>
+                        <input id="edit-pkg-category" type="text" list="existing-categories-list" required placeholder="اكتب اسم التصنيف بحرية (مثال: الألعاب، بطاقات المتاجر...)" class="adm-input w-full px-3.5 py-2.5 font-bold">
+<datalist id="existing-categories-list"></datalist>
                     </div>
 
                     <div class="space-y-1">
@@ -520,6 +516,11 @@
                 }
             }
 
+            const uniqueCats = [...new Set(admCatalog.map(i => (i.category || '').trim()).filter(Boolean))];
+document.getElementById('adm-pkg-cat-filter').innerHTML = `<option value="ALL">كل التصنيفات (${uniqueCats.length})</option>` +
+    uniqueCats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+document.getElementById('existing-categories-list').innerHTML = uniqueCats.map(c => `<option value="${esc(c)}">`).join('');
+
             renderAdminCatalog();
         }
 
@@ -530,7 +531,7 @@
 
             let list = [...admCatalog];
             if (cat !== 'ALL') {
-                list = list.filter(i => String(i.category || 'CARDS').toUpperCase() === cat);
+                list = list.filter(i => String(i.category || '').trim() === cat);
             }
             if (q) {
                 list = list.filter(i =>
@@ -588,7 +589,7 @@
 
             document.getElementById('pkg-editor-title').textContent = item ? 'تعديل بيانات الباقة' : 'إضافة باقة جديدة';
             document.getElementById('edit-pkg-id').value = item ? item.id : '';
-            document.getElementById('edit-pkg-category').value = item ? (item.category || 'CARDS').toUpperCase() : 'GAMES';
+            document.getElementById('edit-pkg-category').value = item ? (item.category || '') : '';
             document.getElementById('edit-pkg-platform').value = item ? (item.platform || '') : '';
             document.getElementById('edit-pkg-name').value = item ? (item.package_name || '') : '';
             document.getElementById('edit-pkg-type').value = item ? (item.product_type || 'CODE').toUpperCase() : 'CODE';
@@ -611,7 +612,7 @@
             const b2bVal = document.getElementById('edit-pkg-b2b-id').value.trim();
 
             const payload = {
-                category: document.getElementById('edit-pkg-category').value,
+                category: document.getElementById('edit-pkg-category').value.trim(),
                 platform: document.getElementById('edit-pkg-platform').value.trim(),
                 package_name: document.getElementById('edit-pkg-name').value.trim(),
                 product_type: document.getElementById('edit-pkg-type').value,
