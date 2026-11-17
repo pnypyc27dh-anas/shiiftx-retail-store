@@ -1032,9 +1032,14 @@ async function refreshUserWallet() {
     if (!currentUser) return;
     const { data } = await retailSupabase
         .from('retail_users')
-        .select('wallet_balance')
+        .select('wallet_balance, full_name')
         .eq('id', currentUser.id)
         .single();
+
+    const nameEl = document.getElementById('sidebar-client-name');
+    if (nameEl) {
+        nameEl.textContent = data?.full_name || currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || '---';
+    }
 
     syncAuthUIState(true, data ? data.wallet_balance : 0);
 }
