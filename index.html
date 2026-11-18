@@ -593,80 +593,106 @@
         </div>
     </div>
 
-    <!-- 2. درج إيداع وشحن المحفظة -->
+    <!-- 2. درج شحن رصيد المتجر وتفعيل القسائم (متوافق مع ZaDiG & App Store) -->
     <div id="topup-modal" class="hidden rev-overlay" onclick="closeModal('topup-modal')">
         <div class="rev-drawer-panel" onclick="event.stopPropagation()">
             <div class="rev-sheet-handle"></div>
 
             <div class="px-6 py-4 border-b border-black/8 dark:border-white/8 flex items-center justify-between shrink-0">
                 <h3 class="text-base font-black flex items-center gap-2">
-                    <i class="ph-fill ph-wallet text-[#005ba3] dark:text-[#5CE1E6] text-xl"></i>
-                    <span data-i18n="topup_drawer_title">إيداع وشحن المحفظة</span>
+                    <i class="ph-fill ph-ticket text-[#005ba3] dark:text-[#5CE1E6] text-xl"></i>
+                    <span data-i18n="topup_drawer_title">إضافة رصيد متجر (Store Credit)</span>
                 </h3>
                 <button onclick="closeModal('topup-modal')" class="rev-btn-secondary w-8 h-8">
                     <i class="ph-bold ph-x text-sm"></i>
                 </button>
             </div>
 
-            <div class="p-6 flex-grow overflow-y-auto space-y-5 text-xs">
-                <div class="p-4 rounded-2xl bg-[#eef1f6] dark:bg-[#181d29] space-y-2">
-                    <span data-i18n="topup_account_email_label" class="block text-[11px] font-bold text-[#64748b] dark:text-slate-400">معرّف حسابك (البريد الإلكتروني):</span>
-                    <div class="flex items-center justify-between gap-2 bg-white dark:bg-[#11151e] p-3 rounded-xl border border-black/8 dark:border-white/8">
-                        <span id="topup-user-email" dir="ltr" class="font-mono font-bold truncate">---</span>
-                        <button type="button" onclick="copyTopupEmail()" data-i18n="btn_copy" class="rev-btn-primary px-3.5 py-1.5 text-[11px] shrink-0">نسخ</button>
+            <div class="p-6 flex-grow overflow-y-auto space-y-6 text-xs">
+
+                <!-- القسم 1: تفعيل قسيمة شحن فورية (Voucher Redeem) -->
+                <div class="p-4 rounded-2xl bg-[#eef1f6] dark:bg-[#181d29] border border-black/6 dark:border-white/8 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-extrabold text-[#0f172a] dark:text-white flex items-center gap-1.5">
+                            <i class="ph-fill ph-barcode text-base text-[#005ba3] dark:text-[#5CE1E6]"></i>
+                            <span>تفعيل قسيمة شحن SHIIFT X</span>
+                        </span>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-black">فوري ⚡</span>
+                    </div>
+                    <p class="text-[11px] text-[#64748b] dark:text-slate-400 leading-relaxed">
+                        أدخل كود بطاقة هدايا أو قسيمة SHIIFT X المسبقة الدفع لإضافة قيمتها فوراً إلى رصيد مشترياتك.
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <input id="redeem-voucher-input" type="text" dir="ltr" placeholder="SX-XXXX-XXXX-XXXX" class="rev-input rounded-xl w-full px-3.5 py-2.5 font-mono font-bold uppercase text-center tracking-wider text-xs">
+                        <button type="button" id="btn-redeem-voucher" onclick="redeemStoreVoucher()" class="rev-btn-primary px-5 py-2.5 text-xs shrink-0">
+                            تفعيل
+                        </button>
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label data-i18n="topup_select_amount" class="block font-extrabold text-[#0f172a] dark:text-white">1. اختر مبلغ الشحن:</label>
-                    <div class="grid grid-cols-4 gap-2" dir="ltr">
-                        <button type="button" onclick="selectTopupAmount(10)" data-amt="10" class="topup-amt-btn rev-amount-chip">$10</button>
-                        <button type="button" onclick="selectTopupAmount(25)" data-amt="25" class="topup-amt-btn rev-amount-chip active">$25</button>
-                        <button type="button" onclick="selectTopupAmount(50)" data-amt="50" class="topup-amt-btn rev-amount-chip">$50</button>
-                        <button type="button" onclick="selectTopupAmount(100)" data-amt="100" class="topup-amt-btn rev-amount-chip">$100</button>
-                    </div>
+                <!-- فاصل بصري -->
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-black/8 dark:border-white/8"></div>
+                    <span class="flex-shrink mx-3 text-[10px] font-extrabold text-[#64748b] uppercase">أو الشراء المباشر</span>
+                    <div class="flex-grow border-t border-black/8 dark:border-white/8"></div>
                 </div>
 
-                <div class="space-y-2.5">
-                    <label data-i18n="topup_select_method" class="block font-extrabold text-[#0f172a] dark:text-white">2. اختر وسيلة الدفع:</label>
-
-                    <div id="pay-method-card" onclick="selectTopupMethod('CARD')" class="rev-pay-method active">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-[#005ba3]/10 dark:bg-[#5CE1E6]/10 text-[#005ba3] dark:text-[#5CE1E6] flex items-center justify-center text-xl shrink-0">
-                                <i class="ph-fill ph-credit-card"></i>
-                            </div>
-                            <div>
-                                <div class="font-black text-xs text-[#0f172a] dark:text-white">Visa / Mastercard</div>
-                                <div data-i18n="pay_card_desc" class="text-[11px] text-[#64748b] dark:text-slate-400">دفع آمن بالبطاقة البنكية الائتمانية أو المسبقة الدفع</div>
-                            </div>
+                <!-- القسم 2: شراء رصيد متجر عبر بوابات الدفع الأوروبية الموثقة -->
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label data-i18n="topup_select_amount" class="font-extrabold text-[#0f172a] dark:text-white">1. اختر فئة رصيد المتجر:</label>
+                            <span class="text-[10px] font-bold text-[#64748b]">شامل الضريبة (inkl. MwSt.)</span>
                         </div>
-                        <i class="ph-fill ph-check-circle text-lg text-[#005ba3] dark:text-[#5CE1E6]"></i>
-                    </div>
-
-                    <div id="pay-method-paypal" onclick="selectTopupMethod('PAYPAL')" class="rev-pay-method">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-[#003087]/10 dark:bg-blue-500/15 text-[#003087] dark:text-blue-400 flex items-center justify-center text-xl shrink-0">
-                                <i class="ph-fill ph-paypal-logo"></i>
-                            </div>
-                            <div>
-                                <div class="font-black text-xs text-[#0f172a] dark:text-white">PayPal</div>
-                                <div data-i18n="pay_paypal_desc" class="text-[11px] text-[#64748b] dark:text-slate-400">دفع سريع وموثق عبر حساب باي بال</div>
-                            </div>
+                        <div class="grid grid-cols-4 gap-2" dir="ltr">
+                            <button type="button" onclick="selectTopupAmount(10)" data-amt="10" class="topup-amt-btn rev-amount-chip">$10</button>
+                            <button type="button" onclick="selectTopupAmount(25)" data-amt="25" class="topup-amt-btn rev-amount-chip active">$25</button>
+                            <button type="button" onclick="selectTopupAmount(50)" data-amt="50" class="topup-amt-btn rev-amount-chip">$50</button>
+                            <button type="button" onclick="selectTopupAmount(100)" data-amt="100" class="topup-amt-btn rev-amount-chip">$100</button>
                         </div>
-                        <i class="ph-fill ph-check-circle text-lg text-[#005ba3] dark:text-[#5CE1E6]"></i>
                     </div>
-                </div>
 
-                <div class="space-y-2.5 pt-2">
+                    <div class="space-y-2.5">
+                        <label data-i18n="topup_select_method" class="block font-extrabold text-[#0f172a] dark:text-white">2. اختر وسيلة الدفع الآمنة:</label>
+
+                        <div id="pay-method-card" onclick="selectTopupMethod('CARD')" class="rev-pay-method active">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-[#005ba3]/10 dark:bg-[#5CE1E6]/10 text-[#005ba3] dark:text-[#5CE1E6] flex items-center justify-center text-xl shrink-0">
+                                    <i class="ph-fill ph-credit-card"></i>
+                                </div>
+                                <div>
+                                    <div class="font-black text-xs text-[#0f172a] dark:text-white">Visa / Mastercard / Apple Pay</div>
+                                    <div data-i18n="pay_card_desc" class="text-[11px] text-[#64748b] dark:text-slate-400">دفع فوري موثق بمعيار الحماية الأوروبي 3D Secure</div>
+                                </div>
+                            </div>
+                            <i class="ph-fill ph-check-circle text-lg text-[#005ba3] dark:text-[#5CE1E6]"></i>
+                        </div>
+
+                        <div id="pay-method-paypal" onclick="selectTopupMethod('PAYPAL')" class="rev-pay-method">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-[#003087]/10 dark:bg-blue-500/15 text-[#003087] dark:text-blue-400 flex items-center justify-center text-xl shrink-0">
+                                    <i class="ph-fill ph-paypal-logo"></i>
+                                </div>
+                                <div>
+                                    <div class="font-black text-xs text-[#0f172a] dark:text-white">PayPal / EPS Überweisung</div>
+                                    <div data-i18n="pay_paypal_desc" class="text-[11px] text-[#64748b] dark:text-slate-400">دفع إلكتروني معتمد مع حماية المشتري</div>
+                                </div>
+                            </div>
+                            <i class="ph-fill ph-check-circle text-lg text-[#005ba3] dark:text-[#5CE1E6]"></i>
+                        </div>
+                    </div>
+
                     <button type="button" onclick="proceedTopupRequest()" class="rev-btn-brand w-full py-3.5 text-xs">
-                        <i class="ph-bold ph-shield-check text-base"></i>
-                        <span data-i18n="btn_proceed_topup">متابعة الدفع وشحن الرصيد</span>
+                        <i class="ph-bold ph-lock-key text-base"></i>
+                        <span data-i18n="btn_proceed_topup">الانتقال إلى بوابة الدفع الآمنة</span>
                     </button>
-                    <a href="mailto:support@shiiftx.com?subject=Wallet%20Top-up%20Request" class="rev-btn-secondary w-full py-3 text-xs">
-                        <i class="ph-bold ph-envelope-simple text-base"></i>
-                        <span data-i18n="btn_email_support">مراسلة الدعم الرسمي</span>
-                    </a>
                 </div>
+
+                <!-- إقرار قانوني لحماية المتجر وفق القانون النمساوي والأوروبي -->
+                <p class="text-[10px] leading-relaxed text-[#64748b] dark:text-slate-400 text-center pt-2 border-t border-black/6 dark:border-white/8">
+                    رصيد المتجر (Store Credit) مخصص حصرياً لشراء البطاقات والباقات الرقمية داخل متجر SHIIFT X ولا يمثل حساب إيداع بنكي أو نقداً قابلاً للسحب أو التحويل الخارجي.
+                </p>
+
             </div>
         </div>
     </div>
