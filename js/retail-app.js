@@ -15,6 +15,18 @@ let CURRENCY_LABELS = {
     USD: '$ USD'
 };
 
+const DYNAMIC_CURRENCY_META = {
+    USD: { title: '🇺🇸 US Dollar', short: '$ USD' },
+    EUR: { title: '🇪🇺 Euro', short: '€ EUR' },
+    SYP: { title: '🇸🇾 ليرة سورية', short: 'SYP' },
+    TRY: { title: '🇹🇷 ليرة تركية', short: '₺ TRY' },
+    SAR: { title: '🇸🇦 ريال سعودي', short: 'SAR' },
+    AED: { title: '🇦🇪 درهم إماراتي', short: 'AED' },
+    GBP: { title: '🇬🇧 British Pound', short: '£ GBP' },
+    JOD: { title: '🇯🇴 دينار أردني', short: 'JOD' },
+    IQD: { title: '🇮🇶 دينار عراقي', short: 'IQD' }
+};
+
 let activeCurrency = localStorage.getItem('shiiftx_retail_currency') || 'USD';
 let activeLang = localStorage.getItem('shiiftx_retail_lang') || 'ar';
 let isSidebarCollapsed = localStorage.getItem('shiiftx_sidebar_collapsed') === 'true';
@@ -120,14 +132,14 @@ const RETAIL_I18N = {
         drawer_instructions_title: 'تعليمات الشحن وملاحظات هامة',
         label_final_price_tax: 'السعر النهائي شامل الضريبة',
         btn_proceed_checkout: 'المتابعة للدفع',
-        topup_drawer_title: 'إيداع وشحن المحفظة',
+        topup_drawer_title: 'إضافة رصيد متجر (Store Credit)',
         topup_account_email_label: 'معرّف حسابك (البريد الإلكتروني):',
         btn_copy: 'نسخ',
-        topup_select_amount: '1. اختر مبلغ الشحن:',
-        topup_select_method: '2. اختر وسيلة الدفع:',
-        pay_card_desc: 'دفع آمن بالبطاقة البنكية الائتمانية أو المسبقة الدفع',
-        pay_paypal_desc: 'دفع سريع وموثق عبر حساب باي بال',
-        btn_proceed_topup: 'متابعة الدفع وشحن الرصيد',
+        topup_select_amount: '1. اختر فئة رصيد المتجر:',
+        topup_select_method: '2. اختر وسيلة الدفع الآمنة:',
+        pay_card_desc: 'دفع فوري موثق بمعيار الحماية الأوروبي 3D Secure',
+        pay_paypal_desc: 'دفع إلكتروني معتمد مع حماية المشتري',
+        btn_proceed_topup: 'الانتقال إلى بوابة الدفع الآمنة',
         btn_email_support: 'مراسلة الدعم الرسمي',
         label_fullname: 'الاسم الكامل',
         label_email: 'البريد الإلكتروني',
@@ -255,14 +267,14 @@ const RETAIL_I18N = {
         drawer_instructions_title: 'Redemption Instructions & Important Notes',
         label_final_price_tax: 'Final Price (Tax Included)',
         btn_proceed_checkout: 'Proceed to Checkout',
-        topup_drawer_title: 'Wallet Top-Up & Deposit',
+        topup_drawer_title: 'Add Store Credit',
         topup_account_email_label: 'Your Account ID (Email):',
         btn_copy: 'Copy',
-        topup_select_amount: '1. Select Top-Up Amount:',
-        topup_select_method: '2. Select Payment Method:',
-        pay_card_desc: 'Secure payment via credit, debit, or prepaid card',
-        pay_paypal_desc: 'Fast & verified checkout via PayPal account',
-        btn_proceed_topup: 'Proceed to Payment & Top Up',
+        topup_select_amount: '1. Select Store Credit Amount:',
+        topup_select_method: '2. Select Secure Payment Method:',
+        pay_card_desc: 'Instant payment verified with EU 3D Secure',
+        pay_paypal_desc: 'Verified checkout with Buyer Protection',
+        btn_proceed_topup: 'Proceed to Secure Checkout',
         btn_email_support: 'Contact Official Support via Email',
         label_fullname: 'Full Name',
         label_email: 'Email Address',
@@ -390,14 +402,14 @@ const RETAIL_I18N = {
         drawer_instructions_title: 'Einlösehinweise & Wichtige Informationen',
         label_final_price_tax: 'Endpreis (inkl. Steuern)',
         btn_proceed_checkout: 'Weiter zur Zahlung',
-        topup_drawer_title: 'Guthaben aufladen',
+        topup_drawer_title: 'Shop-Guthaben aufladen',
         topup_account_email_label: 'Ihre Konto-ID (E-Mail):',
         btn_copy: 'Kopieren',
-        topup_select_amount: '1. Aufladebetrag wählen:',
-        topup_select_method: '2. Zahlungsmethode wählen:',
-        pay_card_desc: 'Sichere Zahlung per Kredit-, Debit- oder Prepaid-Karte',
-        pay_paypal_desc: 'Schnelle und verifizierte Zahlung per PayPal',
-        btn_proceed_topup: 'Weiter zur Zahlung & Aufladung',
+        topup_select_amount: '1. Guthabenbetrag wählen:',
+        topup_select_method: '2. Sichere Zahlungsmethode wählen:',
+        pay_card_desc: 'Sofortzahlung mit europäischem 3D Secure',
+        pay_paypal_desc: 'Geprüfte Zahlung mit Käuferschutz',
+        btn_proceed_topup: 'Weiter zur sicheren Zahlung',
         btn_email_support: 'Support per E-Mail kontaktieren',
         label_fullname: 'Vollständiger Name',
         label_email: 'E-Mail-Adresse',
@@ -569,23 +581,36 @@ document.addEventListener('click', () => {
 });
 
 // =========================================================================
-// تنسيق المبالغ المالية حسب العملة المختارة (USD / EUR / SYP)
+// تنسيق المبالغ المالية حسب العملة المختارة من لوحة الإدارة (USD + أي عملة ديناميكية)
 // =========================================================================
 function formatRetailMoney(usdAmount) {
-    const val = Number(usdAmount || 0);
+    const val = Number(usdAmount) || 0;
+    const rate = Number(CURRENCY_RATES[activeCurrency]) > 0 ? Number(CURRENCY_RATES[activeCurrency]) : 1;
+    const converted = val * rate;
+
+    if (activeCurrency === 'USD') {
+        return `$${converted.toFixed(2)}`;
+    }
     if (activeCurrency === 'EUR') {
-        return `€${(val * CURRENCY_RATES.EUR).toFixed(2)}`;
+        return `€${converted.toFixed(2)}`;
     }
     if (activeCurrency === 'SYP') {
-        const sypVal = Math.round(val * CURRENCY_RATES.SYP);
+        const sypVal = Math.round(converted);
         const suffix = activeLang === 'ar' ? ' ل.س' : ' SYP';
         return `${sypVal.toLocaleString('en-US')}${suffix}`;
     }
-    return `$${val.toFixed(2)}`;
+
+    // أي عملة مضافة يدوياً من لوحة الإدارة (مثل TRY, SAR, AED, JOD...)
+    const decimals = converted >= 100 ? 0 : 2;
+    return `${converted.toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+    })} ${activeCurrency}`;
 }
 
 window.setRetailCurrency = function(curr) {
-    activeCurrency = ['USD', 'EUR', 'SYP'].includes(curr) ? curr : 'USD';
+    const cleanCurr = String(curr || 'USD').trim().toUpperCase();
+    activeCurrency = CURRENCY_RATES[cleanCurr] ? cleanCurr : 'USD';
     localStorage.setItem('shiiftx_retail_currency', activeCurrency);
     closeAllHeaderDropdowns();
     syncCurrencyButtonsUI();
@@ -618,7 +643,7 @@ function syncCurrencyButtonsUI() {
     const currLabel = document.getElementById('current-currency-label');
     const badge = document.getElementById('sidebar-currency-badge');
 
-    if (currLabel) currLabel.textContent = CURRENCY_LABELS[activeCurrency] || '$ USD';
+    if (currLabel) currLabel.textContent = CURRENCY_LABELS[activeCurrency] || activeCurrency;
     if (badge) badge.textContent = activeCurrency;
 
     document.querySelectorAll('.curr-menu-item').forEach(btn => {
@@ -797,13 +822,11 @@ function resolveCardImageUrl(rawUrl) {
     return clean;
 }
 
-// جلب صورة أول باقة متوفرة داخل المنصة لتكون أيقونة ديناميكية 100% للمنصة
 function getPlatformFirstImageUrl(platformName) {
     const match = catalogItems.find(i => i.platform === platformName && i.image_url && String(i.image_url).trim() !== '');
     return match ? resolveCardImageUrl(match.image_url) : '';
 }
 
-// استخراج شارة المنطقة الجغرافية تلقائياً وترجمتها حسب اللغة المختارة
 function detectPackageRegion(platform, packageName) {
     const text = `${platform || ''} ${packageName || ''}`.toLowerCase();
     if (text.includes('امريكي') || text.includes('أمريكي') || text.includes('usa') || /\bus\b/.test(text) || text.includes('united states')) {
@@ -827,42 +850,6 @@ function detectPackageRegion(platform, packageName) {
     return { flag: '🌍', label: t('region_global') };
 }
 
-// أيقونة احتياطية في حال لم يكن لأول باقة في المنصة رابط صورة
-function getPlatformBrandMeta(platformName) {
-    const p = (platformName || '').toLowerCase();
-    if (p.includes('pubg') || p.includes('ببجي') || p.includes('free fire') || p.includes('call of duty') || p.includes('valorant') || p.includes('mobile legends') || p.includes('roblox') || p.includes('rblx') || p.includes('jawaker') || p.includes('جواكر')) {
-        return { icon: 'ph-fill ph-game-controller', bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' };
-    }
-    if (p.includes('google')) {
-        return { icon: 'ph-fill ph-google-play-logo', bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' };
-    }
-    if (p.includes('apple') || p.includes('itunes')) {
-        return { icon: 'ph-fill ph-apple-logo', bg: 'linear-gradient(135deg, #334155 0%, #0f172a 100%)' };
-    }
-    if (p.includes('playstation') || p.includes('psn')) {
-        return { icon: 'ph-fill ph-playstation-logo', bg: 'linear-gradient(135deg, #00439c 0%, #0070d1 100%)' };
-    }
-    if (p.includes('xbox')) {
-        return { icon: 'ph-fill ph-xbox-logo', bg: 'linear-gradient(135deg, #107c10 0%, #0b5a0b 100%)' };
-    }
-    if (p.includes('steam')) {
-        return { icon: 'ph-fill ph-steam-logo', bg: 'linear-gradient(135deg, #1b2838 0%, #2a475e 100%)' };
-    }
-    if (p.includes('razer')) {
-        return { icon: 'ph-fill ph-coin-vertical', bg: 'linear-gradient(135deg, #22c55e 0%, #15803d 100%)' };
-    }
-    if (p.includes('netflix') || p.includes('spotify') || p.includes('shahid') || p.includes('شاهد') || p.includes('انغامي') || p.includes('watch')) {
-        return { icon: 'ph-fill ph-television-simple', bg: 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)' };
-    }
-    if (p.includes('likee') || p.includes('tiktok') || p.includes('bigo') || p.includes('بيكو') || p.includes('discord') || p.includes('tango') || p.includes('yalla') || p.includes('يلا') || p.includes('تيلغرام') || p.includes('telegram')) {
-        return { icon: 'ph-fill ph-chats-circle', bg: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)' };
-    }
-    if (p.includes('windows') || p.includes('windos') || p.includes('office') || p.includes('outlook') || p.includes('microsoft')) {
-        return { icon: 'ph-fill ph-windows-logo', bg: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' };
-    }
-    return { icon: 'ph-fill ph-credit-card', bg: 'linear-gradient(135deg, #005ba3 0%, #004278 100%)' };
-}
-
 function showRetailToast(message, type = 'info') {
     const container = document.getElementById('retail-toast-container');
     if (!container) return;
@@ -877,7 +864,7 @@ function showRetailToast(message, type = 'info') {
             icon: 'ph-fill ph-warning-circle text-white'
         },
         warning: {
-            bg: 'bg-amber-500/95 border-amber-300/40 text-[#191c1f]',
+            bg: 'bg-amber-500/95 border border-amber-300/40 text-[#191c1f]',
             icon: 'ph-fill ph-warning text-[#191c1f]'
         },
         info: {
@@ -949,11 +936,11 @@ window.stepHeroSlide = function(delta) {
 };
 
 // =========================================================================
-// 1. التهيئة ومراقبة جلسة المستخدم
+// 1. التهيئة ومراقبة جلسة المستخدم + جلب أسعار الصرف من لوحة الإدارة
 // =========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
     applyDesktopSidebarState();
-    syncCurrencyButtonsUI();
+    await initDynamicExchangeRates();
     applyLanguageToDOM();
     initHeroCarousel();
     updateFavoritesCounter();
@@ -1027,9 +1014,9 @@ async function refreshUserWallet() {
     if (!currentUser) return;
     const { data } = await retailSupabase
         .from('retail_users')
-        .select('wallet_balance, full_name')
+        .select('*')
         .eq('id', currentUser.id)
-        .single();
+        .maybeSingle();
 
     const nameEl = document.getElementById('sidebar-client-name');
     if (nameEl) {
@@ -1040,7 +1027,7 @@ async function refreshUserWallet() {
 }
 
 // =========================================================================
-// 2. القائمة الجانبية المصنّفة، بطاقات العلامات التجارية بصور أول باقة، والفلترة
+// 2. القائمة الجانبية، بطاقات العلامات التجارية، والفلترة
 // =========================================================================
 window.switchAppView = function(view) {
     activeAppView = view === 'favorites' ? 'favorites' : 'store';
@@ -1120,7 +1107,6 @@ async function loadRetailCatalog() {
     renderCatalogGrid();
 }
 
-// 1. القائمة الجانبية: عرض صورة أول باقة مباشرة بدون أيقونات قديمة
 function renderSidebarPlatforms() {
     const container = document.getElementById('sidebar-platform-list');
     if (!container) return;
@@ -1169,7 +1155,6 @@ function renderSidebarPlatforms() {
     }).join('');
 }
 
-// 2. بطاقات المنصات العلوية: عرض صورة أول باقة فقط بدون الخلفيات والأيقونات القديمة
 function renderBrandHubTiles() {
     const grid = document.getElementById('brand-hub-grid');
     const resetBtn = document.getElementById('brand-reset-btn');
@@ -1213,6 +1198,7 @@ function renderBrandHubTiles() {
         `;
     }).join('');
 }
+
 function filterRetailCatalog(platform) {
     activeAppView = 'store';
     activePlatformFilter = platform || 'ALL';
@@ -1252,6 +1238,9 @@ function clearCatalogSearch() {
 
 function handleDeliveryTypeFilter(typeVal) {
     activeDeliveryTypeFilter = typeVal || 'ALL';
+    document.querySelectorAll('#delivery-type-pills .rev-type-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-type') === activeDeliveryTypeFilter);
+    });
     renderCatalogGrid();
 }
 
@@ -1314,7 +1303,7 @@ function renderCatalogGrid() {
                 <p class="text-sm font-black">${escapeHTML(isFavEmpty ? t('empty_fav_title') : t('empty_search_title'))}</p>
                 <p class="text-xs text-[#68707d] dark:text-slate-400">${escapeHTML(isFavEmpty ? t('empty_fav_desc') : t('empty_search_desc'))}</p>
                 <div class="pt-1">
-                    <button type="button" onclick="clearCatalogSearch(); activeDeliveryTypeFilter='ALL'; document.getElementById('catalog-type-filter').value='ALL'; switchAppView('store'); filterRetailCatalog('ALL');" class="rev-btn-primary px-5 py-2 text-xs">
+                    <button type="button" onclick="clearCatalogSearch(); handleDeliveryTypeFilter('ALL'); switchAppView('store'); filterRetailCatalog('ALL');" class="rev-btn-primary px-5 py-2 text-xs">
                         ${escapeHTML(t('breadcrumb_all_packages'))}
                     </button>
                 </div>
@@ -1322,7 +1311,6 @@ function renderCatalogGrid() {
         return;
     }
 
-    // شبكة مدمجة: 4 بطاقات في الصف على الشاشات الكبيرة و3 على المتوسطة و2 على الصغيرة
     grid.className = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4';
 
     grid.innerHTML = items.map(item => {
@@ -1399,8 +1387,9 @@ function renderCatalogGrid() {
         `;
     }).join('');
 }
+
 // =========================================================================
-// 2.1 الأدراج الجانبية: تفاصيل الباقة + شحن المحفظة عبر PayPal أو Visa/Mastercard
+// 2.1 الأدراج الجانبية: تفاصيل الباقة + إضافة رصيد المتجر وتفعيل القسائم
 // =========================================================================
 window.openPackageDetailsModal = function(itemId) {
     const item = catalogItems.find(i => String(i.id) === String(itemId));
@@ -1483,16 +1472,17 @@ window.selectTopupMethod = function(method) {
 };
 
 window.proceedTopupRequest = function() {
-    const email = currentUser?.email || '';
-    const methodLabel = selectedTopupMethod === 'PAYPAL' ? 'PayPal' : 'Visa / Mastercard';
-    const formattedAmt = formatRetailMoney(selectedTopupAmount);
-    const msg = `SHIIFT X Wallet Top-Up\nAccount: ${email}\nAmount: $${selectedTopupAmount} (${formattedAmt})\nMethod: ${methodLabel}`;
-    window.open(`https://wa.me/message/BWIV77MOPBG4C1?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+    showRetailToast(
+        activeLang === 'ar'
+            ? 'بوابة الدفع بالبطاقات وPayPal قيد الربط النهائي. يمكنك حالياً تفعيل قسيمة شحن SHIIFT X في الأعلى.'
+            : 'Card & PayPal gateway integration is being finalized. You can currently redeem a SHIIFT X voucher above.',
+        'info'
+    );
 };
 
 window.openTopupModal = function() {
     if (!currentUser) {
-        showRetailToast(activeLang === 'ar' ? 'يرجى تسجيل الدخول أولاً لشحن محفظتك' : 'Please sign in first to top up your wallet', 'info');
+        showRetailToast(activeLang === 'ar' ? 'يرجى تسجيل الدخول أولاً لإضافة رصيد المتجر' : 'Please sign in first to add store credit', 'info');
         openAuthModal('login');
         return;
     }
@@ -1799,7 +1789,7 @@ async function syncPendingOrder(localOrderRef, silent = false) {
 }
 
 // =========================================================================
-// 5. إدارة المصادقة والمظهر وحذف الحساب GDPR
+// 5. إدارة المصادقة والمظهر
 // =========================================================================
 function openAuthModal(mode = 'login') {
     document.getElementById('auth-mode').value = mode;
@@ -1879,34 +1869,6 @@ window.acceptEuCookies = function(level) {
     if (banner) banner.classList.add('hidden');
 };
 
-window.deleteMyRetailAccount = async function() {
-    if (!currentUser || !currentSession) return;
-    const msg = activeLang === 'ar'
-        ? 'تحذير نهائي: سيتم حذف حسابك وبياناتك الشخصية نهائياً ولا يمكن التراجع عن هذه الخطوة. هل تريد المتابعة؟'
-        : 'Final Warning: Your account and personal data will be permanently deleted under GDPR. Continue?';
-    if (!confirm(msg)) return;
-
-    try {
-        const res = await fetch('/api/delete-account', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + currentSession.access_token
-            }
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-            showRetailToast(data.error || 'Error deleting account', 'error');
-            return;
-        }
-        await retailSupabase.auth.signOut();
-        closeModal('orders-modal');
-        showRetailToast(activeLang === 'ar' ? 'تم حذف حسابك وبياناتك بنجاح وفق لائحة GDPR' : 'Account deleted under GDPR', 'success');
-    } catch (err) {
-        showRetailToast(err.message, 'error');
-    }
-};
-
 // =========================================================================
 // 6. إعدادات الحساب + حذف الحساب برمز التحقق (OTP) ومهلة 14 يوماً
 // =========================================================================
@@ -1935,9 +1897,9 @@ window.openProfileSettingsModal = async function() {
 
     const { data } = await retailSupabase
         .from('retail_users')
-        .select('full_name, phone, deletion_scheduled_at')
+        .select('*')
         .eq('id', currentUser.id)
-        .single();
+        .maybeSingle();
 
     document.getElementById('prof-retail-name').value = data?.full_name || currentUser.user_metadata?.full_name || '';
     document.getElementById('prof-retail-phone').value = data?.phone || '';
@@ -1957,6 +1919,7 @@ window.saveRetailProfile = async function() {
             .update({ full_name: fullName, phone: phone })
             .eq('id', currentUser.id);
         if (error) throw error;
+        await refreshUserWallet();
         showRetailToast('تم حفظ وتحديث بيانات الحساب بنجاح', 'success');
         closeModal('profile-settings-modal');
     } catch (err) {
@@ -2054,14 +2017,13 @@ window.handleVerifyAndDeleteAccount = async function() {
     }
 };
 
-// فحص حالة جدولة الحذف عند تسجيل الدخول لإظهار نافذة الاستعادة
 async function checkAccountDeletionGracePeriod() {
     if (!currentUser) return;
     const { data } = await retailSupabase
         .from('retail_users')
         .select('deletion_scheduled_at')
         .eq('id', currentUser.id)
-        .single();
+        .maybeSingle();
 
     if (data && data.deletion_scheduled_at) {
         const delDate = new Date(data.deletion_scheduled_at).toLocaleDateString('en-GB');
@@ -2094,6 +2056,9 @@ retailSupabase.auth.onAuthStateChange((_event, session) => {
     }
 });
 
+// =========================================================================
+// 7. تفعيل قسائم شحن المتجر (Store Vouchers)
+// =========================================================================
 window.redeemStoreVoucher = async function() {
     if (!currentUser) {
         closeModal('topup-modal');
@@ -2129,9 +2094,8 @@ window.redeemStoreVoucher = async function() {
 };
 
 // =========================================================================
-// نظام العملات الديناميكي المربوط بلوحة الإدارة (retail_exchange_rates)
+// 8. نظام العملات الديناميكي المربوط بلوحة الإدارة (retail_exchange_rates)
 // =========================================================================
-
 async function initDynamicExchangeRates() {
     try {
         const { data, error } = await retailSupabase
@@ -2141,49 +2105,45 @@ async function initDynamicExchangeRates() {
 
         if (error) throw error;
 
-        // إعادة بناء كائن أسعار الصرف من قاعدة البيانات فقط (مع تثبيت USD كعملة أساس)
         const freshRates = { USD: 1 };
+        const freshLabels = { USD: '$ USD' };
+
         (data || []).forEach(r => {
             const code = String(r.currency_code || '').trim().toUpperCase();
-            if (code && Number(r.rate_to_usd) > 0) {
-                freshRates[code] = Number(r.rate_to_usd);
+            const rate = Number(r.rate_to_usd);
+            if (code && code !== 'USD' && rate > 0) {
+                freshRates[code] = rate;
+                const meta = DYNAMIC_CURRENCY_META[code];
+                freshLabels[code] = meta ? meta.short : code;
             }
         });
-        EXCHANGE_RATES = freshRates;
 
-        // إذا كانت العملة المحفوظة لدى الزبون قد حُذفت من لوحة الأدمن، نعيده تلقائياً إلى USD
-        let savedCurr = localStorage.getItem('retail_currency') || 'USD';
-        if (!EXCHANGE_RATES[savedCurr]) {
-            savedCurr = 'USD';
-            localStorage.setItem('retail_currency', 'USD');
+        CURRENCY_RATES = freshRates;
+        CURRENCY_LABELS = freshLabels;
+
+        if (!CURRENCY_RATES[activeCurrency]) {
+            activeCurrency = 'USD';
+            localStorage.setItem('shiiftx_retail_currency', 'USD');
         }
 
-        // بناء القائمة المنسدلة للعملات في الشريط العلوي
         const menu = document.getElementById('currency-dropdown-menu');
         if (menu) {
-            menu.innerHTML = Object.keys(EXCHANGE_RATES).map(code => {
-                const meta = CURRENCY_LABELS[code] || { label: `🌐 ${code}`, symbol: code };
-                const isActive = code === savedCurr ? 'active' : '';
-                const badgeText = meta.symbol === code ? code : `${meta.symbol} ${code}`;
+            menu.innerHTML = Object.keys(CURRENCY_RATES).map(code => {
+                const meta = DYNAMIC_CURRENCY_META[code] || { title: `🌐 ${code}`, short: code };
+                const isActive = code === activeCurrency ? 'active' : '';
                 return `
                     <button type="button" onclick="setRetailCurrency('${code}')" data-curr="${code}" class="curr-menu-item rev-dropdown-item ${isActive}">
-                        <span>${meta.label}</span>
-                        <span class="font-mono text-[11px] font-black">${badgeText}</span>
+                        <span>${meta.title}</span>
+                        <span class="font-mono text-[11px] font-black">${meta.short}</span>
                     </button>
                 `;
             }).join('');
         }
 
-        // تحديث واجهة المتجر والأسعار ورصيد المحفظة بالأسعار الجديدة
-        if (typeof setRetailCurrency === 'function') {
-            setRetailCurrency(savedCurr);
-        }
+        setRetailCurrency(activeCurrency);
     } catch (err) {
         console.error('Exchange rates sync error:', err.message);
+        syncCurrencyButtonsUI();
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(initDynamicExchangeRates, 300);
-});
 // ==================== نهاية ملف js/retail-app.js ====================
