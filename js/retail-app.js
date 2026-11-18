@@ -5,19 +5,14 @@ const RETAIL_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const retailSupabase = window.supabase.createClient(RETAIL_SUPABASE_URL, RETAIL_ANON_KEY);
 
 // =========================================================================
-// إعدادات العملات وأسعار الصرف (العملة المرجعية في قاعدة البيانات هي USD)
-// يمكنك تعديل سعر صرف اليورو أو الليرة السورية من هنا في أي وقت
+// إعدادات العملات وأسعار الصرف الديناميكية (تُجلب تلقائياً من لوحة الإدارة)
 // =========================================================================
-const CURRENCY_RATES = {
-    USD: 1,
-    EUR: 0.92,
-    SYP: 15000
+let CURRENCY_RATES = {
+    USD: 1
 };
 
-const CURRENCY_LABELS = {
-    USD: '$ USD',
-    EUR: '€ EUR',
-    SYP: 'SYP'
+let CURRENCY_LABELS = {
+    USD: '$ USD'
 };
 
 let activeCurrency = localStorage.getItem('shiiftx_retail_currency') || 'USD';
