@@ -121,6 +121,80 @@
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
+            <!-- ==================== قسم توليد وإدارة قسائم شحن المتجر (Store Vouchers) ==================== -->
+<section class="bg-white dark:bg-[#11151e] border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-sm space-y-6">
+    
+    <!-- الترويسة -->
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-white/8 pb-4">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-[#005ba3]/10 dark:bg-[#5CE1E6]/10 text-[#005ba3] dark:text-[#5CE1E6] flex items-center justify-center text-2xl">
+                <i class="ph-fill ph-ticket"></i>
+            </div>
+            <div>
+                <h2 class="text-base font-black text-slate-900 dark:text-white">مولّد قسائم شحن المتجر (Store Vouchers)</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">توليد أكواد شحن مسبقة الدفع متوافقة مع معايير المتاجر الأوروبية</p>
+            </div>
+        </div>
+        <button type="button" onclick="loadAdminVouchers()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer">
+            <i class="ph-bold ph-arrows-clockwise"></i>
+            <span>تحديث السجل</span>
+        </button>
+    </div>
+
+    <!-- نموذج التوليد الفوري -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end bg-slate-50 dark:bg-[#181d29] p-4 rounded-2xl border border-slate-200/70 dark:border-white/8">
+        <div>
+            <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1.5">قيمة القسيمة ($ USD)</label>
+            <input id="voucher-gen-amount" type="number" step="0.01" min="1" value="25" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#11151e] border border-slate-200 dark:border-white/10 text-xs font-mono font-bold">
+        </div>
+        <div>
+            <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1.5">عدد القسائم المطلوب توليدها</label>
+            <input id="voucher-gen-qty" type="number" min="1" max="50" value="1" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#11151e] border border-slate-200 dark:border-white/10 text-xs font-mono font-bold">
+        </div>
+        <div>
+            <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1.5">بادئة الكود (Prefix)</label>
+            <input id="voucher-gen-prefix" type="text" value="SX" maxlength="6" dir="ltr" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#11151e] border border-slate-200 dark:border-white/10 text-xs font-mono font-bold uppercase text-left">
+        </div>
+        <button type="button" id="btn-generate-vouchers" onclick="generateAdminVouchers()" class="w-full py-2.5 px-4 rounded-xl bg-[#005ba3] hover:bg-[#004a85] text-white font-black text-xs shadow-md flex items-center justify-center gap-2 transition cursor-pointer">
+            <i class="ph-bold ph-sparkle text-base"></i>
+            <span>توليد الأكواد الآن</span>
+        </button>
+    </div>
+
+    <!-- مربع عرض الأكواد المولّدة حديثاً للنسخ السريع -->
+    <div id="newly-generated-vouchers-box" class="hidden p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 space-y-2.5">
+        <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                <i class="ph-fill ph-check-circle text-base"></i>
+                <span>تم توليد القسائم بنجاح (جاهزة للنسخ):</span>
+            </span>
+            <button type="button" onclick="copyAllGeneratedVouchers()" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black flex items-center gap-1 cursor-pointer">
+                <i class="ph-bold ph-copy"></i>
+                <span>نسخ الكل</span>
+            </button>
+        </div>
+        <textarea id="newly-generated-vouchers-text" readonly rows="3" dir="ltr" class="w-full p-3 rounded-xl bg-slate-950 text-[#5CE1E6] font-mono text-xs font-bold tracking-wider border border-white/10 focus:outline-none"></textarea>
+    </div>
+
+    <!-- جدول آخر 30 قسيمة في النظام -->
+    <div class="overflow-x-auto">
+        <table class="w-full text-xs text-right">
+            <thead>
+                <tr class="text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-white/8">
+                    <th class="py-3 px-3">كود القسيمة</th>
+                    <th class="py-3 px-3">القيمة</th>
+                    <th class="py-3 px-3">الحالة</th>
+                    <th class="py-3 px-3">تاريخ الإنشاء</th>
+                    <th class="py-3 px-3 text-center">إجراء</th>
+                </tr>
+            </thead>
+            <tbody id="admin-vouchers-tbody" class="divide-y divide-slate-100 dark:divide-white/6">
+                <tr><td colspan="5" class="py-6 text-center text-slate-400">جاري تحميل القسائم...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
             <!-- بطاقات الإحصائيات السريعة -->
             <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="adm-card p-4 space-y-1">
