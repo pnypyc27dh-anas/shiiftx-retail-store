@@ -135,6 +135,10 @@
                 <div class="adm-card p-5 space-y-4">
                     <h2 class="text-sm font-black">توليد قسائم جديدة</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end">
+                        <label class="flex items-center gap-2 text-xs font-bold text-amber-300 pt-1 cursor-pointer select-none">
+    <input type="checkbox" id="voucher-gen-suspended" class="w-4 h-4 rounded accent-amber-400">
+    <span>توليد بحالة «معلّقة» (للطباعة قبل التفعيل)</span>
+</label>
                         <div>
                             <label class="block text-[11px] font-bold text-slate-400 mb-1">القيمة ($)</label>
                             <input id="voucher-gen-amount" type="number" step="0.01" min="1" value="25" dir="ltr" class="adm-input w-full px-3.5 py-2.5 text-xs font-mono font-bold text-left">
