@@ -945,9 +945,9 @@ document.getElementById('existing-categories-list').innerHTML = uniqueCats.map(c
             await refreshAllAdminData();
         };
 
-        // ==================== دوال توليد وإدارة قسائم المتجر في لوحة الإدارة ====================
+// ==================== دوال توليد وإدارة قسائم المتجر في لوحة الإدارة ====================
 function createRandomVoucherCode(prefix = 'SX') {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // استبعاد الحروف المتشابهة مثل O/0 و I/1
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     const randomPart = (len) => {
         const arr = new Uint32Array(len);
         crypto.getRandomValues(arr);
@@ -964,7 +964,7 @@ async function generateAdminVouchers() {
     const btn = document.getElementById('btn-generate-vouchers');
 
     if (!amount || amount <= 0 || !qty || qty < 1 || qty > 50) {
-        alert('يرجى إدخال قيمة صحيحة وعدد بين 1 و 50 قسيمة.');
+        notifyAdmin('يرجى إدخال قيمة صحيحة وعدد بين 1 و 50 قسيمة.', 'error');
         return;
     }
 
@@ -978,16 +978,17 @@ async function generateAdminVouchers() {
             });
         }
 
-        const { error } = await supabase.from('retail_vouchers').insert(rows);
+        const { error } = await admSupabase.from('retail_vouchers').insert(rows);
         if (error) throw error;
 
         const outputText = rows.map(r => `${r.code} ($${amount.toFixed(2)})`).join('\n');
         document.getElementById('newly-generated-vouchers-text').value = outputText;
         document.getElementById('newly-generated-vouchers-box').classList.remove('hidden');
 
+        notifyAdmin(`تم توليد ${qty} قسيمة شحن بنجاح!`, 'success');
         await loadAdminVouchers();
     } catch (err) {
-        alert('خطأ أثناء توليد القسائم: ' + err.message);
+        notifyAdmin('خطأ أثناء توليد القسائم: ' + err.message, 'error');
     } finally {
         btn.disabled = false;
     }
@@ -996,21 +997,21 @@ async function generateAdminVouchers() {
 function copyAllGeneratedVouchers() {
     const txt = document.getElementById('newly-generated-vouchers-text').value;
     navigator.clipboard.writeText(txt);
-    alert('تم نسخ جميع القسائم المولّدة إلى الحافظة!');
+    notifyAdmin('تم نسخ جميع القسائم المولّدة إلى الحافظة!', 'success');
 }
 
 async function loadAdminVouchers() {
     const tbody = document.getElementById('admin-vouchers-tbody');
     if (!tbody) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await admSupabase
         .from('retail_vouchers')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(30);
 
     if (error) {
-        tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-rose-500">${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-rose-500">${esc(error.message)}</td></tr>`;
         return;
     }
 
@@ -1021,19 +1022,19 @@ async function loadAdminVouchers() {
 
     tbody.innerHTML = data.map(v => {
         const statusBadge = v.is_redeemed
-            ? `<span class="px-2.5 py-0.5 rounded-full bg-slate-500/15 text-slate-500 text-[10px] font-extrabold">مُستخدمة</span>`
-            : `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold">متاحة للتفعيل</span>`;
+            ? `<span class="px-2.5 py-0.5 rounded-full bg-slate-500/15 text-slate-400 text-[10px] font-extrabold">مُستخدمة</span>`
+            : `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-extrabold">متاحة للتفعيل</span>`;
 
         const dateStr = new Date(v.created_at).toLocaleDateString('en-GB');
 
         return `
-            <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition">
-                <td class="py-3 px-3 font-mono font-black text-[#005ba3] dark:text-[#5CE1E6]" dir="ltr">${v.code}</td>
-                <td class="py-3 px-3 font-mono font-bold" dir="ltr">$${Number(v.amount).toFixed(2)}</td>
+            <tr class="hover:bg-white/4 transition">
+                <td class="py-3 px-3 font-mono font-black text-[#5CE1E6]" dir="ltr">${esc(v.code)}</td>
+                <td class="py-3 px-3 num-font font-bold text-emerald-400" dir="ltr">$${Number(v.amount).toFixed(2)}</td>
                 <td class="py-3 px-3">${statusBadge}</td>
-                <td class="py-3 px-3 font-mono text-[11px] text-slate-400" dir="ltr">${dateStr}</td>
+                <td class="py-3 px-3 num-font text-[11px] text-slate-400" dir="ltr">${esc(dateStr)}</td>
                 <td class="py-3 px-3 text-center">
-                    <button type="button" onclick="navigator.clipboard.writeText('${v.code}'); alert('تم نسخ الكود: ${v.code}');" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-[11px] font-bold cursor-pointer">
+                    <button type="button" onclick="navigator.clipboard.writeText('${esc(v.code)}'); notifyAdmin('تم نسخ الكود: ${esc(v.code)}', 'info');" class="px-3 py-1 rounded-full bg-white/10 hover:bg-[#5CE1E6] hover:text-[#080a0d] text-[11px] font-bold transition cursor-pointer">
                         نسخ
                     </button>
                 </td>
@@ -1044,7 +1045,7 @@ async function loadAdminVouchers() {
 
 // تحميل سجل القسائم تلقائياً عند فتح لوحة الإدارة
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(loadAdminVouchers, 600);
+    setTimeout(loadAdminVouchers, 800);
 });
     </script>
 </body>
