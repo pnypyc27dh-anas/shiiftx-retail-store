@@ -135,10 +135,6 @@
                 <div class="adm-card p-5 space-y-4">
                     <h2 class="text-sm font-black">توليد قسائم جديدة</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end">
-                        <label class="flex items-center gap-2 text-xs font-bold text-amber-300 pt-1 cursor-pointer select-none">
-    <input type="checkbox" id="voucher-gen-suspended" class="w-4 h-4 rounded accent-amber-400">
-    <span>توليد بحالة «معلّقة» (للطباعة قبل التفعيل)</span>
-</label>
                         <div>
                             <label class="block text-[11px] font-bold text-slate-400 mb-1">القيمة ($)</label>
                             <input id="voucher-gen-amount" type="number" step="0.01" min="1" value="25" dir="ltr" class="adm-input w-full px-3.5 py-2.5 text-xs font-mono font-bold text-left">
@@ -160,6 +156,11 @@
                         </button>
                     </div>
 
+                    <label class="flex items-center gap-2 text-xs font-bold text-amber-300 pt-1 cursor-pointer select-none">
+                        <input type="checkbox" id="voucher-gen-suspended" class="w-4 h-4 rounded accent-amber-400">
+                        <span>توليد بحالة «معلّقة» (للطباعة قبل التفعيل)</span>
+                    </label>
+
                     <div id="newly-generated-vouchers-box" class="hidden p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-black text-emerald-400">الأكواد المولّدة:</span>
@@ -179,8 +180,9 @@
                             <input id="voucher-archive-search" type="text" oninput="renderAdminVouchers()" placeholder="بحث بالكود أو الملاحظة..." class="adm-input px-3.5 py-2 text-xs font-bold w-56">
                             <select id="voucher-archive-filter" onchange="renderAdminVouchers()" class="adm-input px-3.5 py-2 text-xs font-bold cursor-pointer">
                                 <option value="ALL">جميع الحالات</option>
-                                <option value="active">مفعّلة (متاحة)</option>
-                                <option value="disabled">ملغاة / معطّلة</option>
+                                <option value="active">مفعّلة</option>
+                                <option value="suspended">معلّقة (للطباعة)</option>
+                                <option value="disabled">ملغاة</option>
                                 <option value="redeemed">مُستخدمة</option>
                             </select>
                         </div>
@@ -550,6 +552,8 @@
             const qty = parseInt(document.getElementById('voucher-gen-qty').value, 10);
             const prefix = document.getElementById('voucher-gen-prefix').value.trim();
             const note = document.getElementById('voucher-gen-note').value.trim() || null;
+            const isSuspended = document.getElementById('voucher-gen-suspended')?.checked || false;
+            const initialStatus = isSuspended ? 'suspended' : 'active';
             const btn = document.getElementById('btn-generate-vouchers');
 
             if (!amount || amount <= 0 || !qty || qty < 1 || qty > 100) {
@@ -562,7 +566,7 @@
                 const rows = Array.from({ length: qty }, () => ({
                     code: createRandomVoucherCode(prefix),
                     amount: amount,
-                    status: 'active',
+                    status: initialStatus,
                     note: note
                 }));
 
@@ -573,7 +577,7 @@
                 document.getElementById('newly-generated-vouchers-box').classList.remove('hidden');
                 document.getElementById('voucher-gen-note').value = '';
 
-                notifyAdmin(`تم توليد ${qty} قسيمة`, 'success');
+                notifyAdmin(isSuspended ? `تم توليد ${qty} قسيمة معلّقة للطباعة` : `تم توليد ${qty} قسيمة مفعّلة`, 'success');
                 await loadAdminVouchers();
                 updateAdminStats();
             } catch (err) {
@@ -635,21 +639,27 @@
                 if (v.effectiveStatus === 'redeemed') {
                     const usedAt = v.redeemed_at ? new Date(v.redeemed_at).toLocaleDateString('en-GB') : '';
                     badge = `<span class="px-2.5 py-0.5 rounded-full bg-slate-500/20 text-slate-400 text-[10px] font-black">مُستخدمة ${usedAt}</span>`;
+                } else if (v.effectiveStatus === 'suspended') {
+                    badge = `<span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black">معلّقة</span>`;
                 } else if (v.effectiveStatus === 'disabled') {
                     badge = `<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 text-[10px] font-black">ملغاة</span>`;
                 } else {
                     badge = `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px] font-black">مفعّلة</span>`;
                 }
 
-                const toggleBtn = v.effectiveStatus === 'redeemed'
-                    ? ''
-                    : v.effectiveStatus === 'active'
-                        ? `<button type="button" onclick="setVoucherStatus('${esc(v.id)}', 'disabled')" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-black text-[11px] font-bold transition cursor-pointer">إلغاء</button>`
-                        : `<button type="button" onclick="setVoucherStatus('${esc(v.id)}', 'active')" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-black text-[11px] font-bold transition cursor-pointer">تفعيل</button>`;
-
-                const editBtn = v.effectiveStatus !== 'redeemed'
-                    ? `<button type="button" onclick="editVoucherDetails('${esc(v.id)}', ${Number(v.amount)}, '${esc(v.note || '')}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold transition cursor-pointer">تعديل</button>`
-                    : '';
+                let stateButtons = '';
+                if (v.effectiveStatus !== 'redeemed') {
+                    if (v.effectiveStatus !== 'active') {
+                        stateButtons += `<button type="button" onclick="setVoucherStatus('${esc(v.id)}', 'active')" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-black text-[11px] font-bold transition cursor-pointer">تفعيل</button>`;
+                    }
+                    if (v.effectiveStatus !== 'suspended') {
+                        stateButtons += `<button type="button" onclick="setVoucherStatus('${esc(v.id)}', 'suspended')" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-300 hover:text-black text-[11px] font-bold transition cursor-pointer">تعليق</button>`;
+                    }
+                    if (v.effectiveStatus !== 'disabled') {
+                        stateButtons += `<button type="button" onclick="setVoucherStatus('${esc(v.id)}', 'disabled')" class="px-2.5 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-300 hover:text-white text-[11px] font-bold transition cursor-pointer">إلغاء</button>`;
+                    }
+                    stateButtons += `<button type="button" onclick="editVoucherDetails('${esc(v.id)}', ${Number(v.amount)}, '${esc(v.note || '')}')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-bold transition cursor-pointer">تعديل</button>`;
+                }
 
                 return `
                     <tr class="hover:bg-white/4 transition">
@@ -661,8 +671,7 @@
                         <td class="py-3 px-3">
                             <div class="flex items-center justify-center gap-1.5 flex-wrap">
                                 <button type="button" onclick="navigator.clipboard.writeText('${esc(v.code)}'); notifyAdmin('تم نسخ الكود', 'info');" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-[#5CE1E6] hover:text-black text-[11px] font-bold transition cursor-pointer">نسخ</button>
-                                ${toggleBtn}
-                                ${editBtn}
+                                ${stateButtons}
                                 <button type="button" onclick="deleteAdminVoucher('${esc(v.id)}')" class="px-2 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-600 text-rose-400 hover:text-white text-[11px] transition cursor-pointer" title="حذف"><i class="ph-bold ph-trash"></i></button>
                             </div>
                         </td>
@@ -681,7 +690,8 @@
                 notifyAdmin(error.message, 'error');
                 return;
             }
-            notifyAdmin(newStatus === 'active' ? 'تم تفعيل القسيمة' : 'تم إلغاء القسيمة', 'success');
+            const labels = { active: 'تم تفعيل القسيمة', suspended: 'تم تعليق القسيمة مؤقتاً', disabled: 'تم إلغاء القسيمة' };
+            notifyAdmin(labels[newStatus] || 'تم التحديث', 'success');
             await loadAdminVouchers();
             updateAdminStats();
         };
