@@ -2131,17 +2131,6 @@ window.redeemStoreVoucher = async function() {
 // =========================================================================
 // نظام العملات الديناميكي المربوط بلوحة الإدارة (retail_exchange_rates)
 // =========================================================================
-const CURRENCY_LABELS = {
-    USD: { label: '🇺🇸 US Dollar', symbol: '$' },
-    EUR: { label: '🇪🇺 Euro', symbol: '€' },
-    SYP: { label: '🇸🇾 ليرة سورية', symbol: 'SYP' },
-    TRY: { label: '🇹🇷 ليرة تركية', symbol: '₺' },
-    SAR: { label: '🇸🇦 ريال سعودي', symbol: 'SAR' },
-    AED: { label: '🇦🇪 درهم إماراتي', symbol: 'AED' },
-    GBP: { label: '🇬🇧 British Pound', symbol: '£' },
-    JOD: { label: '🇯🇴 دينار أردني', symbol: 'JOD' },
-    IQD: { label: '🇮🇶 دينار عراقي', symbol: 'IQD' }
-};
 
 async function initDynamicExchangeRates() {
     try {
