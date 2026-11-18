@@ -2133,9 +2133,10 @@ window.redeemStoreVoucher = async function() {
     }
 };
 
-// مزامنة أسعار الصرف اليدوية من لوحة الإدارة تلقائياً
-// قاموس أسماء ورموز العملات المعروفة لعرضها بشكل أنيق في القائمة المنسدلة
-const CURRENCY_META = {
+// =========================================================================
+// نظام العملات الديناميكي المربوط بلوحة الإدارة (retail_exchange_rates)
+// =========================================================================
+const CURRENCY_LABELS = {
     USD: { label: '🇺🇸 US Dollar', symbol: '$' },
     EUR: { label: '🇪🇺 Euro', symbol: '€' },
     SYP: { label: '🇸🇾 ليرة سورية', symbol: 'SYP' },
@@ -2143,48 +2144,62 @@ const CURRENCY_META = {
     SAR: { label: '🇸🇦 ريال سعودي', symbol: 'SAR' },
     AED: { label: '🇦🇪 درهم إماراتي', symbol: 'AED' },
     GBP: { label: '🇬🇧 British Pound', symbol: '£' },
-    JOD: { label: '🇯🇴 دينار أردني', symbol: 'JOD' }
+    JOD: { label: '🇯🇴 دينار أردني', symbol: 'JOD' },
+    IQD: { label: '🇮🇶 دينار عراقي', symbol: 'IQD' }
 };
 
-async function syncRetailExchangeRatesAndMenu() {
+async function initDynamicExchangeRates() {
     try {
-        const { data } = await retailSupabase
+        const { data, error } = await retailSupabase
             .from('retail_exchange_rates')
             .select('currency_code, rate_to_usd')
             .order('currency_code', { ascending: true });
 
-        if (!data || data.length === 0) return;
+        if (error) throw error;
 
-        // 1. تحديث أسعار الصرف في الذاكرة
-        if (typeof EXCHANGE_RATES !== 'undefined') {
-            data.forEach(r => {
-                EXCHANGE_RATES[r.currency_code] = Number(r.rate_to_usd);
-            });
+        // إعادة بناء كائن أسعار الصرف من قاعدة البيانات فقط (مع تثبيت USD كعملة أساس)
+        const freshRates = { USD: 1 };
+        (data || []).forEach(r => {
+            const code = String(r.currency_code || '').trim().toUpperCase();
+            if (code && Number(r.rate_to_usd) > 0) {
+                freshRates[code] = Number(r.rate_to_usd);
+            }
+        });
+        EXCHANGE_RATES = freshRates;
+
+        // إذا كانت العملة المحفوظة لدى الزبون قد حُذفت من لوحة الأدمن، نعيده تلقائياً إلى USD
+        let savedCurr = localStorage.getItem('retail_currency') || 'USD';
+        if (!EXCHANGE_RATES[savedCurr]) {
+            savedCurr = 'USD';
+            localStorage.setItem('retail_currency', 'USD');
         }
 
-        // 2. بناء القائمة المنسدلة ديناميكياً في المتجر لتشمل USD + جميع العملات المضافة من الأدمن
+        // بناء القائمة المنسدلة للعملات في الشريط العلوي
         const menu = document.getElementById('currency-dropdown-menu');
         if (menu) {
-            const activeCurr = localStorage.getItem('retail_currency') || 'USD';
-            const allCodes = ['USD', ...data.map(r => r.currency_code).filter(c => c !== 'USD')];
-
-            menu.innerHTML = allCodes.map(code => {
-                const meta = CURRENCY_META[code] || { label: `🌐 ${code}`, symbol: code };
-                const isActive = code === activeCurr ? 'active' : '';
+            menu.innerHTML = Object.keys(EXCHANGE_RATES).map(code => {
+                const meta = CURRENCY_LABELS[code] || { label: `🌐 ${code}`, symbol: code };
+                const isActive = code === savedCurr ? 'active' : '';
+                const badgeText = meta.symbol === code ? code : `${meta.symbol} ${code}`;
                 return `
                     <button type="button" onclick="setRetailCurrency('${code}')" data-curr="${code}" class="curr-menu-item rev-dropdown-item ${isActive}">
                         <span>${meta.label}</span>
-                        <span class="font-mono text-[11px] font-black">${meta.symbol === code ? code : `${meta.symbol} ${code}`}</span>
+                        <span class="font-mono text-[11px] font-black">${badgeText}</span>
                     </button>
                 `;
             }).join('');
         }
 
-        // 3. تحديث الأسعار والرصيد المعروض حالياً
-        if (typeof renderCatalogGrid === 'function') renderCatalogGrid();
-        if (typeof refreshUserWallet === 'function' && currentUser) refreshUserWallet();
-    } catch (e) {}
+        // تحديث واجهة المتجر والأسعار ورصيد المحفظة بالأسعار الجديدة
+        if (typeof setRetailCurrency === 'function') {
+            setRetailCurrency(savedCurr);
+        }
+    } catch (err) {
+        console.error('Exchange rates sync error:', err.message);
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => setTimeout(syncRetailExchangeRatesAndMenu, 450));
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initDynamicExchangeRates, 300);
+});
 // ==================== نهاية ملف js/retail-app.js ====================
