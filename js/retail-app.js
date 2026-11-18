@@ -2134,17 +2134,57 @@ window.redeemStoreVoucher = async function() {
 };
 
 // مزامنة أسعار الصرف اليدوية من لوحة الإدارة تلقائياً
-async function syncRetailExchangeRates() {
+// قاموس أسماء ورموز العملات المعروفة لعرضها بشكل أنيق في القائمة المنسدلة
+const CURRENCY_META = {
+    USD: { label: '🇺🇸 US Dollar', symbol: '$' },
+    EUR: { label: '🇪🇺 Euro', symbol: '€' },
+    SYP: { label: '🇸🇾 ليرة سورية', symbol: 'SYP' },
+    TRY: { label: '🇹🇷 ليرة تركية', symbol: '₺' },
+    SAR: { label: '🇸🇦 ريال سعودي', symbol: 'SAR' },
+    AED: { label: '🇦🇪 درهم إماراتي', symbol: 'AED' },
+    GBP: { label: '🇬🇧 British Pound', symbol: '£' },
+    JOD: { label: '🇯🇴 دينار أردني', symbol: 'JOD' }
+};
+
+async function syncRetailExchangeRatesAndMenu() {
     try {
-        const { data } = await retailSupabase.from('retail_exchange_rates').select('currency_code, rate_to_usd');
-        if (data && data.length > 0 && typeof EXCHANGE_RATES !== 'undefined') {
+        const { data } = await retailSupabase
+            .from('retail_exchange_rates')
+            .select('currency_code, rate_to_usd')
+            .order('currency_code', { ascending: true });
+
+        if (!data || data.length === 0) return;
+
+        // 1. تحديث أسعار الصرف في الذاكرة
+        if (typeof EXCHANGE_RATES !== 'undefined') {
             data.forEach(r => {
                 EXCHANGE_RATES[r.currency_code] = Number(r.rate_to_usd);
             });
-            if (typeof renderCatalogGrid === 'function') renderCatalogGrid();
-            if (typeof refreshUserWallet === 'function' && currentUser) refreshUserWallet();
         }
+
+        // 2. بناء القائمة المنسدلة ديناميكياً في المتجر لتشمل USD + جميع العملات المضافة من الأدمن
+        const menu = document.getElementById('currency-dropdown-menu');
+        if (menu) {
+            const activeCurr = localStorage.getItem('retail_currency') || 'USD';
+            const allCodes = ['USD', ...data.map(r => r.currency_code).filter(c => c !== 'USD')];
+
+            menu.innerHTML = allCodes.map(code => {
+                const meta = CURRENCY_META[code] || { label: `🌐 ${code}`, symbol: code };
+                const isActive = code === activeCurr ? 'active' : '';
+                return `
+                    <button type="button" onclick="setRetailCurrency('${code}')" data-curr="${code}" class="curr-menu-item rev-dropdown-item ${isActive}">
+                        <span>${meta.label}</span>
+                        <span class="font-mono text-[11px] font-black">${meta.symbol === code ? code : `${meta.symbol} ${code}`}</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // 3. تحديث الأسعار والرصيد المعروض حالياً
+        if (typeof renderCatalogGrid === 'function') renderCatalogGrid();
+        if (typeof refreshUserWallet === 'function' && currentUser) refreshUserWallet();
     } catch (e) {}
 }
-document.addEventListener('DOMContentLoaded', () => setTimeout(syncRetailExchangeRates, 500));
+
+document.addEventListener('DOMContentLoaded', () => setTimeout(syncRetailExchangeRatesAndMenu, 450));
 // ==================== نهاية ملف js/retail-app.js ====================
