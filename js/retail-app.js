@@ -2132,4 +2132,19 @@ window.redeemStoreVoucher = async function() {
         btn.disabled = false;
     }
 };
+
+// مزامنة أسعار الصرف اليدوية من لوحة الإدارة تلقائياً
+async function syncRetailExchangeRates() {
+    try {
+        const { data } = await retailSupabase.from('retail_exchange_rates').select('currency_code, rate_to_usd');
+        if (data && data.length > 0 && typeof EXCHANGE_RATES !== 'undefined') {
+            data.forEach(r => {
+                EXCHANGE_RATES[r.currency_code] = Number(r.rate_to_usd);
+            });
+            if (typeof renderCatalogGrid === 'function') renderCatalogGrid();
+            if (typeof refreshUserWallet === 'function' && currentUser) refreshUserWallet();
+        }
+    } catch (e) {}
+}
+document.addEventListener('DOMContentLoaded', () => setTimeout(syncRetailExchangeRates, 500));
 // ==================== نهاية ملف js/retail-app.js ====================
