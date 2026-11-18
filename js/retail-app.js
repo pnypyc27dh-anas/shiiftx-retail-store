@@ -2098,4 +2098,38 @@ retailSupabase.auth.onAuthStateChange((_event, session) => {
         setTimeout(checkAccountDeletionGracePeriod, 400);
     }
 });
+
+window.redeemStoreVoucher = async function() {
+    if (!currentUser) {
+        closeModal('topup-modal');
+        openAuthModal('login');
+        return;
+    }
+
+    const input = document.getElementById('redeem-voucher-input');
+    const btn = document.getElementById('btn-redeem-voucher');
+    const code = (input?.value || '').trim();
+
+    if (!code || code.length < 4) {
+        showRetailToast('يرجى إدخال كود القسيمة بشكل صحيح', 'warning');
+        return;
+    }
+
+    btn.disabled = true;
+    try {
+        const { data: addedAmount, error } = await retailSupabase.rpc('redeem_retail_voucher', {
+            p_code: code
+        });
+        if (error) throw error;
+
+        input.value = '';
+        await refreshUserWallet();
+        closeModal('topup-modal');
+        showRetailToast(`تم تفعيل القسيمة بنجاح وإضافة $${Number(addedAmount).toFixed(2)} إلى رصيدك!`, 'success');
+    } catch (err) {
+        showRetailToast(err.message || 'تعذر تفعيل القسيمة', 'error');
+    } finally {
+        btn.disabled = false;
+    }
+};
 // ==================== نهاية ملف js/retail-app.js ====================
