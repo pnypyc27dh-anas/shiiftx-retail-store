@@ -208,56 +208,27 @@
                 </div>
             </section>
 
-            <!-- ==================== 2. تعديل أسعار الصرف يدوياً ==================== -->
-            <section id="adm-view-rates" class="hidden space-y-4">
-                <div class="adm-card p-6 max-w-2xl space-y-5">
-                    <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                        <h2 class="text-sm font-black">أسعار الصرف اليدوية (مقابل 1 USD)</h2>
-                        <span class="text-[11px] font-mono text-slate-400">Base: 1.00 USD</span>
-                    </div>
+            <!-- ==================== 2. إدارة أسعار الصرف اليدوية ==================== -->
+<section id="adm-view-rates" class="hidden space-y-4">
+    <div class="adm-card p-6 max-w-2xl space-y-5">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <h2 class="text-sm font-black">أسعار الصرف المعتمدة في المتجر</h2>
+            <span class="text-[11px] font-mono text-[#5CE1E6] font-bold">عملة الأساس: 1.00 USD</span>
+        </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="p-4 rounded-2xl bg-[#181c25] border border-white/8 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-black">🇪🇺 اليورو (EUR)</span>
-                                <span id="rate-eur-updated" class="text-[10px] font-mono text-slate-400" dir="ltr">---</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input id="input-rate-EUR" type="number" step="0.0001" min="0.0001" dir="ltr" class="adm-input w-full px-3.5 py-2.5 text-sm font-mono font-black text-left">
-                                <button type="button" onclick="saveExchangeRate('EUR')" class="px-4 py-2.5 rounded-xl bg-[#5CE1E6] hover:bg-white text-[#080a0d] text-xs font-black shrink-0 cursor-pointer">
-                                    حفظ
-                                </button>
-                            </div>
-                        </div>
+        <!-- إضافة عملة جديدة -->
+        <div class="flex flex-wrap sm:flex-nowrap gap-2 bg-[#181c25] p-3.5 rounded-2xl border border-white/8">
+            <input id="new-rate-code" type="text" maxlength="5" placeholder="رمز العملة (مثال: EUR, SYP, TRY)" dir="ltr" class="adm-input px-3.5 py-2 text-xs font-mono font-bold uppercase text-left w-full sm:w-52">
+            <input id="new-rate-val" type="number" step="0.0001" min="0.0001" placeholder="قيمة 1 USD بهذه العملة" dir="ltr" class="adm-input px-3.5 py-2 text-xs font-mono font-bold text-left w-full sm:w-52">
+            <button type="button" onclick="addNewExchangeRate()" class="px-5 py-2 rounded-xl bg-[#5CE1E6] hover:bg-white text-[#080a0d] text-xs font-black transition cursor-pointer shrink-0">
+                إضافة عملة
+            </button>
+        </div>
 
-                        <div class="p-4 rounded-2xl bg-[#181c25] border border-white/8 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-black">🇸🇾 الليرة السورية (SYP)</span>
-                                <span id="rate-syp-updated" class="text-[10px] font-mono text-slate-400" dir="ltr">---</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input id="input-rate-SYP" type="number" step="1" min="1" dir="ltr" class="adm-input w-full px-3.5 py-2.5 text-sm font-mono font-black text-left">
-                                <button type="button" onclick="saveExchangeRate('SYP')" class="px-4 py-2.5 rounded-xl bg-[#5CE1E6] hover:bg-white text-[#080a0d] text-xs font-black shrink-0 cursor-pointer">
-                                    حفظ
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-2 border-t border-white/10 space-y-2">
-                        <span class="block text-xs font-bold text-slate-400">إضافة عملة جديدة</span>
-                        <div class="flex flex-wrap sm:flex-nowrap gap-2">
-                            <input id="new-rate-code" type="text" maxlength="5" placeholder="رمز العملة (مثال: TRY)" dir="ltr" class="adm-input px-3.5 py-2 text-xs font-mono font-bold uppercase text-left w-full sm:w-44">
-                            <input id="new-rate-val" type="number" step="0.0001" min="0.0001" placeholder="السعر مقابل 1$" dir="ltr" class="adm-input px-3.5 py-2 text-xs font-mono font-bold text-left w-full sm:w-48">
-                            <button type="button" onclick="addNewExchangeRate()" class="px-5 py-2 rounded-xl bg-white/10 hover:bg-[#5CE1E6] hover:text-[#080a0d] text-xs font-black transition cursor-pointer shrink-0">
-                                إضافة
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="all-rates-list" class="space-y-2"></div>
-                </div>
-            </section>
+        <!-- قائمة العملات المفعّلة في المتجر -->
+        <div id="all-rates-list" class="space-y-2.5"></div>
+    </div>
+</section>
 
             <!-- ==================== 3. إدارة الباقات ==================== -->
             <section id="adm-view-catalog" class="hidden space-y-4">
@@ -732,78 +703,99 @@
             updateAdminStats();
         };
 
-        // ==================== 2. أسعار الصرف اليدوية ====================
-        async function loadExchangeRates() {
-            const { data, error } = await admSupabase
-                .from('retail_exchange_rates')
-                .select('*')
-                .order('currency_code', { ascending: true });
+        // ==================== 2. إدارة أسعار الصرف اليدوية ====================
+async function loadExchangeRates() {
+    const { data, error } = await admSupabase
+        .from('retail_exchange_rates')
+        .select('*')
+        .order('currency_code', { ascending: true });
 
-            if (error) return;
-            admRates = data || [];
+    if (error) return;
+    admRates = data || [];
 
-            admRates.forEach(r => {
-                const inp = document.getElementById(`input-rate-${r.currency_code}`);
-                if (inp) inp.value = r.rate_to_usd;
-                const upd = document.getElementById(`rate-${r.currency_code.toLowerCase()}-updated`);
-                if (upd && r.updated_at) upd.textContent = new Date(r.updated_at).toLocaleDateString('en-GB');
-            });
+    const listBox = document.getElementById('all-rates-list');
+    if (!listBox) return;
 
-            const extraRates = admRates.filter(r => !['EUR', 'SYP'].includes(r.currency_code));
-            const listBox = document.getElementById('all-rates-list');
-            if (listBox) {
-                listBox.innerHTML = extraRates.map(r => `
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#181c25] border border-white/8 text-xs">
-                        <span class="font-mono font-black text-[#5CE1E6]">${esc(r.currency_code)}</span>
-                        <div class="flex items-center gap-2">
-                            <input id="input-rate-${esc(r.currency_code)}" type="number" step="0.0001" value="${r.rate_to_usd}" dir="ltr" class="adm-input px-3 py-1.5 font-mono font-bold w-32 text-left">
-                            <button type="button" onclick="saveExchangeRate('${esc(r.currency_code)}')" class="px-3 py-1.5 rounded-lg bg-[#5CE1E6] text-black font-black cursor-pointer">حفظ</button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
+    const baseRow = `
+        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-[#181c25]/60 border border-white/8 text-xs">
+            <div class="flex items-center gap-2.5">
+                <span class="font-mono font-black text-emerald-400 text-sm">USD</span>
+                <span class="text-slate-400 text-[11px]">عملة الأساس الافتراضية</span>
+            </div>
+            <span class="font-mono font-black text-slate-300" dir="ltr">1.0000</span>
+        </div>
+    `;
 
-        window.saveExchangeRate = async function(code) {
-            const inp = document.getElementById(`input-rate-${code}`);
-            const rate = parseFloat(inp?.value);
-            if (!rate || rate <= 0) {
-                notifyAdmin('أدخل سعر صرف صحيح', 'error');
-                return;
-            }
+    const dynamicRows = admRates
+        .filter(r => r.currency_code !== 'USD')
+        .map(r => `
+            <div class="flex flex-wrap items-center justify-between gap-2 p-3.5 rounded-2xl bg-[#181c25] border border-white/8 text-xs">
+                <div>
+                    <span class="font-mono font-black text-[#5CE1E6] text-sm">${esc(r.currency_code)}</span>
+                    <span class="block text-[10px] font-mono text-slate-400 mt-0.5" dir="ltr">1 USD = ${r.rate_to_usd} ${esc(r.currency_code)}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input id="input-rate-${esc(r.currency_code)}" type="number" step="0.0001" min="0.0001" value="${r.rate_to_usd}" dir="ltr" class="adm-input px-3 py-2 font-mono font-bold w-32 text-left">
+                    <button type="button" onclick="saveExchangeRate('${esc(r.currency_code)}')" class="px-3.5 py-2 rounded-xl bg-[#5CE1E6] hover:bg-white text-[#080a0d] font-black transition cursor-pointer">
+                        حفظ
+                    </button>
+                    <button type="button" onclick="deleteExchangeRate('${esc(r.currency_code)}')" class="px-3 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-400 hover:text-white transition cursor-pointer" title="حذف العملة من المتجر">
+                        <i class="ph-bold ph-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
 
-            const { error } = await admSupabase
-                .from('retail_exchange_rates')
-                .upsert({ currency_code: code, rate_to_usd: rate, updated_at: new Date().toISOString() });
+    listBox.innerHTML = baseRow + dynamicRows;
+}
 
-            if (error) {
-                notifyAdmin(error.message, 'error');
-                return;
-            }
-            notifyAdmin(`تم تحديث سعر ${code} إلى ${rate}`, 'success');
-            await loadExchangeRates();
-        };
+window.saveExchangeRate = async function(code) {
+    const inp = document.getElementById(`input-rate-${code}`);
+    const rate = parseFloat(inp?.value);
+    if (!rate || rate <= 0) {
+        notifyAdmin('أدخل سعر صرف صحيح', 'error');
+        return;
+    }
 
-        window.addNewExchangeRate = async function() {
-            const code = (document.getElementById('new-rate-code').value || '').trim().toUpperCase();
-            const rate = parseFloat(document.getElementById('new-rate-val').value);
-            if (!code || code.length < 2 || !rate || rate <= 0) {
-                notifyAdmin('أدخل رمز العملة وسعر الصرف', 'error');
-                return;
-            }
-            const { error } = await admSupabase
-                .from('retail_exchange_rates')
-                .upsert({ currency_code: code, rate_to_usd: rate, updated_at: new Date().toISOString() });
+    const { error } = await admSupabase
+        .from('retail_exchange_rates')
+        .upsert({ currency_code: code, rate_to_usd: rate, updated_at: new Date().toISOString() });
 
-            if (error) {
-                notifyAdmin(error.message, 'error');
-                return;
-            }
-            document.getElementById('new-rate-code').value = '';
-            document.getElementById('new-rate-val').value = '';
-            notifyAdmin(`تمت إضافة ${code}`, 'success');
-            await loadExchangeRates();
-        };
+    if (error) return notifyAdmin(error.message, 'error');
+    notifyAdmin(`تم تحديث سعر ${code}`, 'success');
+    await loadExchangeRates();
+};
+
+window.addNewExchangeRate = async function() {
+    const code = (document.getElementById('new-rate-code').value || '').trim().toUpperCase().replace(/[^A-Z]/g, '');
+    const rate = parseFloat(document.getElementById('new-rate-val').value);
+    if (!code || code.length < 2 || code === 'USD' || !rate || rate <= 0) {
+        notifyAdmin('أدخل رمز عملة صحيح وسعر الصرف مقابل 1 دولار', 'error');
+        return;
+    }
+
+    const { error } = await admSupabase
+        .from('retail_exchange_rates')
+        .upsert({ currency_code: code, rate_to_usd: rate, updated_at: new Date().toISOString() });
+
+    if (error) return notifyAdmin(error.message, 'error');
+    document.getElementById('new-rate-code').value = '';
+    document.getElementById('new-rate-val').value = '';
+    notifyAdmin(`تمت إضافة ${code} إلى المتجر`, 'success');
+    await loadExchangeRates();
+};
+
+window.deleteExchangeRate = async function(code) {
+    if (!confirm(`حذف عملة ${code} وإزالتها من المتجر؟`)) return;
+    const { error } = await admSupabase
+        .from('retail_exchange_rates')
+        .delete()
+        .eq('currency_code', code);
+
+    if (error) return notifyAdmin(error.message, 'error');
+    notifyAdmin(`تم حذف ${code}`, 'success');
+    await loadExchangeRates();
+};
 
         // ==================== 3. الباقات ====================
         async function loadAdminCatalog() {
