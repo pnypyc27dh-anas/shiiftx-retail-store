@@ -1,77 +1,175 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy & GDPR | SHIIFT X</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHIIFT X — privacy-policy سياسة الخصوصية</title>
+    
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/x-icon" href="assets/og-cover.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- منع وميض الوضع الليلي -->
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Tajawal', 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: #0f172a;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html.dark body {
+            background-color: #0b1120;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+            color: #f8fafc;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.07);
+        }
+
+        html.dark .glass-panel {
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        .policy-card {
+            background: rgba(241, 245, 249, 0.6);
+            border: 1px solid #e2e8f0;
+        }
+
+        html.dark .policy-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-200 min-h-screen flex flex-col justify-between font-sans antialiased">
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40">
-    <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a href="/" class="text-lg font-black tracking-tight text-white">SHIIFT <span class="text-indigo-400">X</span></a>
-      <a href="/" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition">العودة للمتجر ←</a>
-    </div>
-  </header>
+<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 antialiased transition-colors duration-200">
 
-  <main class="max-w-4xl mx-auto px-4 py-10 space-y-8 w-full">
-    <div class="space-y-2 border-b border-slate-800 pb-6">
-      <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold">EU GDPR (DSGVO) Compliant</span>
-      <h1 class="text-2xl font-black text-white">سياسة الخصوصية وحماية البيانات — Privacy Policy</h1>
-      <p class="text-xs text-slate-400">تاريخ السريان: نوفمبر 2026 | Effective Date: November 2026</p>
-    </div>
+    <!-- شريط الترويسة الرسمي -->
+    <header class="w-full max-w-3xl mx-auto flex items-center justify-between py-4 px-2">
+        <a href="index.html" class="flex items-center text-slate-900 dark:text-white hover:opacity-90 transition active:scale-95" title="الرئيسية">
+            <svg class="h-8 sm:h-9 w-auto" viewBox="70 100 405 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill="currentColor" d="M102.584 151.616C106.853 151.616 110.767 152.034 114.324 152.871C117.871 153.706 121.098 154.808 124.002 156.179L124.289 156.315L124.185 156.615L121.162 165.332L121.035 165.698L120.682 165.538C118.039 164.34 115.144 163.327 111.994 162.501H111.992C108.929 161.679 105.721 161.268 102.368 161.268C99.163 161.268 96.5183 161.754 94.4189 162.708C92.3171 163.663 90.7558 165.014 89.7178 166.756L89.7148 166.762C88.6751 168.434 88.1484 170.405 88.1484 172.689C88.1485 175.36 88.6793 177.557 89.7178 179.3C90.758 181.046 92.4705 182.63 94.8828 184.044C97.3071 185.465 100.597 187.005 104.761 188.661H104.762C109.309 190.402 113.145 192.298 116.265 194.352L116.856 194.73C119.772 196.644 121.995 198.937 123.511 201.611H123.51C125.204 204.471 126.039 208.046 126.039 212.315C126.039 217.201 124.91 221.385 122.635 224.849L122.633 224.852C120.359 228.236 117.1 230.841 112.874 232.676L112.875 232.677C108.718 234.513 103.809 235.425 98.1582 235.425C95.2674 235.425 92.4834 235.273 89.8066 234.97L89.8047 234.969C87.2021 234.666 84.8129 234.248 82.6377 233.716L82.626 233.713C80.4497 233.104 78.5209 232.38 76.8418 231.537L76.6465 231.44V220.93L77.1494 221.164C79.7146 222.36 82.8951 223.447 86.6953 224.425H86.6943C90.5515 225.399 94.5164 225.886 98.5898 225.886C102.374 225.886 105.528 225.362 108.064 224.327C110.602 223.292 112.482 221.823 113.731 219.931C114.984 218.033 115.616 215.801 115.616 213.22C115.616 210.626 115.086 208.465 114.047 206.721C113.01 204.981 111.194 203.358 108.562 201.866L108.553 201.861C105.99 200.293 102.379 198.642 97.7109 196.909L97.707 196.907C94.3838 195.619 91.452 194.253 88.915 192.809L88.9043 192.803C86.4318 191.278 84.3524 189.557 82.6709 187.64C80.9858 185.719 79.7044 183.529 78.8262 181.073L78.8223 181.064V181.063C78.0167 178.605 77.6182 175.774 77.6182 172.575C77.6182 168.214 78.6769 164.48 80.8115 161.392C82.9379 158.24 85.8691 155.823 89.5928 154.138L89.5947 154.137C93.3894 152.453 97.7216 151.616 102.584 151.616ZM156.342 152.748V186.94H195.144V152.748H205.566V234.292H195.144V196.591H156.342V234.292H145.918V152.748H156.342Z"/>
+                <path fill="currentColor" d="M389.967 151.616V161.519H350.874V190.257H387.563V200.159H350.874V235.425H338.781V151.616H389.967ZM467.7 151.616V161.519H439.615V235.425H427.521V161.519H399.308V151.616H467.7Z"/>
+                <path class="fill-[#005ba3] dark:fill-[#5CE1E6]" d="M234.632 132.734L234.737 132.895L270.402 187.555L270.537 187.763L270.388 187.961L234.723 235.284L234.616 235.425H212.435L212.827 234.867L246.018 187.733L212.815 133.272L212.487 132.734H234.632ZM332.739 132.734L332.41 133.272L299.206 187.733L332.398 234.867L332.79 235.425H310.609L310.502 235.284L274.837 187.961L274.688 187.763L274.823 187.555L310.489 132.895L310.593 132.734H332.739ZM225.717 104.646C229.012 104.647 231.91 105.552 234.396 107.37C237.099 109.098 238.429 111.887 238.429 115.655C238.429 119.302 237.094 122.079 234.406 123.931L234.406 123.932C231.918 125.755 229.017 126.664 225.717 126.664C222.102 126.664 219.037 125.76 216.542 123.932C214.011 122.077 212.763 119.296 212.763 115.655C212.763 111.893 214.007 109.103 216.552 107.371C219.045 105.548 222.107 104.646 225.717 104.646ZM319.508 104.646C323.118 104.646 326.181 105.548 328.673 107.371L328.907 107.537C331.294 109.279 332.462 112.011 332.462 115.655C332.462 119.296 331.214 122.077 328.683 123.932C326.189 125.76 323.123 126.664 319.508 126.664C316.208 126.664 313.307 125.755 310.819 123.932V123.931C308.13 122.079 306.796 119.301 306.796 115.655C306.796 111.888 308.126 109.098 310.828 107.37C313.314 105.552 316.213 104.647 319.508 104.646Z"/>
+            </svg>
+        </a>
 
-    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3 text-sm leading-relaxed">
-      <h2 class="text-base font-black text-white">1. المتحكم في البيانات (Data Controller)</h2>
-      <p class="text-slate-300">
-        المسؤول عن معالجة البيانات الشخصية وفق المادة 4(7) من اللائحة الأوروبية العامة لحماية البيانات (GDPR) هو <strong>SHIIFT X</strong> (إدارة: أنس — مسجل في جمهورية النمسا). للتواصل بخصوص الخصوصية: <span dir="ltr" class="font-mono text-indigo-400">support@shiiftx.com</span>.
-      </p>
-    </section>
+        <a href="index.html" class="text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1.5 transition">
+            <i class="ph ph-arrow-right"></i>
+            <span>العودة للمتجر</span>
+        </a>
+    </header>
 
-    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3 text-sm leading-relaxed">
-      <h2 class="text-base font-black text-white">2. البيانات التي نجمعها وأساسها القانوني (Data Collected & Legal Basis)</h2>
-      <ul class="space-y-2 text-slate-300 list-disc list-inside">
-        <li><strong>بيانات الحساب:</strong> البريد الإلكتروني، الاسم، ومعرّف المستخدم المشفّر لإنشاء الحساب وتأمين الدخول (المادة 6(1)(b) GDPR — تنفيذ العقد).</li>
-        <li><strong>بيانات تنفيذ الطلبات:</strong> معرّف اللاعب (Player ID) للباقات المباشرة وسجل المشتريات والأكواد الرقمية المسلمة (المادة 6(1)(b) و (c) GDPR — الالتزامات المحاسبية والقانونية).</li>
-        <li><strong>البيانات التقنية والأمنية:</strong> سجلات الحماية من الاحتيال ومنع التكرار (Idempotency & Rate Limiting) عبر Cloudflare و Vercel (المادة 6(1)(f) GDPR — المصلحة المشروعة لأمن المنصة).</li>
-      </ul>
-      <p class="text-slate-400 text-xs" dir="ltr">
-        We collect only essential account credentials (email, name), order records, and player IDs required to fulfill digital purchases. We do not sell personal data or use third-party advertising trackers.
-      </p>
-    </section>
+    <!-- الحاوية الرئيسية للمحتوى -->
+    <main class="w-full max-w-3xl mx-auto my-auto py-6">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 space-y-8">
+            
+            <!-- رأس الصفحة التوضيحي -->
+            <div class="text-center space-y-2 pb-4 border-b border-slate-200 dark:border-slate-800">
+                <div class="flex justify-center mb-3">
+                    <img src="assets/app-icon-192.png" alt="SHIIFT X" class="w-14 h-14 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 object-cover">
+                </div>
+                <h1 class="text-2xl font-black text-slate-900 dark:text-white">سياسة الخصوصية وحماية البيانات (Privacy Policy)</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">آخر تحديث: نوفمبر 2026</p>
+            </div>
 
-    <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3 text-sm leading-relaxed">
-      <h2 class="text-base font-black text-white">3. مكان استضافة البيانات والأمان (EU Data Hosting & Security)</h2>
-      <p class="text-slate-300">
-        تُستضاف قاعدة بيانات المستخدمين والطلبات داخل خوادم الاتحاد الأوروبي (Supabase EU Region) مع تشفير كامل للاتصالات (TLS/SSL) وعزل الصلاحيات على مستوى الصفوف (Row Level Security).
-      </p>
-    </section>
+            <!-- أقسام البنود والشروط -->
+            <div class="space-y-6 text-xs sm:text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                <!-- يتم وضع المحتوى التفصيلي هنا -->
+                <section class="space-y-2">
+    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <i class="ph-bold ph-shield-check text-emerald-500"></i> 1. البيانات التي يتم جمعها
+    </h3>
+    <p>نقوم بجمع البيانات الضرورية فقط لتنفيذ العمليات، وتتضمن: البريد الإلكتروني، رقم الهاتف الخلوي للتحقق من العمليات، ومعرّف اللاعب (Player ID) واسم السيرفر عند طلب الشحن المباشر. <strong>نؤكد أننا لا نطلب أو نخزن كلمات مرور حساباتك في الألعاب نهائياً.</strong></p>
+</section>
 
-    <section id="account-deletion" class="bg-slate-900 border border-rose-500/30 rounded-2xl p-6 space-y-3 text-sm leading-relaxed">
-      <h2 class="text-base font-black text-rose-400">4. حقوق المستخدم وحذف الحساب نهائياً (GDPR Rights & Account Deletion)</h2>
-      <p class="text-slate-300">
-        وفق المواد 15 إلى 20 من لائحة GDPR وسياسات <strong>Google Play</strong> و<strong>Apple App Store</strong>، يحق لك الوصول إلى بياناتك أو تصحيحها أو حذف حسابك نهائياً في أي وقت:
-      </p>
-      <ul class="space-y-1.5 text-slate-300 list-disc list-inside">
-        <li><strong>الحذف الفوري الذاتي:</strong> سجّل الدخول إلى حسابك في المتجر، افتح نافذة <strong>«طلباتي»</strong>، واضغط على زر <strong>«حذف حسابي نهائياً»</strong> لمسح بيانات حسابك وسجل المصادقة فوراً.</li>
-        <li><strong>الحذف عبر البريد:</strong> يمكنك أيضاً إرسال طلب حذف من بريدك المسجل إلى <span dir="ltr" class="font-mono text-indigo-400">support@shiiftx.com</span> وسيُنفذ خلال 48 ساعة.</li>
-      </ul>
-      <p class="text-slate-400 text-xs" dir="ltr">
-        Account Deletion: Users can permanently delete their account and personal profile data at any time directly inside the app/website under "My Orders" -> "Delete My Account Permanently", or by emailing support@shiiftx.com.
-      </p>
-    </section>
-  </main>
+<section class="space-y-2">
+    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <i class="ph-bold ph-cpu text-blue-500"></i> 2. الغرض من معالجة البيانات
+    </h3>
+    <ul class="list-disc pr-5 space-y-1 text-slate-600 dark:text-slate-400">
+        <li>تسليم الأكواد الرقمية المشفرة وتنفيذ الشحن اللحظي.</li>
+        <li>التحقق من إشعارات الإيداع المالي عبر الوكلاء المعتمدين لمنع الاحتيال.</li>
+        <li>الاحتفاظ بسجلات محاسبية مؤمنة ومطابقة للقوانين المالية.</li>
+    </ul>
+</section>
 
-  <footer class="border-t border-slate-800 bg-slate-900/60 py-6 px-4 text-xs text-slate-400">
-    <div class="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
-      <span>© 2026 SHIIFT X — Registered in Austria (EU)</span>
-      <div class="flex flex-wrap gap-4 font-bold text-indigo-400">
-        <a href="/impressum.html" class="hover:underline">Impressum</a>
-        <a href="/terms.html" class="hover:underline">شروط الاستخدام (Terms)</a>
-        <a href="/privacy.html" class="underline">سياسة الخصوصية (Privacy)</a>
-        <a href="/refund.html" class="hover:underline">سياسة الاسترجاع (Refund)</a>
-      </div>
-    </div>
-  </footer>
+<section class="space-y-2">
+    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <i class="ph-bold ph-trash text-red-500"></i> 3. حذف الحساب والبيانات (Google Play & Apple Compliance)
+    </h3>
+    <p>يحق لك في أي وقت تقديم طلب لحذف حسابك ومسح كافة بياناتك نهائياً سواء من داخل إعدادات التطبيق أو عبر صفحة <a href="delete-account.html" class="text-red-500 font-bold underline">حذف الحساب</a>، مع مهلة سماح مدتها 14 يوماً قبل المسح النهائي من السيرفرات.</p>
+</section>
+
+<section class="space-y-2">
+    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <i class="ph-bold ph-clock-counter-clockwise text-blue-500"></i> 4. معالجة بيانات النشاط وإدارة الحسابات الخاملة (GDPR)
+    </h3>
+    <p>
+        امتثالاً للائحة العامة لحماية البيانات في الاتحاد الأوروبي والنمسا (GDPR / DSGVO)، نوضح آلية معالجة بيانات النشاط وصيانة الحسابات:
+    </p>
+    <ul class="list-disc pr-5 space-y-1 text-slate-600 dark:text-slate-400">
+        <li><strong>بيانات التتبع الآمنة:</strong> يفحص النظام المؤتمت طابع آخر تسجيل دخول للمستخدم (Authentication Timestamp) وتواريخ المعاملات للتحقق الدوري من حالة نشاط الحساب.</li>
+        <li><strong>الأساس القانوني للمعالجة:</strong> تتم المعالجة استناداً إلى المادة (6/1/b) من GDPR لتنفيذ بنود الاتفاقية التعاقدية، والمادة (6/1/f) للمصلحة المشروعة في صيانة البنية التحتية وحماية الخوادم.</li>
+        <li><strong>الشفافية والأتمتة:</strong> لا تتضمن المعالجة أي بناء للملفات الشخصية التفضيلية (Profiling) أو قرارات ائتمانية بالمعنى المنصوص عليه في المادة 22 من GDPR؛ إذ يقتصر الإجراء على خوارزمية حسابية مطابقة لمدة الخمول التعاقدية (180 يوماً).</li>
+        <li><strong>الاحتفاظ بالسجلات المحاسبية:</strong> تُحفظ القيود المحاسبية الناتجة عن المعاملات ورسوم الصيانة لمدة <strong>7 سنوات</strong> امتثالاً للمتطلبات الإلزامية في القانون المالي الاتحادي النمساوي (BAO § 132).</li>
+    </ul>
+</section>                
+            </div>
+
+            <!-- بطاقة التنبيه القانوني والتواصل -->
+            <div class="policy-card p-4 rounded-2xl space-y-2 text-xs">
+                <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="ph-fill ph-headset text-blue-500 text-base"></i> الدعم القانوني والامتثال
+                </div>
+                <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                    لأي استفسارات قانونية أو تقديم شكوى تتعلق بهذه الاتفاقية، يرجى مراسلتنا مباشرة عبر البريد المعتمد:
+                    <a href="mailto:support@shiiftx.com" class="text-blue-600 dark:text-blue-400 font-bold underline font-mono">support@shiiftx.com</a>
+                </p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- التذييل الرسمي وروابط التنقل القانونية السريعة -->
+    <footer class="w-full max-w-3xl mx-auto text-center py-6 space-y-3">
+        <div class="flex flex-wrap justify-center items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+             <a href="privacy-policy.html" class="hover:underline text-red-500">سياسة الخصوصية</a>
+            <span>•</span>
+            <a href="terms.html" class="hover:underline">الشروط والأحكام</a>
+            <span>•</span>
+            <a href="refund-policy.html" class="hover:underline">سياسة الاسترداد</a>
+            <span>•</span>
+            <a href="acceptable-use.html" class="hover:underline">سياسة الاستخدام</a>
+            <span>•</span>
+            <a href="impressum.html" class="hover:underline">impressum.html </a>
+            
+        </div>
+        <p class="text-[11px] text-slate-400 dark:text-slate-500">
+            منصة SHIIFT X © 2026 — جميع الحقوق محفوظة
+        </p>
+    </footer>
+
 </body>
 </html>
