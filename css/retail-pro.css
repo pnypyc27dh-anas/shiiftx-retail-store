@@ -68,6 +68,7 @@ html[dir="ltr"] body {
 }
 
 /* ==================== تمدد ديناميكي للحاويات على الشاشات الكبيرة والصغيرة ==================== */
+.rev-container,
 header .max-w-6xl,
 main.max-w-6xl,
 footer.max-w-6xl {
@@ -75,8 +76,8 @@ footer.max-w-6xl {
     max-width: 1420px !important;
     margin-left: auto;
     margin-right: auto;
-    padding-left: clamp(1.15rem, 3.5vw, 2.75rem) !important;
-    padding-right: clamp(1.15rem, 3.5vw, 2.75rem) !important;
+    padding-left: clamp(0.85rem, 3vw, 2.5rem) !important;
+    padding-right: clamp(0.85rem, 3vw, 2.5rem) !important;
 }
 
 /* ==================== هيكل التطبيق والقائمة الجانبية القابلة للطي والفتح ==================== */
@@ -254,28 +255,30 @@ html.dark .rev-nav-item.active .rev-nav-icon {
 
 /* ==================== الشريط العلوي المتجاوب للهواتف والشاشات ==================== */
 .rev-topbar {
-    background: rgba(245, 246, 248, 0.88);
+    background: rgba(245, 246, 248, 0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--rev-border);
+    width: 100%;
 }
 html.dark .rev-topbar {
-    background: rgba(8, 10, 13, 0.88);
+    background: rgba(8, 10, 13, 0.92);
 }
 
-/* على شاشات الهواتف الصغيرة يلتف حقل البحث لسطر كامل مستقل حتى لا تنضغط الأزرار */
-@media (max-width: 639px) {
-    .rev-topbar > div {
-        height: auto !important;
-        padding-top: 10px;
-        padding-bottom: 10px;
+@media (max-width: 767px) {
+    .rev-topbar .rev-container {
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
     }
-    .rev-topbar > div > div.relative.flex-grow {
-        order: 3;
-        min-width: 100%;
-        max-width: 100%;
+    #catalog-search-input {
+        width: 100%;
+        height: 40px;
+        font-size: 16px !important; /* منع التكبير التلقائي في iOS Safari */
     }
 }
 
