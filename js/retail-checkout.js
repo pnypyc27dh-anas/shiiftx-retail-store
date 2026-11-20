@@ -386,6 +386,7 @@ async function checkPendingOrdersStatus() {
     const { data, error } = await retailSupabase
         .from('retail_orders')
         .select('local_order_ref')
+        .eq('user_id', currentUser.id)
         .eq('status', 'pending');
 
     if (!error && data && data.length > 0) {
@@ -416,12 +417,14 @@ async function openOrdersModal() {
 }
 
 async function loadUserOrdersHistory() {
+    if (!currentUser) return;
     const tbody = document.getElementById('retail-orders-tbody');
     tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-[#68707d]">...</td></tr>`;
 
     const { data, error } = await retailSupabase
         .from('retail_orders')
         .select('catalog_id, local_order_ref, retail_price, player_id, delivered_code, status, rejection_reason, created_at, retail_catalog(platform, package_name)')
+        .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false });
 
     if (error) {
