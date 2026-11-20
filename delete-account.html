@@ -2,31 +2,33 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIIFT X — طلب حذف الحساب والبيانات</title>
-    
-    <!-- أيقونات المتجر الرسمية المعتمدة -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب حذف الحساب والبيانات | SHIIFT X</title>
+
+    <!-- أيقونات المتجر الرسمية -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
     <link rel="icon" type="image/x-icon" href="assets/og-cover.png">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    
-    <!-- الخطوط وملف التنسيق -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- مكتبة Supabase وملف الإعدادات -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js"></script>
 
     <!-- مزامنة المظهر فوراً قبل رسم الصفحة لمنع الوميض -->
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('retail_theme') === 'dark' || (!('retail_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
     </script>
+
+    <!-- الخطوط وملف التنسيق الإنتاجي -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- مكتبة Supabase وملف الإعدادات -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
 
     <style>
         body {
@@ -38,7 +40,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* التبديل التلقائي للوضع الليلي */
         html.dark body {
             background-color: #0b1120;
             background-image: radial-gradient(#1e293b 1px, transparent 1px);
@@ -79,6 +80,11 @@
             outline: none;
         }
 
+        html.dark .input-field:focus {
+            border-color: #5CE1E6 !important;
+            box-shadow: 0 0 0 3px rgba(92, 225, 230, 0.2) !important;
+        }
+
         .no-spin::-webkit-outer-spin-button,
         .no-spin::-webkit-inner-spin-button {
             -webkit-appearance: none !important;
@@ -89,62 +95,59 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 antialiased transition-colors duration-200">
 
-    <!-- شريط الترويسة الآمن والمتوافق تلقائياً مع المظهرين -->
+    <!-- شريط الترويسة الرسمي -->
     <header class="w-full max-w-xl mx-auto flex items-center justify-between py-4 px-2">
-        <!-- الشعار الفيكتور المباشر -->
         <a href="index.html" class="flex items-center text-slate-900 dark:text-white hover:opacity-90 transition active:scale-95" title="الرئيسية">
-            <svg class="h-8 sm:h-9 w-auto" viewBox="70 100 405 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- أحرف SH و FT (تأخذ لون النص تلقائياً عبر currentColor) -->
+            <svg class="h-8 sm:h-9 w-auto" viewBox="70 100 405 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="SHIIFT X">
                 <path fill="currentColor" d="M102.584 151.616C106.853 151.616 110.767 152.034 114.324 152.871C117.871 153.706 121.098 154.808 124.002 156.179L124.289 156.315L124.185 156.615L121.162 165.332L121.035 165.698L120.682 165.538C118.039 164.34 115.144 163.327 111.994 162.501H111.992C108.929 161.679 105.721 161.268 102.368 161.268C99.163 161.268 96.5183 161.754 94.4189 162.708C92.3171 163.663 90.7558 165.014 89.7178 166.756L89.7148 166.762C88.6751 168.434 88.1484 170.405 88.1484 172.689C88.1485 175.36 88.6793 177.557 89.7178 179.3C90.758 181.046 92.4705 182.63 94.8828 184.044C97.3071 185.465 100.597 187.005 104.761 188.661H104.762C109.309 190.402 113.145 192.298 116.265 194.352L116.856 194.73C119.772 196.644 121.995 198.937 123.511 201.611H123.51C125.204 204.471 126.039 208.046 126.039 212.315C126.039 217.201 124.91 221.385 122.635 224.849L122.633 224.852C120.359 228.236 117.1 230.841 112.874 232.676L112.875 232.677C108.718 234.513 103.809 235.425 98.1582 235.425C95.2674 235.425 92.4834 235.273 89.8066 234.97L89.8047 234.969C87.2021 234.666 84.8129 234.248 82.6377 233.716L82.626 233.713C80.4497 233.104 78.5209 232.38 76.8418 231.537L76.6465 231.44V220.93L77.1494 221.164C79.7146 222.36 82.8951 223.447 86.6953 224.425H86.6943C90.5515 225.399 94.5164 225.886 98.5898 225.886C102.374 225.886 105.528 225.362 108.064 224.327C110.602 223.292 112.482 221.823 113.731 219.931C114.984 218.033 115.616 215.801 115.616 213.22C115.616 210.626 115.086 208.465 114.047 206.721C113.01 204.981 111.194 203.358 108.562 201.866L108.553 201.861C105.99 200.293 102.379 198.642 97.7109 196.909L97.707 196.907C94.3838 195.619 91.452 194.253 88.915 192.809L88.9043 192.803C86.4318 191.278 84.3524 189.557 82.6709 187.64C80.9858 185.719 79.7044 183.529 78.8262 181.073L78.8223 181.064V181.063C78.0167 178.605 77.6182 175.774 77.6182 172.575C77.6182 168.214 78.6769 164.48 80.8115 161.392C82.9379 158.24 85.8691 155.823 89.5928 154.138L89.5947 154.137C93.3894 152.453 97.7216 151.616 102.584 151.616ZM156.342 152.748V186.94H195.144V152.748H205.566V234.292H195.144V196.591H156.342V234.292H145.918V152.748H156.342Z"/>
                 <path fill="currentColor" d="M389.967 151.616V161.519H350.874V190.257H387.563V200.159H350.874V235.425H338.781V151.616H389.967ZM467.7 151.616V161.519H439.615V235.425H427.521V161.519H399.308V151.616H467.7Z"/>
-                <!-- النواة المركزية المضيئة -->
                 <path class="fill-[#005ba3] dark:fill-[#5CE1E6]" d="M234.632 132.734L234.737 132.895L270.402 187.555L270.537 187.763L270.388 187.961L234.723 235.284L234.616 235.425H212.435L212.827 234.867L246.018 187.733L212.815 133.272L212.487 132.734H234.632ZM332.739 132.734L332.41 133.272L299.206 187.733L332.398 234.867L332.79 235.425H310.609L310.502 235.284L274.837 187.961L274.688 187.763L274.823 187.555L310.489 132.895L310.593 132.734H332.739ZM225.717 104.646C229.012 104.647 231.91 105.552 234.396 107.37C237.099 109.098 238.429 111.887 238.429 115.655C238.429 119.302 237.094 122.079 234.406 123.931L234.406 123.932C231.918 125.755 229.017 126.664 225.717 126.664C222.102 126.664 219.037 125.76 216.542 123.932C214.011 122.077 212.763 119.296 212.763 115.655C212.763 111.893 214.007 109.103 216.552 107.371C219.045 105.548 222.107 104.646 225.717 104.646ZM319.508 104.646C323.118 104.646 326.181 105.548 328.673 107.371L328.907 107.537C331.294 109.279 332.462 112.011 332.462 115.655C332.462 119.296 331.214 122.077 328.683 123.932C326.189 125.76 323.123 126.664 319.508 126.664C316.208 126.664 313.307 125.755 310.819 123.932V123.931C308.13 122.079 306.796 119.301 306.796 115.655C306.796 111.888 308.126 109.098 310.828 107.37C313.314 105.552 316.213 104.647 319.508 104.646Z"/>
             </svg>
         </a>
 
-        <!-- زر العودة -->
-        <a href="index.html" class="text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1.5 transition">
+        <a href="index.html" class="text-xs font-bold text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 transition">
             <i class="ph ph-arrow-right"></i>
-            <span>العودة للمنصة الرئيسية</span>
+            <span>العودة للمتجر</span>
         </a>
     </header>
+
     <!-- الحاوية المركزية لمعالجة الطلب -->
     <main class="w-full max-w-xl mx-auto my-auto py-4">
         <div class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
-            
+
             <div class="text-center space-y-2">
-                <!-- الأيقونة الرسمية للمتجر في صدارة البطاقة -->
                 <div class="flex justify-center mb-3">
                     <img src="assets/app-icon-192.png" alt="SHIIFT X" class="w-16 h-16 rounded-2xl shadow-lg shadow-indigo-600/15 border border-slate-200 dark:border-slate-800 object-cover">
                 </div>
                 <h1 class="text-xl font-black text-slate-900 dark:text-white">طلب حذف الحساب والبيانات</h1>
                 <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed max-w-md mx-auto">
-                    بموجب سياسات حماية البيانات ومتطلبات Google Play، يتيح هذا النموذج طلب حذف حسابك وبياناتك المرتبطة حتى لو حذفت التطبيق من جهازك.
+                    بموجب سياسات حماية البيانات (GDPR) ومتطلبات Google Play، يتيح هذا النموذج طلب حذف حسابك وبياناتك المرتبطة بمتجر SHIIFT X حتى لو حذفت التطبيق من جهازك.
                 </p>
             </div>
 
-            <!-- سياسة الخصوصية وتفاصيل الحذف للامتثال لشروط المتجر -->
+            <!-- تفاصيل دورة الحذف -->
             <div class="p-4 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 space-y-2.5 text-xs">
-                <h3 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                    <i class="ph-fill ph-info text-blue-500"></i> تفاصيل دورة الحذف والبيانات:
-                </h3>
+                <h2 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <i class="ph-fill ph-info text-blue-500 dark:text-[#5CE1E6]"></i>
+                    <span>تفاصيل دورة الحذف والبيانات:</span>
+                </h2>
                 <ul class="space-y-1.5 text-slate-600 dark:text-slate-400 pr-4 list-disc leading-relaxed">
-                    <li><strong class="text-slate-800 dark:text-slate-300">مهلة التراجع (14 يوماً):</strong> فور تأكيد الطلب يتم تعطيل الوصول، وتمنح مهلة 14 يوماً لإلغاء الحذف بمجرد تسجيل الدخول في أي وقت.</li>
-                    <li><strong class="text-slate-800 dark:text-slate-300">البيانات التي تُحذف نهائياً:</strong> بيانات تسجيل الدخول، البريد، رقم الهاتف، الاسم، والعناوين الرقمية.</li>
-                    <li><strong class="text-slate-800 dark:text-slate-300">البيانات المحتفظ بها قانونياً:</strong> سجلات التحويلات والفواتير المالية المكتملة تُحفظ بصفة مشفرة ومفصولة لأغراض التدقيق المحاسبي والامتثال الضريبي.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">مهلة التراجع (14 يوماً):</strong> فور تأكيد الطلب يتم تعطيل الوصول مؤقتاً، وتُمنح مهلة 14 يوماً لإلغاء الحذف بمجرد تسجيل الدخول مجدداً إلى المتجر.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">البيانات التي تُحذف نهائياً:</strong> بيانات تسجيل الدخول، البريد الإلكتروني، رقم الهاتف، الاسم الكامل، وإعدادات الحساب.</li>
+                    <li><strong class="text-slate-800 dark:text-slate-200">البيانات المحتفظ بها قانونياً:</strong> سجلات المعاملات والفواتير المالية المكتملة تُحفظ بصورة مشفرة ومفصولة لأغراض التدقيق المحاسبي والامتثال الضريبي (BAO § 132).</li>
                 </ul>
             </div>
 
             <!-- النموذج التفاعلي (مرحلتين) -->
             <div id="deletion-flow-container" class="space-y-4">
-                
+
                 <!-- المرحلة 1: إدخال البريد الإلكتروني وطلب رمز التحقق -->
                 <div id="step-request-otp" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">البريد الإلكتروني المسجل بالحساب</label>
+                        <label for="web-del-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">البريد الإلكتروني المسجل بالحساب</label>
                         <div class="relative">
                             <i class="ph ph-envelope-simple absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
-                            <input id="web-del-email" type="email" required placeholder="name@example.com" class="input-field w-full pr-11 pl-4 py-3 text-xs" dir="ltr">
+                            <input id="web-del-email" type="email" required autocomplete="email" placeholder="name@example.com" class="input-field w-full pr-11 pl-4 py-3 text-xs" dir="ltr">
                         </div>
                     </div>
 
@@ -158,10 +161,10 @@
                 <div id="step-verify-otp" class="hidden space-y-4">
                     <div>
                         <div class="flex justify-between items-center mb-1.5">
-                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">رمز التحقق المستلم (6 أرقام)</label>
-                            <span id="target-email-badge" class="text-[11px] text-blue-600 dark:text-blue-400 font-mono font-bold"></span>
+                            <label for="web-del-code" class="text-xs font-bold text-slate-700 dark:text-slate-300">رمز التحقق المستلم (6 أرقام)</label>
+                            <span id="target-email-badge" class="text-[11px] text-blue-600 dark:text-[#5CE1E6] font-mono font-bold"></span>
                         </div>
-                        <input id="web-del-code" type="text" maxlength="6" inputmode="numeric" placeholder="••••••" class="input-field no-spin w-full px-4 py-3.5 text-center text-xl font-mono font-bold tracking-[0.4em] focus:border-red-500" dir="ltr" autocomplete="one-time-code">
+                        <input id="web-del-code" type="text" maxlength="6" inputmode="numeric" placeholder="••••••" class="input-field no-spin w-full px-4 py-3.5 text-center text-xl font-mono font-bold tracking-[0.4em]" dir="ltr" autocomplete="one-time-code">
                     </div>
 
                     <button id="web-confirm-delete-btn" type="button" onclick="confirmWebDeleteOTP()" class="w-full py-3.5 bg-red-600 hover:bg-red-700 active:scale-95 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-red-600/30 flex items-center justify-center gap-2 cursor-pointer">
@@ -182,15 +185,22 @@
             </div>
 
             <!-- رسالة الحالة والتنبيهات -->
-            <div id="web-status-msg" class="hidden p-4 rounded-2xl text-xs font-bold text-center leading-relaxed"></div>
+            <div id="web-status-msg" class="hidden p-4 rounded-2xl text-xs font-bold text-center leading-relaxed" role="alert"></div>
 
         </div>
     </main>
 
-    <!-- منطق المعالجة بالجافاسكريبت -->
+    <!-- منطق المعالجة بالجافاسكريبت المتوافق مع دوال متجر التجزئة -->
     <script>
-        const client = (typeof supabase !== 'undefined') ? supabase : (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+        function getRetailClient() {
+            if (typeof supabaseClient !== 'undefined' && supabaseClient && supabaseClient.auth) return supabaseClient;
+            if (typeof db !== 'undefined' && db && db.auth) return db;
+            if (typeof retailSupabase !== 'undefined' && retailSupabase && retailSupabase.auth) return retailSupabase;
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) return supabase;
+            return null;
+        }
 
+        const client = getRetailClient();
         let activeTargetEmail = '';
         let resendCountdownTimer = null;
 
@@ -207,6 +217,10 @@
 
         // 1. إرسال رمز التحقق
         async function sendWebDeleteOTP() {
+            if (!client) {
+                return showStatus("تعذر الاتصال بالخادم حالياً، يرجى تحديث الصفحة والمحاولة مجدداً.");
+            }
+
             const emailInput = document.getElementById('web-del-email');
             const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
             const btn = document.getElementById('web-send-otp-btn');
@@ -245,6 +259,8 @@
                 const errMsg = err?.message || String(err);
                 if (errMsg.includes('429') || errMsg.includes('security purposes') || errMsg.includes('rate limit')) {
                     showStatus("يرجى الانتظار لمدة دقيقة واحدة قبل طلب رمز جديد حفاظاً على الأمان.");
+                } else if (errMsg.includes('Signups not allowed')) {
+                    showStatus("لم يتم العثور على حساب مسجل بهذا البريد الإلكتروني.");
                 } else {
                     showStatus("فشل إرسال الرمز: " + errMsg);
                 }
@@ -260,7 +276,6 @@
             const icon = document.getElementById('web-resend-icon');
 
             if (!btn || !timerDisplay) return;
-
             if (resendCountdownTimer) clearInterval(resendCountdownTimer);
 
             btn.disabled = true;
@@ -288,7 +303,7 @@
             const btn = document.getElementById('web-resend-btn');
             const icon = document.getElementById('web-resend-icon');
 
-            if (!activeTargetEmail) return;
+            if (!activeTargetEmail || !client) return;
 
             btn.disabled = true;
             if (icon) icon.classList.add('animate-spin');
@@ -313,8 +328,12 @@
             }
         }
 
-        // 4. التحقق من الرمز وتنفيذ جدولة الحذف عبر دالة الخادم الآمنة
+        // 4. التحقق من الرمز وتنفيذ جدولة الحذف عبر دالة متجر التجزئة الآمنة
         async function confirmWebDeleteOTP() {
+            if (!client) {
+                return showStatus("تعذر الاتصال بالخادم حالياً، يرجى تحديث الصفحة والمحاولة مجدداً.");
+            }
+
             const codeInput = document.getElementById('web-del-code');
             const rawToken = codeInput ? codeInput.value : '';
             const cleanToken = rawToken.replace(/\s+/g, '').trim();
@@ -348,14 +367,15 @@
                     throw new Error("رمز التحقق غير صحيح أو منتهي الصلاحية.");
                 }
 
-                const { data: rpcData, error: rpcError } = await client.rpc('request_account_deletion');
+                // استدعاء دالة جدولة الحذف الخاصة بمتجر التجزئة
+                const { data: rpcData, error: rpcError } = await client.rpc('schedule_retail_account_deletion');
 
                 if (rpcError) {
                     throw new Error(rpcError.message || "فشل تنفيذ العملية.");
                 }
 
-                if (rpcData && rpcData.status === 'error') {
-                    throw new Error(rpcData.message);
+                if (rpcData && (rpcData.status === 'error' || rpcData.success === false)) {
+                    throw new Error(rpcData.message || "فشل جدولة حذف الحساب.");
                 }
 
                 await client.auth.signOut();
@@ -367,12 +387,12 @@
                             <div class="w-12 h-12 bg-amber-500/20 text-amber-500 rounded-full flex items-center justify-center mx-auto text-2xl">
                                 <i class="ph-bold ph-clock-countdown"></i>
                             </div>
-                            <h4 class="text-base font-black text-slate-900 dark:text-white">الطلب مسجل مسبقاً</h4>
+                            <h3 class="text-base font-black text-slate-900 dark:text-white">الطلب مسجل مسبقاً</h3>
                             <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
                                 هذا الحساب مجدول للحذف بالفعل وموقوف مؤقتاً، ومتبقي لديك <span class="text-amber-500 font-bold">(${daysLeft}) يوم</span> ضمن مهلة التراجع قبل المسح التام لكافة بياناتك.
                             </p>
                             <p class="text-[11px] text-slate-500 dark:text-slate-400">
-                                يمكنك استعادة حسابك في أي وقت عبر تسجيل الدخول في المنصة الرئيسية.
+                                يمكنك استعادة حسابك في أي وقت عبر تسجيل الدخول في المتجر الرئيسي.
                             </p>
                         </div>
                     `;
@@ -385,7 +405,7 @@
                         <div class="w-12 h-12 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto text-2xl">
                             <i class="ph-bold ph-check-circle"></i>
                         </div>
-                        <h4 class="text-base font-black text-slate-900 dark:text-white">تم تأكيد طلب الحذف بنجاح</h4>
+                        <h3 class="text-base font-black text-slate-900 dark:text-white">تم تأكيد طلب الحذف بنجاح</h3>
                         <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
                             تم التحقق من هويتك بنجاح وتعطيل حسابك فوراً. حسابك الآن ضمن مهلة السماح (14 يوماً)، وسيتم مسح كافة البيانات بشكل نهائي وتلقائي فور انتهاء المهلة.
                         </p>
@@ -400,23 +420,22 @@
             }
         }
     </script>
-     <!-- التذييل الرسمي وروابط التنقل القانونية السريعة -->
+
+    <!-- التذييل الرسمي الموحّد -->
     <footer class="w-full max-w-3xl mx-auto text-center py-6 space-y-3">
         <div class="flex flex-wrap justify-center items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-            <a href="privacy-policy.html" class="hover:underline">سياسة الخصوصية</a>
-            <span>•</span>
-            <a href="terms.html" class="hover:underline">الشروط والأحكام</a>
-            <span>•</span>
-            <a href="refund-policy.html" class="hover:underline">سياسة الاسترداد</a>
-            <span>•</span>
-            <a href="acceptable-use.html" class="hover:underline">سياسة الاستخدام</a>
- <span>•</span>
-            <a href="impressum.html" class="hover:underline">impressum.html </a>
-            
+            <a href="privacy.html" class="hover:text-slate-900 dark:hover:text-white hover:underline transition">سياسة الخصوصية</a>
+            <span class="opacity-40">•</span>
+            <a href="terms.html" class="hover:text-slate-900 dark:hover:text-white hover:underline transition">الشروط والأحكام</a>
+            <span class="opacity-40">•</span>
+            <a href="refund.html" class="hover:text-slate-900 dark:hover:text-white hover:underline transition">سياسة الاسترداد</a>
+            <span class="opacity-40">•</span>
+            <a href="impressum.html" class="hover:text-slate-900 dark:hover:text-white hover:underline transition">الإشعار القانوني (Impressum)</a>
         </div>
         <p class="text-[11px] text-slate-400 dark:text-slate-500">
             منصة SHIIFT X © 2026 — جميع الحقوق محفوظة
         </p>
     </footer>
+
 </body>
 </html>
