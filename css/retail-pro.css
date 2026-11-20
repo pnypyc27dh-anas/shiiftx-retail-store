@@ -266,19 +266,10 @@ html.dark .rev-topbar {
 }
 
 @media (max-width: 767px) {
-    .rev-topbar .rev-container {
-        padding-top: 10px !important;
-        padding-bottom: 10px !important;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-    }
     #catalog-search-input {
         width: 100%;
         height: 40px;
-        font-size: 16px !important; /* منع التكبير التلقائي في iOS Safari */
+        font-size: 16px !important;
     }
 }
 
@@ -289,21 +280,29 @@ html.dark .rev-topbar {
 }
 
 .rev-dropdown-trigger {
-    height: 34px;
-    padding: 0 10px;
+    height: 32px;
+    padding: 0 8px;
     border-radius: 9999px;
     background: var(--rev-surface-subtle);
     border: 1px solid var(--rev-border);
     color: var(--rev-text-primary);
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 800;
     font-family: 'Plus Jakarta Sans', 'Tajawal', sans-serif;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     cursor: pointer;
     transition: all 0.2s var(--rev-spring);
     white-space: nowrap;
+}
+@media (min-width: 640px) {
+    .rev-dropdown-trigger {
+        height: 36px;
+        padding: 0 12px;
+        font-size: 11.5px;
+        gap: 6px;
+    }
 }
 .rev-dropdown-trigger:hover {
     border-color: var(--rev-border-strong);
