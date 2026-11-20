@@ -178,10 +178,10 @@ window.saveRetailProfile = async function() {
 
     btn.disabled = true;
     try {
-        const { error } = await retailSupabase
-            .from('retail_users')
-            .update({ full_name: fullName, phone: phone })
-            .eq('id', currentUser.id);
+        const { error } = await retailSupabase.rpc('update_retail_profile', {
+            p_full_name: fullName,
+            p_phone: phone
+        });
         if (error) throw error;
         await refreshUserWallet();
         showRetailToast('تم حفظ وتحديث بيانات الحساب بنجاح', 'success');
