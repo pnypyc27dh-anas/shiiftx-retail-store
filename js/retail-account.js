@@ -13,7 +13,10 @@ function syncAuthUIState(isLoggedIn, balance = 0) {
     const sbLogout = document.getElementById('sidebar-logout-btn');
 
     if (isLoggedIn) {
-        if (guestBtn) guestBtn.classList.add('hidden');
+        if (guestBtn) {
+            guestBtn.classList.add('hidden');
+            guestBtn.style.display = 'none';
+        }
         if (navPanel) {
             navPanel.classList.remove('hidden');
             navPanel.classList.add('flex');
@@ -29,7 +32,10 @@ function syncAuthUIState(isLoggedIn, balance = 0) {
             navPanel.classList.add('hidden');
             navPanel.classList.remove('flex');
         }
-        if (guestBtn) guestBtn.classList.remove('hidden');
+        if (guestBtn) {
+            guestBtn.classList.remove('hidden');
+            guestBtn.style.display = '';
+        }
 
         if (sbGuest) sbGuest.classList.remove('hidden');
         if (sbUser) sbUser.classList.add('hidden');
