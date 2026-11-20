@@ -644,7 +644,11 @@ function applyDesktopSidebarState() {
         topbarLogo.classList.toggle('lg:hidden', !isSidebarCollapsed);
     }
 }
-
+window.toggleDesktopSidebar = function() {
+    isSidebarCollapsed = !isSidebarCollapsed;
+    localStorage.setItem('shiiftx_sidebar_collapsed', String(isSidebarCollapsed));
+    applyDesktopSidebarState();
+};
 window.toggleMobileSidebar = function(forceOpen) {
     const sidebar = document.getElementById('app-sidebar');
     const backdrop = document.getElementById('sidebar-backdrop');
