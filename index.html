@@ -694,7 +694,7 @@
         </div>
     </div>
 
-    <!-- 3. درج تسجيل الدخول وإنشاء الحساب -->
+    <!-- 3. درج تسجيل الدخول وإنشاء الحساب والتحقق برمز OTP -->
     <div id="auth-modal" class="hidden rev-overlay" onclick="closeModal('auth-modal')">
         <div class="rev-drawer-panel" onclick="event.stopPropagation()">
             <div class="rev-sheet-handle"></div>
@@ -707,31 +707,68 @@
             </div>
 
             <div class="p-6 flex-grow overflow-y-auto space-y-5">
-                <form id="auth-form" onsubmit="handleRetailAuthSubmit(event)" class="space-y-4 text-xs">
-                    <input type="hidden" id="auth-mode" value="login">
-                    <div id="auth-name-group" class="hidden space-y-1.5">
-                        <label data-i18n="label_fullname" class="block font-bold text-[#64748b] dark:text-slate-400">الاسم الكامل</label>
-                        <input id="auth-fullname" type="text" class="rev-input rounded-2xl w-full px-4 py-3.5 font-bold">
+                <!-- الخطوة 1: بيانات الدخول / التسجيل -->
+                <div id="auth-credentials-step" class="space-y-5">
+                    <form id="auth-form" onsubmit="handleRetailAuthSubmit(event)" class="space-y-4 text-xs">
+                        <input type="hidden" id="auth-mode" value="login">
+                        <div id="auth-name-group" class="hidden space-y-1.5">
+                            <label data-i18n="label_fullname" class="block font-bold text-[#64748b] dark:text-slate-400">الاسم الكامل</label>
+                            <input id="auth-fullname" type="text" class="rev-input rounded-2xl w-full px-4 py-3.5 font-bold">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label data-i18n="label_email" class="block font-bold text-[#64748b] dark:text-slate-400">البريد الإلكتروني</label>
+                            <input id="auth-email" type="email" required placeholder="name@example.com" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-bold text-left">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label data-i18n="label_password" class="block font-bold text-[#64748b] dark:text-slate-400">كلمة المرور</label>
+                            <input id="auth-password" type="password" required minlength="6" placeholder="••••••••" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-bold text-left">
+                        </div>
+                        <div class="pt-2">
+                            <button type="submit" id="auth-submit-btn" class="rev-btn-primary w-full py-3.5 text-xs">
+                                متابعة
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center text-xs text-[#64748b] dark:text-slate-400 pt-4 border-t border-black/8 dark:border-white/8">
+                        <span id="auth-switch-text">ليس لديك حساب؟</span>
+                        <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-[#005ba3] dark:text-[#5CE1E6] font-extrabold hover:underline mx-1 cursor-pointer">إنشاء حساب جديد</button>
                     </div>
-                    <div class="space-y-1.5">
-                        <label data-i18n="label_email" class="block font-bold text-[#64748b] dark:text-slate-400">البريد الإلكتروني</label>
-                        <input id="auth-email" type="email" required placeholder="name@example.com" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-bold text-left">
+                </div>
+
+                <!-- الخطوة 2: التحقق برمز التوكين عبر البريد الإلكتروني -->
+                <form id="auth-otp-step" onsubmit="handleVerifySignupOtp(event)" class="hidden space-y-5 text-xs">
+                    <div class="p-4 rounded-2xl bg-[#eef1f6] dark:bg-[#181d29] border border-black/6 dark:border-white/8 text-center space-y-2">
+                        <div class="w-12 h-12 rounded-2xl bg-[#005ba3]/10 dark:bg-[#5CE1E6]/10 text-[#005ba3] dark:text-[#5CE1E6] flex items-center justify-center mx-auto text-2xl">
+                            <i class="ph-fill ph-envelope-simple-open"></i>
+                        </div>
+                        <p data-i18n="auth_otp_desc" class="text-[#64748b] dark:text-slate-300 leading-relaxed">
+                            أرسلنا رمز تحقق مكوّناً من 6 أرقام إلى بريدك الإلكتروني:
+                        </p>
+                        <div id="signup-otp-email-display" dir="ltr" class="font-mono font-black text-xs text-[#0f172a] dark:text-white break-all">---</div>
                     </div>
-                    <div class="space-y-1.5">
-                        <label data-i18n="label_password" class="block font-bold text-[#64748b] dark:text-slate-400">كلمة المرور</label>
-                        <input id="auth-password" type="password" required minlength="6" placeholder="••••••••" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-bold text-left">
+
+                    <div class="space-y-2">
+                        <input id="signup-otp-code-input" type="text" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="••••••" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-mono tracking-[0.45em] text-center text-xl font-bold">
                     </div>
-                    <div class="pt-2">
-                        <button type="submit" id="auth-submit-btn" class="rev-btn-primary w-full py-3.5 text-xs">
-                            متابعة
+
+                    <button type="submit" id="btn-verify-signup-otp" class="rev-btn-brand w-full py-3.5 text-xs">
+                        <i class="ph-bold ph-shield-check text-base"></i>
+                        <span data-i18n="auth_otp_verify_btn">تأكيد وتفعيل الحساب</span>
+                    </button>
+
+                    <div class="flex flex-col items-center gap-3 pt-2 border-t border-black/8 dark:border-white/8">
+                        <button type="button" id="signup-otp-resend-btn" onclick="handleResendSignupOtp()" disabled class="text-xs font-bold text-[#005ba3] dark:text-[#5CE1E6] disabled:text-slate-400 disabled:opacity-60 hover:underline inline-flex items-center gap-1.5 cursor-pointer">
+                            <i class="ph-bold ph-arrows-clockwise"></i>
+                            <span data-i18n="auth_otp_resend">إعادة إرسال الرمز</span>
+                            <span id="signup-otp-resend-timer" class="font-mono">(60s)</span>
+                        </button>
+
+                        <button type="button" onclick="backToAuthCredentialsStep()" data-i18n="auth_otp_back" class="text-[11px] font-bold text-[#64748b] dark:text-slate-400 hover:text-[#0f172a] dark:hover:text-white transition cursor-pointer">
+                            العودة وتعديل البريد الإلكتروني
                         </button>
                     </div>
                 </form>
-
-                <div class="text-center text-xs text-[#64748b] dark:text-slate-400 pt-4 border-t border-black/8 dark:border-white/8">
-                    <span id="auth-switch-text">ليس لديك حساب؟</span>
-                    <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-[#005ba3] dark:text-[#5CE1E6] font-extrabold hover:underline mx-1 cursor-pointer">إنشاء حساب جديد</button>
-                </div>
             </div>
         </div>
     </div>
