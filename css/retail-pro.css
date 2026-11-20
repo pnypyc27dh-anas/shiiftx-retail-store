@@ -907,4 +907,19 @@ html.dark .rev-input:focus {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* 1. ضمان إخفاء زر الدخول (وأي زر يحمل hidden) فور تسجيل دخول العميل */
+.hidden {
+    display: none !important;
+}
+
+/* 2. إظهار الشعار في الشريط العلوي على الشاشات الكبيرة فقط عند طيّ القائمة الجانبية */
+@media (min-width: 1024px) {
+    #topbar-brand-logo {
+        display: none;
+    }
+    .rev-sidebar.collapsed + div #topbar-brand-logo {
+        display: flex;
+    }
+}
 /* ==================== نهاية ملف css/retail-pro.css ==================== */
