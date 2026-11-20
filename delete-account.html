@@ -28,7 +28,7 @@
 
     <!-- مكتبة Supabase وملف الإعدادات -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js"></script>
+    <script src="js/retail-core.js"></script>
 
     <style>
         body {
@@ -193,12 +193,30 @@
     <!-- منطق المعالجة بالجافاسكريبت المتوافق مع دوال متجر التجزئة -->
     <script>
         function getRetailClient() {
-            if (typeof supabaseClient !== 'undefined' && supabaseClient && supabaseClient.auth) return supabaseClient;
-            if (typeof db !== 'undefined' && db && db.auth) return db;
-            if (typeof retailSupabase !== 'undefined' && retailSupabase && retailSupabase.auth) return retailSupabase;
-            if (typeof supabase !== 'undefined' && supabase && supabase.auth) return supabase;
-            return null;
-        }
+    if (typeof retailSupabase !== 'undefined' && retailSupabase && retailSupabase.auth) {
+        return retailSupabase;
+    }
+    if (window.retailSupabase && window.retailSupabase.auth) {
+        return window.retailSupabase;
+    }
+    if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+        const fallbackClient = supabase.createClient(
+            'https://qavdmizccaltsggwrdkk.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhdmRtaXpjY2FsdHNnZ3dyZGtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0NDUzMTgsImV4cCI6MjExMDAyMTMxOH0.RUqkSQggtLrpfFGcr8Y2RUyD6RoJLqzKD3CVc5fo4KI',
+            {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true,
+                    storageKey: 'sb-qavdmizccaltsggwrdkk-auth-token'
+                }
+            }
+        );
+        window.retailSupabase = fallbackClient;
+        return fallbackClient;
+    }
+    return null;
+}
 
         const client = getRetailClient();
         let activeTargetEmail = '';
@@ -220,7 +238,8 @@
             if (!client) {
                 return showStatus("تعذر الاتصال بالخادم حالياً، يرجى تحديث الصفحة والمحاولة مجدداً.");
             }
-
+            
+            const client = getRetailClient();
             const emailInput = document.getElementById('web-del-email');
             const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
             const btn = document.getElementById('web-send-otp-btn');
@@ -300,8 +319,10 @@
 
         // 3. إعادة إرسال الرمز
         async function resendWebDeleteOTP() {
+            const client = getRetailClient();
             const btn = document.getElementById('web-resend-btn');
             const icon = document.getElementById('web-resend-icon');
+            
 
             if (!activeTargetEmail || !client) return;
 
@@ -330,6 +351,7 @@
 
         // 4. التحقق من الرمز وتنفيذ جدولة الحذف عبر دالة متجر التجزئة الآمنة
         async function confirmWebDeleteOTP() {
+            const client = getRetailClient();
             if (!client) {
                 return showStatus("تعذر الاتصال بالخادم حالياً، يرجى تحديث الصفحة والمحاولة مجدداً.");
             }
