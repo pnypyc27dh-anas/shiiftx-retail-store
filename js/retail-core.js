@@ -637,13 +637,13 @@ document.addEventListener('click', closeAllHeaderDropdowns);
 function applyDesktopSidebarState() {
     const sidebar = document.getElementById('app-sidebar');
     if (sidebar) sidebar.classList.toggle('collapsed', isSidebarCollapsed);
-}
 
-window.toggleDesktopSidebar = function() {
-    isSidebarCollapsed = !isSidebarCollapsed;
-    localStorage.setItem('shiiftx_sidebar_collapsed', String(isSidebarCollapsed));
-    applyDesktopSidebarState();
-};
+    const topbarLogo = document.getElementById('topbar-brand-logo');
+    if (topbarLogo) {
+        // على الشاشات الكبيرة: يظهر الشعار في الشريط العلوي فقط عندما تكون القائمة الجانبية مطوية (collapsed)
+        topbarLogo.classList.toggle('lg:hidden', !isSidebarCollapsed);
+    }
+}
 
 window.toggleMobileSidebar = function(forceOpen) {
     const sidebar = document.getElementById('app-sidebar');
