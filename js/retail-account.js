@@ -3,10 +3,9 @@
 function syncAuthUIState(isLoggedIn, balance = 0) {
     currentWalletBalance = Number(balance || 0);
     const formatted = formatRetailMoney(currentWalletBalance);
-    const navPanel = document.getElementById('user-nav-panel');
-    const guestBtn = document.getElementById('guest-login-btn');
-    const navBal = document.getElementById('nav-wallet-balance');
 
+    const guestBtn = document.getElementById('guest-login-btn');
+    const guestBtnWrap = guestBtn?.parentElement;
     const sbGuest = document.getElementById('sidebar-guest-box');
     const sbUser = document.getElementById('sidebar-user-box');
     const sbBal = document.getElementById('sidebar-wallet-balance');
@@ -17,24 +16,23 @@ function syncAuthUIState(isLoggedIn, balance = 0) {
             guestBtn.classList.add('hidden');
             guestBtn.style.display = 'none';
         }
-        if (navPanel) {
-            navPanel.classList.remove('hidden');
-            navPanel.classList.add('flex');
+        if (guestBtnWrap) {
+            guestBtnWrap.classList.add('hidden');
+            guestBtnWrap.classList.remove('sm:inline-flex');
         }
-        if (navBal) navBal.textContent = formatted;
 
         if (sbGuest) sbGuest.classList.add('hidden');
         if (sbUser) sbUser.classList.remove('hidden');
         if (sbBal) sbBal.textContent = formatted;
         if (sbLogout) sbLogout.classList.remove('hidden');
     } else {
-        if (navPanel) {
-            navPanel.classList.add('hidden');
-            navPanel.classList.remove('flex');
-        }
         if (guestBtn) {
             guestBtn.classList.remove('hidden');
             guestBtn.style.display = '';
+        }
+        if (guestBtnWrap) {
+            guestBtnWrap.classList.remove('hidden');
+            guestBtnWrap.classList.add('sm:inline-flex');
         }
 
         if (sbGuest) sbGuest.classList.remove('hidden');
@@ -98,16 +96,27 @@ async function handleRetailAuthSubmit(e) {
 
     try {
         if (mode === 'register') {
-            const { error } = await retailSupabase.auth.signUp({
+            const { data, error } = await retailSupabase.auth.signUp({
                 email,
                 password,
                 options: { data: { full_name: fullName } }
             });
             if (error) throw error;
+            if (data?.session) {
+                currentSession = data.session;
+                currentUser = data.session.user;
+                await refreshUserWallet();
+            }
             showRetailToast(activeLang === 'ar' ? 'تم إنشاء حسابك بنجاح' : 'Account created successfully', 'success');
         } else {
-            const { error } = await retailSupabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await retailSupabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
+            if (data?.session) {
+                currentSession = data.session;
+                currentUser = data.session.user;
+                await refreshUserWallet();
+                await checkPendingOrdersStatus();
+            }
             showRetailToast(activeLang === 'ar' ? 'مرحباً بعودتك' : 'Welcome back', 'success');
         }
         closeModal('auth-modal');
@@ -310,6 +319,19 @@ window.handleCancelReactivate = async function() {
 // =========================================================================
 document.addEventListener('DOMContentLoaded', async () => {
     applyDesktopSidebarState();
+
+    // 1. استعادة الجلسة أولاً قبل أي رسم للواجهة
+    try {
+        const { data: { session } } = await retailSupabase.auth.getSession();
+        if (session) {
+            currentSession = session;
+            currentUser = session.user;
+        }
+    } catch (err) {
+        console.error('Session bootstrap error:', err.message);
+    }
+
+    // 2. تحميل الإعدادات والكتالوج
     await initDynamicExchangeRates();
     applyLanguageToDOM();
     initHeroCarousel();
@@ -321,23 +343,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (banner) banner.classList.remove('hidden');
     }
 
-    const { data: { session } } = await retailSupabase.auth.getSession();
-    if (session) {
-        currentSession = session;
-        currentUser = session.user;
+    // 3. مزامنة بيانات المحفظة والطلبات النشطة
+    if (currentUser) {
         await refreshUserWallet();
         await checkPendingOrdersStatus();
         setTimeout(checkAccountDeletionGracePeriod, 400);
+    } else {
+        syncAuthUIState(false, 0);
     }
 
-    retailSupabase.auth.onAuthStateChange(async (_event, session) => {
+    // 4. الاستماع لتغييرات المصادقة اللاحقة فقط
+    retailSupabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'INITIAL_SESSION') return;
+
         currentSession = session;
         currentUser = session ? session.user : null;
+
         if (currentUser) {
             await refreshUserWallet();
             await checkPendingOrdersStatus();
             setTimeout(checkAccountDeletionGracePeriod, 400);
-        } else {
+        } else if (event === 'SIGNED_OUT') {
+            currentWalletBalance = 0;
             syncAuthUIState(false, 0);
             const pendingBanner = document.getElementById('pending-order-banner');
             if (pendingBanner) pendingBanner.classList.add('hidden');
