@@ -184,7 +184,10 @@ window.saveRetailProfile = async function() {
         });
         if (error) throw error;
         await refreshUserWallet();
-        showRetailToast('تم حفظ وتحديث بيانات الحساب بنجاح', 'success');
+        showRetailToast(
+            activeLang === 'ar' ? 'تم حفظ وتحديث بيانات الحساب بنجاح' : 'Profile updated successfully',
+            'success'
+        );
         closeModal('profile-settings-modal');
     } catch (err) {
         showRetailToast(err.message, 'error');
