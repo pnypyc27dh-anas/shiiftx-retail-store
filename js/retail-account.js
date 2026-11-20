@@ -58,9 +58,19 @@ async function refreshUserWallet() {
 }
 
 // =========================================================================
-// المصادقة (تسجيل الدخول / إنشاء حساب / خروج)
+// المصادقة (تسجيل الدخول / إنشاء حساب / التحقق برمز OTP / خروج)
 // =========================================================================
+let pendingVerifyEmail = '';
+let signupOtpCountdown = null;
+
 function openAuthModal(mode = 'login') {
+    pendingVerifyEmail = '';
+    if (signupOtpCountdown) {
+        clearInterval(signupOtpCountdown);
+        signupOtpCountdown = null;
+    }
+    document.getElementById('auth-credentials-step')?.classList.remove('hidden');
+    document.getElementById('auth-otp-step')?.classList.add('hidden');
     document.getElementById('auth-mode').value = mode;
     updateAuthModalUI();
     document.getElementById('auth-modal').classList.remove('hidden');
@@ -75,6 +85,13 @@ function toggleAuthMode() {
 function updateAuthModalUI() {
     const modeEl = document.getElementById('auth-mode');
     if (!modeEl) return;
+
+    const otpStep = document.getElementById('auth-otp-step');
+    if (otpStep && !otpStep.classList.contains('hidden')) {
+        document.getElementById('auth-modal-title').textContent = t('auth_title_verify');
+        return;
+    }
+
     const isRegister = modeEl.value === 'register';
     document.getElementById('auth-modal-title').textContent = isRegister ? t('auth_title_register') : t('auth_title_login');
     document.getElementById('auth-name-group').classList.toggle('hidden', !isRegister);
@@ -82,6 +99,55 @@ function updateAuthModalUI() {
     document.getElementById('auth-switch-text').textContent = isRegister ? t('auth_switch_have_acc') : t('auth_switch_no_acc');
     document.getElementById('auth-switch-btn').textContent = isRegister ? t('auth_link_login') : t('auth_link_register');
 }
+
+function startSignupOtpTimer() {
+    const resendBtn = document.getElementById('signup-otp-resend-btn');
+    const timerSpan = document.getElementById('signup-otp-resend-timer');
+    if (!resendBtn || !timerSpan) return;
+
+    let sec = 60;
+    resendBtn.disabled = true;
+    timerSpan.textContent = `(${sec}s)`;
+
+    if (signupOtpCountdown) clearInterval(signupOtpCountdown);
+    signupOtpCountdown = setInterval(() => {
+        sec--;
+        if (sec <= 0) {
+            clearInterval(signupOtpCountdown);
+            signupOtpCountdown = null;
+            resendBtn.disabled = false;
+            timerSpan.textContent = '';
+        } else {
+            timerSpan.textContent = `(${sec}s)`;
+        }
+    }, 1000);
+}
+
+function showSignupOtpStep(email) {
+    pendingVerifyEmail = email;
+    const emailDisplay = document.getElementById('signup-otp-email-display');
+    const codeInput = document.getElementById('signup-otp-code-input');
+
+    if (emailDisplay) emailDisplay.textContent = email;
+    if (codeInput) codeInput.value = '';
+
+    document.getElementById('auth-credentials-step')?.classList.add('hidden');
+    document.getElementById('auth-otp-step')?.classList.remove('hidden');
+    document.getElementById('auth-modal-title').textContent = t('auth_title_verify');
+
+    startSignupOtpTimer();
+    setTimeout(() => codeInput?.focus(), 100);
+}
+
+window.backToAuthCredentialsStep = function() {
+    if (signupOtpCountdown) {
+        clearInterval(signupOtpCountdown);
+        signupOtpCountdown = null;
+    }
+    document.getElementById('auth-otp-step')?.classList.add('hidden');
+    document.getElementById('auth-credentials-step')?.classList.remove('hidden');
+    updateAuthModalUI();
+};
 
 async function handleRetailAuthSubmit(e) {
     e.preventDefault();
@@ -102,15 +168,51 @@ async function handleRetailAuthSubmit(e) {
                 options: { data: { full_name: fullName } }
             });
             if (error) throw error;
+
+            if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+                showRetailToast(
+                    activeLang === 'ar'
+                        ? 'هذا البريد مسجّل بالفعل. يرجى تسجيل الدخول.'
+                        : 'This email is already registered. Please sign in.',
+                    'warning'
+                );
+                document.getElementById('auth-mode').value = 'login';
+                updateAuthModalUI();
+                return;
+            }
+
             if (data?.session) {
                 currentSession = data.session;
                 currentUser = data.session.user;
                 await refreshUserWallet();
+                showRetailToast(activeLang === 'ar' ? 'تم إنشاء حسابك بنجاح' : 'Account created successfully', 'success');
+                closeModal('auth-modal');
+            } else {
+                showSignupOtpStep(email);
+                showRetailToast(
+                    activeLang === 'ar'
+                        ? 'تم إرسال رمز التفعيل المكون من 6 أرقام إلى بريدك الإلكتروني'
+                        : 'A 6-digit verification code has been sent to your email',
+                    'success'
+                );
             }
-            showRetailToast(activeLang === 'ar' ? 'تم إنشاء حسابك بنجاح' : 'Account created successfully', 'success');
         } else {
             const { data, error } = await retailSupabase.auth.signInWithPassword({ email, password });
-            if (error) throw error;
+            if (error) {
+                if (error.message && error.message.toLowerCase().includes('email not confirmed')) {
+                    await retailSupabase.auth.resend({ type: 'signup', email });
+                    showSignupOtpStep(email);
+                    showRetailToast(
+                        activeLang === 'ar'
+                            ? 'بريدك غير مفعّل بعد. أرسلنا لك رمز تحقق جديد.'
+                            : 'Your email is not verified yet. We sent a new verification code.',
+                        'info'
+                    );
+                    return;
+                }
+                throw error;
+            }
+
             if (data?.session) {
                 currentSession = data.session;
                 currentUser = data.session.user;
@@ -118,8 +220,8 @@ async function handleRetailAuthSubmit(e) {
                 await checkPendingOrdersStatus();
             }
             showRetailToast(activeLang === 'ar' ? 'مرحباً بعودتك' : 'Welcome back', 'success');
+            closeModal('auth-modal');
         }
-        closeModal('auth-modal');
     } catch (err) {
         showRetailToast(err.message, 'error');
     } finally {
@@ -127,6 +229,80 @@ async function handleRetailAuthSubmit(e) {
         updateAuthModalUI();
     }
 }
+
+window.handleVerifySignupOtp = async function(e) {
+    if (e) e.preventDefault();
+    const codeInput = document.getElementById('signup-otp-code-input');
+    const btn = document.getElementById('btn-verify-signup-otp');
+    const code = (codeInput?.value || '').trim();
+
+    if (!pendingVerifyEmail || code.length < 6) {
+        showRetailToast(
+            activeLang === 'ar' ? 'يرجى إدخال رمز التحقق المكون من 6 أرقام' : 'Please enter the 6-digit verification code',
+            'warning'
+        );
+        return;
+    }
+
+    btn.disabled = true;
+    try {
+        const { data, error } = await retailSupabase.auth.verifyOtp({
+            email: pendingVerifyEmail,
+            token: code,
+            type: 'signup'
+        });
+        if (error) throw error;
+
+        if (signupOtpCountdown) {
+            clearInterval(signupOtpCountdown);
+            signupOtpCountdown = null;
+        }
+
+        if (data?.session) {
+            currentSession = data.session;
+            currentUser = data.session.user;
+            await refreshUserWallet();
+            await checkPendingOrdersStatus();
+        }
+
+        pendingVerifyEmail = '';
+        closeModal('auth-modal');
+        showRetailToast(
+            activeLang === 'ar' ? 'تم تفعيل حسابك وتسجيل الدخول بنجاح!' : 'Account verified and signed in successfully!',
+            'success'
+        );
+    } catch (err) {
+        showRetailToast(
+            (activeLang === 'ar' ? 'رمز التحقق غير صحيح أو منتهي الصلاحية: ' : 'Invalid or expired code: ') + err.message,
+            'error'
+        );
+    } finally {
+        btn.disabled = false;
+    }
+};
+
+window.handleResendSignupOtp = async function() {
+    if (!pendingVerifyEmail) return;
+    const resendBtn = document.getElementById('signup-otp-resend-btn');
+    if (resendBtn) resendBtn.disabled = true;
+
+    try {
+        const { error } = await retailSupabase.auth.resend({
+            type: 'signup',
+            email: pendingVerifyEmail
+        });
+        if (error) throw error;
+
+        startSignupOtpTimer();
+        showRetailToast(
+            activeLang === 'ar' ? 'تمت إعادة إرسال رمز التحقق إلى بريدك' : 'Verification code resent to your email',
+            'success'
+        );
+    } catch (err) {
+        if (resendBtn) resendBtn.disabled = false;
+        showRetailToast(err.message, 'error');
+    }
+};
 
 async function handleRetailLogout() {
     await retailSupabase.auth.signOut();
