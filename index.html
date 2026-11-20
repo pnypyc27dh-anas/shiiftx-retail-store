@@ -175,86 +175,88 @@
         <!-- ==================== مساحة العمل الرئيسية ==================== -->
         <div class="flex-1 flex flex-col min-w-0">
 
-            <!-- الشريط العلوي -->
-            <header class="rev-topbar sticky top-0 z-30">
-                <div class="rev-container py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+            <!-- الشريط العلوي المتجاوب الجذري -->
+<header class="rev-topbar sticky top-0 z-30">
+    <div class="rev-container py-2.5 grid grid-cols-2 md:flex md:items-center md:justify-between gap-x-2 gap-y-2.5">
 
-                    <!-- يمين الشريط: زر القائمة والشعار على الجوال -->
-                    <div class="flex items-center gap-2 lg:hidden">
-                        <button type="button" onclick="toggleMobileSidebar(true)" class="rev-btn-secondary w-9 h-9 shrink-0" title="القائمة">
-                            <i class="ph-bold ph-list text-lg"></i>
-                        </button>
-                        <a href="/" class="font-black text-sm tracking-tight flex items-center gap-1">
-                            <span>SHIIFT</span>
-                            <span class="text-[#005ba3] dark:text-[#5CE1E6]">X</span>
-                        </a>
-                    </div>
+        <!-- 1. يمين الشريط على الجوال: زر القائمة + الشعار -->
+        <div class="flex items-center gap-2 lg:hidden justify-self-start">
+            <button type="button" onclick="toggleMobileSidebar(true)" class="rev-btn-secondary w-8 h-8 sm:w-9 sm:h-9 shrink-0" title="القائمة">
+                <i class="ph-bold ph-list text-base sm:text-lg"></i>
+            </button>
+            <a href="/" class="font-black text-sm tracking-tight flex items-center gap-1 whitespace-nowrap">
+                <span>SHIIFT</span>
+                <span class="text-[#005ba3] dark:text-[#5CE1E6]">X</span>
+            </a>
+        </div>
 
-                    <!-- وسط الشريط: حقل البحث المتجاوب -->
-<div class="relative order-3 md:order-2 w-full md:w-auto md:flex-1 max-w-xl mx-auto">
-    <i class="ph-bold ph-magnifying-glass absolute inset-inline-start-3.5 top-1/2 -translate-y-1/2 text-[#64748b] text-sm pointer-events-none"></i>
-    <input id="catalog-search-input" type="text" oninput="handleCatalogSearch(this.value)" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن لعبة، بطاقة هدايا، أو منطقة (US / EU)..." class="rev-input w-full ps-9 pe-8 py-2 text-xs font-bold">
-    <button type="button" id="clear-search-btn" onclick="clearCatalogSearch()" class="hidden absolute inset-inline-end-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/10 dark:bg-white/10 text-[10px] items-center justify-center hover:bg-rose-500 hover:text-white transition cursor-pointer">
-        <i class="ph-bold ph-x"></i>
-    </button>
-</div>
+        <!-- 2. يسار الشريط على الجوال: اللغات + العملات + المظهر (مضمون في نفس السطر) -->
+        <div class="flex items-center justify-end justify-self-end gap-1 sm:gap-2 md:order-3 shrink-0">
 
-                    <!-- يسار الشريط: اللغات + العملات + المظهر + كبسولة المحفظة -->
-                    <div class="order-2 md:order-3 flex items-center gap-1.5 sm:gap-2 shrink-0">
-
-                        <!-- 1. القائمة المنسدلة للغات -->
-                        <div class="rev-dropdown-wrap" id="lang-dropdown-wrap">
-                            <button type="button" onclick="toggleHeaderDropdown('lang-dropdown-menu', event)" class="rev-dropdown-trigger" title="Language / اللغة">
-                                <i class="ph-bold ph-globe text-sm text-[#005ba3] dark:text-[#5CE1E6]"></i>
-                                <span id="current-lang-label">AR</span>
-                                <i class="ph-bold ph-caret-down text-[10px] opacity-60"></i>
-                            </button>
-                            <div id="lang-dropdown-menu" class="hidden rev-dropdown-menu">
-                                <button type="button" onclick="setRetailLanguage('ar')" data-lang="ar" class="lang-menu-item rev-dropdown-item active">
-                                    <span>🇸🇦 العربية</span>
-                                    <span class="text-[10px] opacity-60 font-mono">AR</span>
-                                </button>
-                                <button type="button" onclick="setRetailLanguage('en')" data-lang="en" class="lang-menu-item rev-dropdown-item">
-                                    <span>🇺🇸 English</span>
-                                    <span class="text-[10px] opacity-60 font-mono">EN</span>
-                                </button>
-                                <button type="button" onclick="setRetailLanguage('de')" data-lang="de" class="lang-menu-item rev-dropdown-item">
-                                    <span>🇩🇪 Deutsch</span>
-                                    <span class="text-[10px] opacity-60 font-mono">DE</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. القائمة المنسدلة للعملات -->
-                        <div class="rev-dropdown-wrap" id="currency-dropdown-wrap">
-                            <button type="button" onclick="toggleHeaderDropdown('currency-dropdown-menu', event)" class="rev-dropdown-trigger" title="Currency / العملة">
-                                <i class="ph-bold ph-coins text-sm text-emerald-600 dark:text-emerald-400"></i>
-                                <span id="current-currency-label">$ USD</span>
-                                <i class="ph-bold ph-caret-down text-[10px] opacity-60"></i>
-                            </button>
-                            <div id="currency-dropdown-menu" class="hidden rev-dropdown-menu">
-    <button type="button" onclick="setRetailCurrency('USD')" data-curr="USD" class="curr-menu-item rev-dropdown-item active">
-        <span>🇺🇸 US Dollar</span>
-        <span class="font-mono text-[11px] font-black">$ USD</span>
-    </button>
-</div>
-                        </div>
-
-                        <!-- 3. زر المظهر -->
-                        <button type="button" onclick="toggleRetailTheme()" class="rev-btn-secondary w-9 h-9 text-slate-700 dark:text-amber-400 shrink-0" title="Theme">
-                            <i class="ph-fill ph-moon text-base dark:hidden"></i>
-                            <i class="ph-fill ph-sun text-base hidden dark:inline"></i>
-                        </button>
-                        
-                        <!-- زر الدخول للزوار -->
-                        <button id="guest-login-btn" onclick="openAuthModal('login')" class="rev-btn-primary h-9 px-4 text-xs hidden sm:inline-flex">
-                            <i class="ph-bold ph-user text-sm"></i>
-                            <span data-i18n="btn_login_short">دخول</span>
-                        </button>
-                    </div>
-
+            <!-- القائمة المنسدلة للغات -->
+            <div class="rev-dropdown-wrap" id="lang-dropdown-wrap">
+                <button type="button" onclick="toggleHeaderDropdown('lang-dropdown-menu', event)" class="rev-dropdown-trigger" title="Language / اللغة">
+                    <i class="ph-bold ph-globe text-xs sm:text-sm text-[#005ba3] dark:text-[#5CE1E6]"></i>
+                    <span id="current-lang-label">AR</span>
+                    <i class="ph-bold ph-caret-down text-[10px] opacity-60"></i>
+                </button>
+                <div id="lang-dropdown-menu" class="hidden rev-dropdown-menu">
+                    <button type="button" onclick="setRetailLanguage('ar')" data-lang="ar" class="lang-menu-item rev-dropdown-item active">
+                        <span>🇸🇦 العربية</span>
+                        <span class="text-[10px] opacity-60 font-mono">AR</span>
+                    </button>
+                    <button type="button" onclick="setRetailLanguage('en')" data-lang="en" class="lang-menu-item rev-dropdown-item">
+                        <span>🇺🇸 English</span>
+                        <span class="text-[10px] opacity-60 font-mono">EN</span>
+                    </button>
+                    <button type="button" onclick="setRetailLanguage('de')" data-lang="de" class="lang-menu-item rev-dropdown-item">
+                        <span>🇩🇪 Deutsch</span>
+                        <span class="text-[10px] opacity-60 font-mono">DE</span>
+                    </button>
                 </div>
-            </header>
+            </div>
+
+            <!-- القائمة المنسدلة للعملات -->
+            <div class="rev-dropdown-wrap" id="currency-dropdown-wrap">
+                <button type="button" onclick="toggleHeaderDropdown('currency-dropdown-menu', event)" class="rev-dropdown-trigger" title="Currency / العملة">
+                    <i class="ph-bold ph-coins text-xs sm:text-sm text-emerald-600 dark:text-emerald-400"></i>
+                    <span id="current-currency-label">$ USD</span>
+                    <i class="ph-bold ph-caret-down text-[10px] opacity-60"></i>
+                </button>
+                <div id="currency-dropdown-menu" class="hidden rev-dropdown-menu">
+                    <button type="button" onclick="setRetailCurrency('USD')" data-curr="USD" class="curr-menu-item rev-dropdown-item active">
+                        <span>🇺🇸 US Dollar</span>
+                        <span class="font-mono text-[11px] font-black">$ USD</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- زر المظهر -->
+            <button type="button" onclick="toggleRetailTheme()" class="rev-btn-secondary w-8 h-8 sm:w-9 sm:h-9 text-slate-700 dark:text-amber-400 shrink-0" title="Theme">
+                <i class="ph-fill ph-moon text-sm sm:text-base dark:hidden"></i>
+                <i class="ph-fill ph-sun text-sm sm:text-base hidden dark:inline"></i>
+            </button>
+
+            <!-- حاوية تخفي زر الدخول على الهاتف حتى لو أزالت الجافاسكربت hidden من الزر نفسه -->
+            <div class="hidden sm:inline-flex">
+                <button id="guest-login-btn" onclick="openAuthModal('login')" class="rev-btn-primary h-9 px-4 text-xs">
+                    <i class="ph-bold ph-user text-sm"></i>
+                    <span data-i18n="btn_login_short">دخول</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. الصف الثاني على الجوال (والوسط على الشاشات الكبيرة): شريط البحث بعرض كامل -->
+        <div class="col-span-2 md:order-2 relative w-full md:flex-1 max-w-xl mx-auto">
+            <i class="ph-bold ph-magnifying-glass absolute inset-inline-start-3.5 top-1/2 -translate-y-1/2 text-[#64748b] text-sm pointer-events-none"></i>
+            <input id="catalog-search-input" type="text" oninput="handleCatalogSearch(this.value)" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن لعبة، بطاقة هدايا، أو منطقة (US / EU)..." class="rev-input w-full ps-9 pe-8 py-2 text-xs font-bold">
+            <button type="button" id="clear-search-btn" onclick="clearCatalogSearch()" class="hidden absolute inset-inline-end-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/10 dark:bg-white/10 text-[10px] items-center justify-center hover:bg-rose-500 hover:text-white transition cursor-pointer">
+                <i class="ph-bold ph-x"></i>
+            </button>
+        </div>
+
+    </div>
+</header>
 
             <!-- المحتوى الرئيسي -->
             <main class="rev-container py-5 space-y-6 flex-grow fade-in">
