@@ -283,7 +283,7 @@ const RETAIL_I18N = {
         footer_terms: 'Terms',
         footer_refund: 'Refunds',
         footer_acceptableuse: 'acceptable use',
-        footer_impressum: 'impressum',
+        footer_impressum: 'Legal Notice',
         drawer_instructions_title: 'Redemption Instructions & Important Notes',
         label_final_price_tax: 'Final Price (Tax Included)',
         btn_proceed_checkout: 'Proceed to Checkout',
