@@ -917,4 +917,8 @@ html.dark .rev-input:focus {
     position: absolute;
     inset: -10px;
 }
+.rev-product-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 270px;
+}
 /* ==================== نهاية ملف css/retail-pro.css ==================== */
