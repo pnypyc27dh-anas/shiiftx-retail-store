@@ -3,10 +3,16 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="متجر SHIIFT X للبطاقات الرقمية وبطاقات الهدايا وشحن الألعاب والاشتراكات بتسليم فوري وأسعارمنافسة.">
     <meta name="referrer" content="no-referrer">
     <meta name="theme-color" content="#005ba3">
     <title>SHIIFT X — متجر البطاقات الرقمية والشحن الفوري</title>
+
+    <link rel="preconnect" href="https://qavdmizccaltsggwrdkk.supabase.co">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <script>
         if (localStorage.getItem('retail_theme') === 'dark' || (!('retail_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -17,8 +23,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/retail-pro.css?v=15">
     <link rel="stylesheet" href="css/tailwind.min.css?v=1">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 </head>
 <body class="min-h-screen pb-20 lg:pb-0 antialiased selection:bg-[#005ba3]/15 selection:text-[#005ba3]">
 
@@ -34,17 +40,17 @@
         <aside id="app-sidebar" class="rev-sidebar">
             <!-- رأس القائمة والشعار -->
             <div class="rev-sidebar-header h-16 px-4 border-b border-slate-100 dark:border-white/8 flex items-center justify-between gap-2 shrink-0">
-                <a href="/" class="sidebar-hide-collapsed flex items-center gap-2 select-none group overflow-hidden">
+                <a href="/" aria-label="الرئيسية — SHIIFT X" class="sidebar-hide-collapsed flex items-center gap-2 select-none group overflow-hidden">
                     <svg class="h-6 w-auto transition-transform duration-200 group-hover:scale-105" viewBox="70 100 405 140" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path class="fill-slate-900 dark:fill-white transition-colors" d="M102.584 151.616C106.853 151.616 110.767 152.034 114.324 152.871C117.871 153.706 121.098 154.808 124.002 156.179L124.289 156.315L124.185 156.615L121.162 165.332L121.035 165.698L120.682 165.538C118.039 164.34 115.144 163.327 111.994 162.501H111.992C108.929 161.679 105.721 161.268 102.368 161.268C99.163 161.268 96.5183 161.754 94.4189 162.708C92.3171 163.663 90.7558 165.014 89.7178 166.756L89.7148 166.762C88.6751 168.434 88.1484 170.405 88.1484 172.689C88.1485 175.36 88.6793 177.557 89.7178 179.3C90.758 181.046 92.4705 182.63 94.8828 184.044C97.3071 185.465 100.597 187.005 104.761 188.661H104.762C109.309 190.402 113.145 192.298 116.265 194.352L116.856 194.73C119.772 196.644 121.995 198.937 123.511 201.611H123.51C125.204 204.471 126.039 208.046 126.039 212.315C126.039 217.201 124.91 221.385 122.635 224.849L122.633 224.852C120.359 228.236 117.1 230.841 112.874 232.676L112.875 232.677C108.718 234.513 103.809 235.425 98.1582 235.425C95.2674 235.425 92.4834 235.273 89.8066 234.97L89.8047 234.969C87.2021 234.666 84.8129 234.248 82.6377 233.716L82.626 233.713C80.4497 233.104 78.5209 232.38 76.8418 231.537L76.6465 231.44V220.93L77.1494 221.164C79.7146 222.36 82.8951 223.447 86.6953 224.425H86.6943C90.5515 225.399 94.5164 225.886 98.5898 225.886C102.374 225.886 105.528 225.362 108.064 224.327C110.602 223.292 112.482 221.823 113.731 219.931C114.984 218.033 115.616 215.801 115.616 213.22C115.616 210.626 115.086 208.465 114.047 206.721C113.01 204.981 111.194 203.358 108.562 201.866L108.553 201.861C105.99 200.293 102.379 198.642 97.7109 196.909L97.707 196.907C94.3838 195.619 91.452 194.253 88.915 192.809L88.9043 192.803C86.4318 191.278 84.3524 189.557 82.6709 187.64C80.9858 185.719 79.7044 183.529 78.8262 181.073L78.8223 181.064V181.063C78.0167 178.605 77.6182 175.774 77.6182 172.575C77.6182 168.214 78.6769 164.48 80.8115 161.392C82.9379 158.24 85.8691 155.823 89.5928 154.138L89.5947 154.137C93.3894 152.453 97.7216 151.616 102.584 151.616ZM156.342 152.748V186.94H195.144V152.748H205.566V234.292H195.144V196.591H156.342V234.292H145.918V152.748H156.342Z"/>
                         <path class="fill-slate-900 dark:fill-white transition-colors" d="M389.967 151.616V161.519H350.874V190.257H387.563V200.159H350.874V235.425H338.781V151.616H389.967ZM467.7 151.616V161.519H439.615V235.425H427.521V161.519H399.308V151.616H467.7Z"/>
                         <path class="fill-[#005ba3] dark:fill-[#5CE1E6] transition-colors" d="M234.632 132.734L234.737 132.895L270.402 187.555L270.537 187.763L270.388 187.961L234.723 235.284L234.616 235.425H212.435L212.827 234.867L246.018 187.733L212.815 133.272L212.487 132.734H234.632ZM332.739 132.734L332.41 133.272L299.206 187.733L332.398 234.867L332.79 235.425H310.609L310.502 235.284L274.837 187.961L274.688 187.763L274.823 187.555L310.489 132.895L310.593 132.734H332.739ZM225.717 104.646C229.012 104.647 231.91 105.552 234.396 107.37C237.099 109.098 238.429 111.887 238.429 115.655C238.429 119.302 237.094 122.079 234.406 123.931L234.406 123.932C231.918 125.755 229.017 126.664 225.717 126.664C222.102 126.664 219.037 125.76 216.542 123.932C214.011 122.077 212.763 119.296 212.763 115.655C212.763 111.893 214.007 109.103 216.552 107.371C219.045 105.548 222.107 104.646 225.717 104.646ZM319.508 104.646C323.118 104.646 326.181 105.548 328.673 107.371L328.907 107.537C331.294 109.279 332.462 112.011 332.462 115.655C332.462 119.296 331.214 122.077 328.683 123.932C326.189 125.76 323.123 126.664 319.508 126.664C316.208 126.664 313.307 125.755 310.819 123.932V123.931C308.13 122.079 306.796 119.301 306.796 115.655C306.796 111.888 308.126 109.098 310.828 107.37C313.314 105.552 316.213 104.647 319.508 104.646Z"/>
                     </svg>
                 </a>
-                <button type="button" onclick="toggleDesktopSidebar()" class="hidden lg:inline-flex rev-btn-secondary w-8 h-8 shrink-0" title="طي / توسيع القائمة">
+                <button type="button" onclick="toggleDesktopSidebar()" class="hidden lg:inline-flex rev-btn-secondary w-8 h-8 shrink-0" title="طي / توسيع القائمة" aria-label="طي أو توسيع القائمة">
                     <i id="sidebar-collapse-icon" class="ph-bold ph-sidebar-simple text-base transition-transform duration-300"></i>
                 </button>
-                <button type="button" onclick="toggleMobileSidebar(false)" class="lg:hidden rev-btn-secondary w-8 h-8">
+                <button type="button" onclick="toggleMobileSidebar(false)" aria-label="إغلاق القائمة" class="lg:hidden rev-btn-secondary w-8 h-8">
                     <i class="ph-bold ph-x text-sm"></i>
                 </button>
             </div>
@@ -153,13 +159,13 @@
             <!-- تذييل القائمة الجانبية: أيقونات التواصل + تسجيل الخروج -->
             <div class="p-3.5 border-t border-slate-100 dark:border-white/8 space-y-3 shrink-0">
                 <div class="sidebar-hide-collapsed flex justify-center items-center gap-2.5">
-                    <a href="https://www.facebook.com/share/19z9gWepTE/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 text-slate-600 dark:text-slate-300 hover:text-blue-600 flex items-center justify-center text-lg transition" title="فيسبوك">
+                    <a href="https://www.facebook.com/share/19z9gWepTE/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 text-slate-600 dark:text-slate-300 hover:text-blue-600 flex items-center justify-center text-lg transition" title="فيسبوك" aria-label="فيسبوك">
                         <i class="ph-fill ph-facebook-logo"></i>
                     </a>
-                    <a href="https://www.instagram.com/shiiftx11?rpxt=czF4N2NubHljandn&utm_source=qr" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-pink-50 text-slate-600 dark:text-slate-300 hover:text-pink-600 flex items-center justify-center text-lg transition" title="إنستغرام">
+                    <a href="https://www.instagram.com/shiiftx11?rpxt=czF4N2NubHljandn&utm_source=qr" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-pink-50 text-slate-600 dark:text-slate-300 hover:text-pink-600 flex items-center justify-center text-lg transition" title="إنستغرام" aria-label="إنستغرام">
                         <i class="ph-fill ph-instagram-logo"></i>
                     </a>
-                    <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 flex items-center justify-center text-lg transition" title="واتساب">
+                    <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 flex items-center justify-center text-lg transition" title="واتساب" aria-label="واتساب">
                         <i class="ph-fill ph-whatsapp-logo"></i>
                     </a>
                 </div>
@@ -180,7 +186,7 @@
 
                     <!-- 1. يمين الشريط: زر القائمة للجوال + الشعار الديناميكي -->
                     <div class="flex items-center gap-2 justify-self-start">
-                        <button type="button" onclick="toggleMobileSidebar(true)" class="lg:hidden rev-btn-secondary w-8 h-8 sm:w-9 sm:h-9 shrink-0" title="القائمة">
+                        <button type="button" onclick="toggleMobileSidebar(true)" class="lg:hidden rev-btn-secondary w-8 h-8 sm:w-9 sm:h-9 shrink-0" title="القائمة" aria-label="فتح القائمة">
                             <i class="ph-bold ph-list text-base sm:text-lg"></i>
                         </button>
                         <a id="topbar-brand-logo" href="/" class="flex items-center select-none group shrink-0" aria-label="SHIIFT X">
@@ -197,7 +203,7 @@
 
                         <!-- القائمة المنسدلة للغات -->
                         <div class="rev-dropdown-wrap" id="lang-dropdown-wrap">
-                            <button type="button" onclick="toggleHeaderDropdown('lang-dropdown-menu', event)" class="rev-dropdown-trigger" title="Language / اللغة">
+                            <button type="button" onclick="toggleHeaderDropdown('lang-dropdown-menu', event)" class="rev-dropdown-trigger" title="Language / اللغة" aria-label="اختيار اللغة">
                                 <i class="ph-bold ph-globe text-xs sm:text-sm text-[#005ba3] dark:text-[#5CE1E6]"></i>
                                 <span id="current-lang-label">AR</span>
                                 <i class="ph-bold ph-caret-down text-[10px] opacity-60"></i>
@@ -220,7 +226,7 @@
 
                         <!-- القائمة المنسدلة للعملات -->
                         <div class="rev-dropdown-wrap" id="currency-dropdown-wrap">
-                            <button type="button" onclick="toggleHeaderDropdown('currency-dropdown-menu', event)" class="rev-dropdown-trigger" title="Currency / العملة">
+                            <button type="button" onclick="toggleHeaderDropdown('currency-dropdown-menu', event)" class="rev-dropdown-trigger" title="Currency / العملة" aria-label="اختيار العملة">
                                 <i class="ph-bold ph-coins text-xs sm:text-sm text-emerald-600 dark:text-emerald-400"></i>
                                 <span id="current-currency-label">$ USD</span>
                                 <i class="ph-bold ph-caret-down text-[10px] opacity-60"></i>
@@ -234,7 +240,7 @@
                         </div>
 
                         <!-- زر المظهر -->
-                        <button type="button" onclick="toggleRetailTheme()" class="rev-btn-secondary w-8 h-8 sm:w-9 sm:h-9 text-slate-700 dark:text-amber-400 shrink-0" title="Theme">
+                        <button type="button" onclick="toggleRetailTheme()" class="rev-btn-secondary w-8 h-8 sm:w-9 sm:h-9 text-slate-700 dark:text-amber-400 shrink-0" title="Theme" aria-label="تبديل المظهر الداكن والفاتح">
                             <i class="ph-fill ph-moon text-sm sm:text-base dark:hidden"></i>
                             <i class="ph-fill ph-sun text-sm sm:text-base hidden dark:inline"></i>
                         </button>
@@ -251,8 +257,8 @@
                     <!-- 3. الصف الثاني على الجوال (والوسط على الشاشات الكبيرة): شريط البحث بعرض كامل -->
                     <div class="col-span-2 md:order-2 relative w-full md:flex-1 max-w-xl mx-auto">
                         <i class="ph-bold ph-magnifying-glass absolute inset-inline-start-3.5 top-1/2 -translate-y-1/2 text-[#64748b] text-sm pointer-events-none"></i>
-                        <input id="catalog-search-input" type="text" oninput="handleCatalogSearch(this.value)" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن لعبة، بطاقة هدايا، أو منطقة (US / EU)..." class="rev-input w-full ps-9 pe-8 py-2 text-xs font-bold">
-                        <button type="button" id="clear-search-btn" onclick="clearCatalogSearch()" class="hidden absolute inset-inline-end-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/10 dark:bg-white/10 text-[10px] items-center justify-center hover:bg-rose-500 hover:text-white transition cursor-pointer">
+                        <input id="catalog-search-input" type="text" oninput="handleCatalogSearch(this.value)" aria-label="البحث في الباقات" data-i18n-placeholder="search_placeholder" placeholder="ابحث عن لعبة، بطاقة هدايا، أو منطقة (US / EU)..." class="rev-input w-full ps-9 pe-8 py-2 text-xs font-bold">
+                        <button type="button" id="clear-search-btn" onclick="clearCatalogSearch()" aria-label="مسح البحث" class="hidden absolute inset-inline-end-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-black/10 dark:bg-white/10 text-[10px] items-center justify-center hover:bg-rose-500 hover:text-white transition cursor-pointer">
                             <i class="ph-bold ph-x"></i>
                         </button>
                     </div>
@@ -332,16 +338,16 @@
 
                     <div class="absolute inset-x-0 bottom-0 z-20 px-5 sm:px-9 pb-4 flex items-center justify-between">
                         <div class="flex items-center gap-2" id="hero-carousel-dots">
-                            <button type="button" onclick="goToHeroSlide(0)" class="rev-carousel-dot active" aria-label="1"></button>
-                            <button type="button" onclick="goToHeroSlide(1)" class="rev-carousel-dot" aria-label="2"></button>
-                            <button type="button" onclick="goToHeroSlide(2)" class="rev-carousel-dot" aria-label="3"></button>
+                            <button type="button" onclick="goToHeroSlide(0)" class="rev-carousel-dot active" aria-label="الشريحة 1"></button>
+                            <button type="button" onclick="goToHeroSlide(1)" class="rev-carousel-dot" aria-label="الشريحة 2"></button>
+                            <button type="button" onclick="goToHeroSlide(2)" class="rev-carousel-dot" aria-label="الشريحة 3"></button>
                         </div>
 
                         <div class="flex items-center gap-1.5">
-                            <button type="button" onclick="stepHeroSlide(-1)" class="w-7 h-7 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
+                            <button type="button" onclick="stepHeroSlide(-1)" aria-label="الشريحة السابقة" class="w-7 h-7 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
                                 <i class="ph-bold ph-caret-right rtl-flip text-xs"></i>
                             </button>
-                            <button type="button" onclick="stepHeroSlide(1)" class="w-7 h-7 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
+                            <button type="button" onclick="stepHeroSlide(1)" aria-label="الشريحة التالية" class="w-7 h-7 rounded-full bg-white/15 hover:bg-white/30 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
                                 <i class="ph-bold ph-caret-left rtl-flip text-xs"></i>
                             </button>
                         </div>
@@ -360,9 +366,9 @@
                         </button>
                     </div>
 
-                    <div id="business-category-tabs" class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar"></div>
+                    <div id="business-category-tabs" class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar min-h-[36px]"></div>
 
-                    <div id="brand-hub-grid">
+                    <div id="brand-hub-grid" class="min-h-[260px]">
                         <div class="rev-panel h-[68px] animate-pulse"></div>
                         <div class="rev-panel h-[68px] animate-pulse"></div>
                         <div class="rev-panel h-[68px] animate-pulse hidden sm:block"></div>
@@ -388,13 +394,13 @@
                             <button type="button" onclick="handleDeliveryTypeFilter('ID')" data-type="ID" class="rev-type-pill px-3.5 py-1.5 rounded-full text-[11px] font-extrabold transition cursor-pointer" data-i18n="filter_type_id">شحن مباشر (ID)</button>
                         </div>
 
-                        <select id="catalog-type-filter" onchange="handleDeliveryTypeFilter(this.value)" class="hidden">
+                        <select id="catalog-type-filter" onchange="handleDeliveryTypeFilter(this.value)" aria-label="تصفية نوع التسليم" class="hidden">
                             <option value="ALL">ALL</option>
                             <option value="CODE">CODE</option>
                             <option value="ID">ID</option>
                         </select>
 
-                        <select id="catalog-sort-select" onchange="handleCatalogSort(this.value)" class="rev-input px-3.5 py-1.5 text-xs font-bold cursor-pointer">
+                        <select id="catalog-sort-select" onchange="handleCatalogSort(this.value)" aria-label="ترتيب الباقات" class="rev-input px-3.5 py-1.5 text-xs font-bold cursor-pointer">
                             <option value="default" data-i18n="sort_default">الترتيب الافتراضي</option>
                             <option value="price_asc" data-i18n="sort_price_asc">السعر: من الأقل للأعلى</option>
                             <option value="price_desc" data-i18n="sort_price_desc">السعر: من الأعلى للأقل</option>
@@ -403,7 +409,7 @@
                 </section>
 
                 <!-- 5. شبكة عرض الباقات المتجاوبة -->
-                <section id="catalog-grid" class="rev-catalog-grid">
+                <section id="catalog-grid" class="rev-catalog-grid min-h-[800px]">
                     <div class="rev-panel h-56 animate-pulse"></div>
                     <div class="rev-panel h-56 animate-pulse"></div>
                     <div class="rev-panel h-56 animate-pulse hidden sm:block"></div>
@@ -510,13 +516,13 @@
                     <div class="flex items-center gap-2.5">
                         <span class="font-bold text-slate-700 dark:text-slate-300 text-xs">تواصل معنا:</span>
                         <div class="flex items-center gap-1.5">
-                            <a href="https://www.facebook.com/share/19z9gWepTE/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 text-slate-600 dark:text-slate-300 hover:text-blue-600 flex items-center justify-center text-base transition" title="فيسبوك">
+                            <a href="https://www.facebook.com/share/19z9gWepTE/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 text-slate-600 dark:text-slate-300 hover:text-blue-600 flex items-center justify-center text-base transition" title="فيسبوك" aria-label="فيسبوك">
                                 <i class="ph-fill ph-facebook-logo"></i>
                             </a>
-                            <a href="https://www.instagram.com/shiiftx11?rpxt=czF4N2NubHljandn&utm_source=qr" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-pink-50 text-slate-600 dark:text-slate-300 hover:text-pink-600 flex items-center justify-center text-base transition" title="إنستغرام">
+                            <a href="https://www.instagram.com/shiiftx11?rpxt=czF4N2NubHljandn&utm_source=qr" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-pink-50 text-slate-600 dark:text-slate-300 hover:text-pink-600 flex items-center justify-center text-base transition" title="إنستغرام" aria-label="إنستغرام">
                                 <i class="ph-fill ph-instagram-logo"></i>
                             </a>
-                            <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 flex items-center justify-center text-base transition" title="واتساب">
+                            <a href="https://wa.me/message/BWIV77MOPBG4C1" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 flex items-center justify-center text-base transition" title="واتساب" aria-label="واتساب">
                                 <i class="ph-fill ph-whatsapp-logo"></i>
                             </a>
                         </div>
@@ -550,10 +556,10 @@
                     <i class="ph-duotone ph-credit-card text-6xl text-[#5CE1E6]"></i>
                 </div>
                 <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 to-transparent"></div>
-                <button type="button" onclick="closePackageDetailsModal()" class="absolute top-4 left-4 w-9 h-9 rounded-full bg-black/55 hover:bg-rose-600 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
+                <button type="button" onclick="closePackageDetailsModal()" aria-label="إغلاق" class="absolute top-4 left-4 w-9 h-9 rounded-full bg-black/55 hover:bg-rose-600 text-white flex items-center justify-center backdrop-blur-md transition cursor-pointer">
                     <i class="ph-bold ph-x text-base"></i>
                 </button>
-                <button type="button" id="pkg-detail-fav-btn" data-id="" onclick="toggleFavoritePackage(this.dataset.id)" class="rev-fav-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/55 hover:bg-rose-500 text-white border border-white/15 flex items-center justify-center backdrop-blur-md transition cursor-pointer">
+                <button type="button" id="pkg-detail-fav-btn" data-id="" onclick="toggleFavoritePackage(this.dataset.id)" aria-label="إضافة إلى المفضلة" class="rev-fav-btn absolute top-4 right-4 w-9 h-9 rounded-full bg-black/55 hover:bg-rose-500 text-white border border-white/15 flex items-center justify-center backdrop-blur-md transition cursor-pointer">
                     <i class="ph-fill ph-heart text-base"></i>
                 </button>
                 <span id="pkg-detail-platform" class="absolute bottom-4 right-5 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white text-[11px] font-extrabold">---</span>
@@ -599,7 +605,7 @@
                     <i class="ph-fill ph-ticket text-[#005ba3] dark:text-[#5CE1E6] text-xl"></i>
                     <span data-i18n="topup_drawer_title">إضافة رصيد متجر (Store Credit)</span>
                 </h3>
-                <button onclick="closeModal('topup-modal')" class="rev-btn-secondary w-8 h-8">
+                <button type="button" onclick="closeModal('topup-modal')" aria-label="إغلاق" class="rev-btn-secondary w-8 h-8">
                     <i class="ph-bold ph-x text-sm"></i>
                 </button>
             </div>
@@ -619,7 +625,7 @@
                         أدخل كود بطاقة هدايا أو قسيمة SHIIFT X المسبقة الدفع لإضافة قيمتها فوراً إلى رصيد مشترياتك.
                     </p>
                     <div class="flex items-center gap-2">
-                        <input id="redeem-voucher-input" type="text" dir="ltr" placeholder="SH-XXXX-XXXX-XXXX" class="rev-input rounded-xl w-full px-3.5 py-2.5 font-mono font-bold uppercase text-center tracking-wider text-xs">
+                        <input id="redeem-voucher-input" type="text" dir="ltr" aria-label="كود قسيمة الشحن" placeholder="SH-XXXX-XXXX-XXXX" class="rev-input rounded-xl w-full px-3.5 py-2.5 font-mono font-bold uppercase text-center tracking-wider text-xs">
                         <button type="button" id="btn-redeem-voucher" onclick="redeemStoreVoucher()" class="rev-btn-primary px-5 py-2.5 text-xs shrink-0">
                             تفعيل
                         </button>
@@ -700,7 +706,7 @@
 
             <div class="px-6 py-4 border-b border-black/8 dark:border-white/8 flex items-center justify-between shrink-0">
                 <h3 id="auth-modal-title" class="text-base font-black">تسجيل الدخول إلى حسابك</h3>
-                <button onclick="closeModal('auth-modal')" class="rev-btn-secondary w-8 h-8">
+                <button type="button" onclick="closeModal('auth-modal')" aria-label="إغلاق" class="rev-btn-secondary w-8 h-8">
                     <i class="ph-bold ph-x text-sm"></i>
                 </button>
             </div>
@@ -748,7 +754,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <input id="signup-otp-code-input" type="text" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="••••••" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-mono tracking-[0.45em] text-center text-xl font-bold">
+                        <input id="signup-otp-code-input" type="text" maxlength="6" inputmode="numeric" autocomplete="one-time-code" aria-label="رمز التحقق" placeholder="••••••" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-mono tracking-[0.45em] text-center text-xl font-bold">
                     </div>
 
                     <button type="submit" id="btn-verify-signup-otp" class="rev-btn-brand w-full py-3.5 text-xs">
@@ -782,7 +788,7 @@
                     <i class="ph-fill ph-shopping-bag text-[#005ba3] dark:text-[#5CE1E6] text-xl"></i>
                     <span data-i18n="checkout_drawer_title">إتمام الطلب</span>
                 </h3>
-                <button onclick="closeModal('buy-modal')" class="rev-btn-secondary w-8 h-8">
+                <button type="button" onclick="closeModal('buy-modal')" aria-label="إغلاق" class="rev-btn-secondary w-8 h-8">
                     <i class="ph-bold ph-x text-sm"></i>
                 </button>
             </div>
@@ -857,7 +863,7 @@
                         <label for="buy-delivered-code" data-i18n="label_your_digital_code" class="block font-bold text-[#64748b] dark:text-slate-400">الكود الرقمي الخاص بك:</label>
                         <div class="flex items-center gap-2">
                             <input id="buy-delivered-code" readonly dir="ltr" class="w-full p-3.5 rounded-2xl bg-[#0b1324] font-mono font-black text-[#5CE1E6] text-center tracking-wider text-sm">
-                            <button onclick="copyDeliveredCode()" data-i18n="btn_copy" class="rev-btn-primary px-5 py-3.5 shrink-0">نسخ</button>
+                            <button type="button" onclick="copyDeliveredCode()" data-i18n="btn_copy" class="rev-btn-primary px-5 py-3.5 shrink-0">نسخ</button>
                         </div>
                     </div>
 
@@ -865,7 +871,7 @@
                         تم إرسال طلب الشحن لمعرّف اللاعب بنجاح وهو الآن قيد التنفيذ. يمكنك متابعة اكتمال الشحن من درج «طلباتي».
                     </div>
 
-                    <button onclick="closeModal('buy-modal')" data-i18n="btn_done_close" class="rev-btn-secondary w-full py-3.5 text-xs">
+                    <button type="button" onclick="closeModal('buy-modal')" data-i18n="btn_done_close" class="rev-btn-secondary w-full py-3.5 text-xs">
                         تم، إغلاق
                     </button>
                 </div>
@@ -883,7 +889,7 @@
                     <i class="ph-fill ph-receipt text-[#005ba3] dark:text-[#5CE1E6] text-xl"></i>
                     <span data-i18n="orders_drawer_title">سجل مشترياتي</span>
                 </h3>
-                <button onclick="closeModal('orders-modal')" class="rev-btn-secondary w-8 h-8">
+                <button type="button" onclick="closeModal('orders-modal')" aria-label="إغلاق" class="rev-btn-secondary w-8 h-8">
                     <i class="ph-bold ph-x text-sm"></i>
                 </button>
             </div>
@@ -919,7 +925,7 @@
                     <i class="ph-fill ph-user-gear text-[#005ba3] dark:text-[#5CE1E6] text-xl"></i>
                     <span>إعدادات الحساب</span>
                 </h3>
-                <button onclick="closeModal('profile-settings-modal')" class="rev-btn-secondary w-8 h-8">
+                <button type="button" onclick="closeModal('profile-settings-modal')" aria-label="إغلاق" class="rev-btn-secondary w-8 h-8">
                     <i class="ph-bold ph-x text-sm"></i>
                 </button>
             </div>
@@ -968,7 +974,7 @@
                         <p class="text-[10px] text-red-500 font-bold">مهلة 14 يوماً قبل الحذف التام</p>
                     </div>
                 </div>
-                <button onclick="closeDeleteAccountOTPModal()" type="button" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center cursor-pointer">
+                <button onclick="closeDeleteAccountOTPModal()" type="button" aria-label="إغلاق" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center cursor-pointer">
                     <i class="ph ph-x font-bold text-base"></i>
                 </button>
             </div>
@@ -1002,7 +1008,7 @@
                     أدخل رمز الأمان المكون من 6 أرقام المرسل إلى بريدك:
                 </p>
 
-                <input type="text" id="del-otp-code-input" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="••••••" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-mono tracking-[0.4em] text-center text-xl font-bold">
+                <input type="text" id="del-otp-code-input" maxlength="6" inputmode="numeric" autocomplete="one-time-code" aria-label="رمز التحقق للحذف" placeholder="••••••" dir="ltr" class="rev-input rounded-2xl w-full px-4 py-3.5 font-mono tracking-[0.4em] text-center text-xl font-bold">
 
                 <button type="button" id="confirm-del-with-otp-btn" onclick="handleVerifyAndDeleteAccount()" class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black transition shadow-md flex justify-center items-center gap-2 cursor-pointer">
                     <i class="ph-bold ph-trash"></i>
@@ -1033,11 +1039,11 @@
                 </p>
             </div>
             <div class="space-y-2 pt-2">
-                <button id="confirm-reactivate-btn" onclick="handleConfirmReactivate()" class="rev-btn-brand w-full py-3.5 text-xs">
+                <button type="button" id="confirm-reactivate-btn" onclick="handleConfirmReactivate()" class="rev-btn-brand w-full py-3.5 text-xs">
                     <i class="ph-fill ph-arrow-counter-clockwise text-lg"></i>
                     <span>إلغاء طلب الحذف واستعادة الحساب</span>
                 </button>
-                <button onclick="handleCancelReactivate()" class="rev-btn-secondary w-full py-3.5 text-xs">
+                <button type="button" onclick="handleCancelReactivate()" class="rev-btn-secondary w-full py-3.5 text-xs">
                     البقاء معلقاً وتسجيل الخروج
                 </button>
             </div>
@@ -1072,10 +1078,10 @@
         <button type="button" onclick="acceptEuCookies('essential')" data-i18n="btn_accept_cookie" class="px-5 py-2 rounded-full bg-white text-[#0f172a] font-extrabold shrink-0 cursor-pointer">موافق</button>
     </div>
 
-    <script src="js/retail-core.js?v=2"></script>
-    <script src="js/retail-catalog.js?v=2"></script>
-    <script src="js/retail-checkout.js?v=2"></script>
-    <script src="js/retail-account.js?v=2"></script>
+    <script src="js/retail-core.js?v=2" defer></script>
+    <script src="js/retail-catalog.js?v=2" defer></script>
+    <script src="js/retail-checkout.js?v=2" defer></script>
+    <script src="js/retail-account.js?v=2" defer></script>
 </body>
 </html>
 <!-- ==================== نهاية ملف index.html ==================== -->
