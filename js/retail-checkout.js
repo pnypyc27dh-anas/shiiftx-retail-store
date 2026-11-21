@@ -296,6 +296,9 @@ async function openBuyModal(catalogId, prefillPlayerId = '') {
     document.getElementById('buy-confirm-step').classList.remove('hidden');
     document.getElementById('buy-result-step').classList.add('hidden');
     document.getElementById('buy-modal').classList.remove('hidden');
+    const consentBox = document.getElementById('eu-withdrawal-waiver');
+if (consentBox) consentBox.checked = false;
+toggleCheckoutSubmitState();
 }
 
 async function executeRetailPurchase() {
@@ -503,5 +506,15 @@ async function syncPendingOrder(localOrderRef, silent = false) {
     } catch (_err) {
         if (!silent) showRetailToast('Error syncing order', 'error');
     }
+}
+
+function toggleCheckoutSubmitState() {
+    const checkbox = document.getElementById('eu-withdrawal-waiver');
+    const submitBtn = document.getElementById('btn-confirm-purchase');
+    if (!checkbox || !submitBtn) return;
+
+    submitBtn.disabled = !checkbox.checked;
+    submitBtn.classList.toggle('opacity-50', !checkbox.checked);
+    submitBtn.classList.toggle('cursor-not-allowed', !checkbox.checked);
 }
 // ==================== نهاية ملف js/retail-checkout.js ====================
