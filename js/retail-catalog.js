@@ -434,7 +434,7 @@ function renderCatalogGrid() {
         const isFavEmpty = activeAppView === 'favorites' && !activeSearchQuery;
         grid.innerHTML = `
             <div class="col-span-full rev-panel py-14 px-4 text-center space-y-3">
-                <i class="ph-duotone ${isFavEmpty ? 'ph-heart-break' : 'ph-magnifying-glass'} text-3xl text-[#68707d]"></i>
+                <i class="ph-fill ${isFavEmpty ? 'ph-heart-break' : 'ph-magnifying-glass'} text-3xl text-[#68707d]"></i>
                 <p class="text-sm font-black">${escapeHTML(isFavEmpty ? t('empty_fav_title') : t('empty_search_title'))}</p>
                 <p class="text-xs text-[#68707d] dark:text-slate-400">${escapeHTML(isFavEmpty ? t('empty_fav_desc') : t('empty_search_desc'))}</p>
                 <div class="pt-1">
@@ -483,7 +483,7 @@ function renderCatalogGrid() {
                         <span>${escapeHTML(badgeText)}</span>
                     </span>
 
-                    <button type="button" data-id="${safeId}" onclick="event.stopPropagation(); toggleFavoritePackage(this.dataset.id);"
+                    <button type="button" data-id="${safeId}" aria-label="إضافة إلى المفضلة" onclick="event.stopPropagation(); toggleFavoritePackage(this.dataset.id);"
                             class="rev-fav-btn ${isFav ? 'is-fav' : ''} absolute top-2.5 left-2.5 w-7 h-7 rounded-full bg-black/55 hover:bg-rose-500 text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition cursor-pointer">
                         <i class="ph-fill ph-heart text-xs"></i>
                     </button>
