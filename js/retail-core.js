@@ -130,7 +130,7 @@ const RETAIL_I18N = {
         region_tr: 'المتجر التركي (TR)',
         region_uk: 'المتجر البريطاني (UK)',
         region_global: 'حساب عالمي (Global)',
-        faq_heading: 'الأسئلة الشائعة وضمانات المشتري',
+        faq_heading: 'الأسئلة الشائعة',
         faq_subheading: 'كل ما تحتاج معرفته حول التسليم الفوري، توافق المناطق، والدفع عبر PayPal وبطاقات Visa / Mastercard.',
         btn_contact_support: 'تحدث مع فريق الدعم',
         faq_q1: 'متى أستلم الكود الرقمي أو الشحن بعد الدفع؟',
