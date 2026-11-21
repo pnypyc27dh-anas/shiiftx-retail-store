@@ -506,7 +506,6 @@ function renderCatalogGrid() {
 
                     <div class="pt-2.5 border-t border-black/6 dark:border-white/8 flex items-center justify-between gap-2">
                         <div class="min-w-0">
-                            <span class="block text-[9px] font-bold text-[#68707d] dark:text-slate-400 truncate">${escapeHTML(t('label_tax_included'))}</span>
                             <span class="financial-amount text-sm sm:text-base font-black" dir="ltr">${priceFormatted}</span>
                         </div>
 
