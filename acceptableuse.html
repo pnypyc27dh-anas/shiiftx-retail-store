@@ -2,25 +2,27 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHIIFT X — acceptable-use سياسة الاستخدام</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIIFT X — سياسة الاستخدام العادل</title>
     
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
-    <link rel="icon" type="image/x-icon" href="assets/og-cover.png">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- منع وميض الوضع الليلي -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- مزامنة الوضع الليلي مع المتجر الرئيسي -->
     <script>
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('retail_theme') === 'dark' || (!('retail_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
     </script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Tajawal:wght@500;700;800;900&display=swap">
+    <link rel="stylesheet" href="css/retail-pro.css?v=16">
+    <link rel="stylesheet" href="css/tailwind.min.css?v=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/bold/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css">
 
     <style>
         body {
@@ -76,7 +78,7 @@
         </a>
 
         <a href="index.html" class="text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white flex items-center gap-1.5 transition">
-            <i class="ph ph-arrow-right"></i>
+            <i class="ph-bold ph-arrow-right"></i>
             <span>العودة للمتجر</span>
         </a>
     </header>
@@ -87,8 +89,8 @@
             
             <!-- رأس الصفحة التوضيحي -->
             <div class="text-center space-y-2 pb-4 border-b border-slate-200 dark:border-slate-800">
-                <div class="flex justify-center mb-3">
-                    <img src="assets/app-icon-192.png" alt="SHIIFT X" class="w-14 h-14 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 object-cover">
+                <div class="w-14 h-14 rounded-2xl bg-[#005ba3]/10 dark:bg-[#5CE1E6]/10 text-[#005ba3] dark:text-[#5CE1E6] flex items-center justify-center mx-auto mb-3 text-3xl">
+                    <i class="ph-fill ph-shield-check"></i>
                 </div>
                 <h1 class="text-2xl font-black text-slate-900 dark:text-white">سياسة الاستخدام العادل (Acceptable Use Policy)</h1>
                 <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">آخر تحديث: نوفمبر 2026</p>
@@ -96,26 +98,28 @@
 
             <!-- أقسام البنود والشروط -->
             <div class="space-y-6 text-xs sm:text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                <!-- يتم وضع المحتوى التفصيلي هنا -->
                 <section class="space-y-2">
-    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-        <i class="ph-bold ph-prohibit text-rose-500"></i> 1. السلوكيات المحظورة
-    </h3>
-    <p>يُحظر تماماً: إرسال إشعارات تحويل مزورة للوكلاء، إغراق خوادم المنصة بالطلبات الوهمية، استغلال الثغرات البرمجية، أو استخدام برامج وأكواد الروبوت (Bots) لمحاولة استهلاك المخزون دون دفع فعلي.</p>
-</section>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="ph-bold ph-prohibit text-rose-500"></i>
+                        <span>1. السلوكيات المحظورة</span>
+                    </h2>
+                    <p>يُحظر تماماً: إرسال إشعارات تحويل مزورة للوكلاء، إغراق خوادم المنصة بالطلبات الوهمية، استغلال الثغرات البرمجية، أو استخدام برامج وأكواد الروبوت (Bots) لمحاولة استهلاك المخزون دون دفع فعلي.</p>
+                </section>
 
-<section class="space-y-2">
-    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-        <i class="ph-bold ph-gavel text-amber-500"></i> 2. الإجراءات التأديبية وإنهاء الخدمة
-    </h3>
-    <p>تحتفظ SHIIFT X بالحق الكامل في تجميد أي حساب وإلغاء رصيده وإدراجه في القائمة السوداء تلقائياً في حال ثبوت أي محاولة تلاعب مالي أو احتيال ضد الوكلاء الماليين أو المنصة.</p>
-</section>
+                <section class="space-y-2">
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="ph-bold ph-gavel text-amber-500"></i>
+                        <span>2. الإجراءات التأديبية وإنهاء الخدمة</span>
+                    </h2>
+                    <p>تحتفظ SHIIFT X بالحق الكامل في تجميد أي حساب وإلغاء رصيده وإدراجه في القائمة السوداء تلقائياً في حال ثبوت أي محاولة تلاعب مالي أو احتيال ضد الوكلاء الماليين أو المنصة.</p>
+                </section>
             </div>
 
             <!-- بطاقة التنبيه القانوني والتواصل -->
             <div class="policy-card p-4 rounded-2xl space-y-2 text-xs">
                 <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <i class="ph-fill ph-headset text-blue-500 text-base"></i> الدعم القانوني والامتثال
+                    <i class="ph-fill ph-headset text-blue-500 text-base"></i>
+                    <span>الدعم القانوني والامتثال</span>
                 </div>
                 <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
                     لأي استفسارات قانونية أو تقديم شكوى تتعلق بهذه الاتفاقية، يرجى مراسلتنا مباشرة عبر البريد المعتمد:
@@ -129,16 +133,15 @@
     <!-- التذييل الرسمي وروابط التنقل القانونية السريعة -->
     <footer class="w-full max-w-3xl mx-auto text-center py-6 space-y-3">
         <div class="flex flex-wrap justify-center items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-            <a href="privacy-policy.html" class="hover:underline">سياسة الخصوصية</a>
+            <a href="/privacy.html" class="hover:underline">سياسة الخصوصية</a>
             <span>•</span>
-            <a href="terms.html" class="hover:underline">الشروط والأحكام</a>
+            <a href="/terms.html" class="hover:underline">الشروط والأحكام</a>
             <span>•</span>
-            <a href="refund-policy.html" class="hover:underline">سياسة الاسترداد</a>
+            <a href="/refund.html" class="hover:underline">سياسة الاسترداد</a>
             <span>•</span>
-            <a href="acceptable-use.html" class="hover:underline text-red-500">سياسة الاستخدام</a>
+            <a href="/acceptable-use.html" class="hover:underline font-bold text-[#005ba3] dark:text-[#5CE1E6]">سياسة الاستخدام</a>
             <span>•</span>
-            <a href="impressum.html" class="hover:underline">impressum.html </a>
-           
+            <a href="/impressum.html" class="hover:underline">Impressum</a>
         </div>
         <p class="text-[11px] text-slate-400 dark:text-slate-500">
             منصة SHIIFT X © 2026 — جميع الحقوق محفوظة
