@@ -146,6 +146,7 @@ const RETAIL_I18N = {
         footer_privacy: 'سياسة الخصوصية',
         footer_terms: 'الشروط والأحكام',
         footer_refund: 'سياسة الاسترجاع',
+        footer_acceptableuse: 'سياسة الاستخدام',
         drawer_instructions_title: 'تعليمات الشحن وملاحظات هامة',
         label_final_price_tax: 'السعر النهائي شامل الضريبة',
         btn_proceed_checkout: 'المتابعة للدفع',
